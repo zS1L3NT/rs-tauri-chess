@@ -166,6 +166,6 @@ impl Board {
     pub fn execute(r#move: Move) {}
 
 	pub fn determine_threat(&self, piece: &Piece) -> bool {
-		todo!()
+		true
 	}
 }
