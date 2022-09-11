@@ -21,7 +21,7 @@ impl Piece {
         Piece { id, r#type, color }
     }
 
-    pub fn get_moves(&self, board: Board) {
+    pub fn get_moves(&self, board: &Board) -> Vec<Move> {
         let mut moves = vec![];
         let square = board.get_square(self);
 
@@ -36,89 +36,87 @@ impl Piece {
                     }
 
                     if square.rank == Rank::_7 {
-                        if let Some(square_offset) = square.offset(-1, 1) {
-                            if let Some(piece) = board.get_piece(square_offset) {
-                                if piece.color != self.color {
+                        if let Some(target_square) = square.offset(-1, 1) {
+                            if let Some(target_piece) = board.get_piece(target_square) {
+                                if target_piece.color != self.color {
                                     moves.push(Move::fromPromotionCapture(
                                         square,
-                                        square_offset,
+                                        target_square,
                                         PieceType::Queen,
-                                        board.determine_threat(piece),
+                                        board.determine_threat(PieceType::Queen, target_square),
                                     ));
                                     moves.push(Move::fromPromotionCapture(
                                         square,
-                                        square_offset,
+                                        target_square,
                                         PieceType::Rook,
-                                        board.determine_threat(piece),
+                                        board.determine_threat(PieceType::Rook, target_square),
                                     ));
                                     moves.push(Move::fromPromotionCapture(
                                         square,
-                                        square_offset,
+                                        target_square,
                                         PieceType::Bishop,
-                                        board.determine_threat(piece),
+                                        board.determine_threat(PieceType::Bishop, target_square),
                                     ));
                                     moves.push(Move::fromPromotionCapture(
                                         square,
-                                        square_offset,
+                                        target_square,
                                         PieceType::Knight,
                                         false,
                                     ));
                                 }
                             }
                         }
-                        let square_offset = square.offset(0, 1).unwrap();
-                        if let Some(piece) = board.get_piece(square_offset) {
-                            if piece.color != self.color {
-                                moves.push(Move::fromPromotion(
-                                    square,
-                                    square_offset,
-                                    PieceType::Queen,
-                                    board.determine_threat(piece),
-                                ));
-                                moves.push(Move::fromPromotion(
-                                    square,
-                                    square_offset,
-                                    PieceType::Rook,
-                                    board.determine_threat(piece),
-                                ));
-                                moves.push(Move::fromPromotion(
-                                    square,
-                                    square_offset,
-                                    PieceType::Bishop,
-                                    board.determine_threat(piece),
-                                ));
-                                moves.push(Move::fromPromotion(
-                                    square,
-                                    square_offset,
-                                    PieceType::Knight,
-                                    false,
-                                ));
-                            }
+                        let target_square = square.offset(0, 1).unwrap();
+                        if let None = board.get_piece(target_square) {
+                            moves.push(Move::fromPromotion(
+                                square,
+                                target_square,
+                                PieceType::Queen,
+                                board.determine_threat(PieceType::Queen, target_square),
+                            ));
+                            moves.push(Move::fromPromotion(
+                                square,
+                                target_square,
+                                PieceType::Rook,
+                                board.determine_threat(PieceType::Rook, target_square),
+                            ));
+                            moves.push(Move::fromPromotion(
+                                square,
+                                target_square,
+                                PieceType::Bishop,
+                                board.determine_threat(PieceType::Bishop, target_square),
+                            ));
+                            moves.push(Move::fromPromotion(
+                                square,
+                                target_square,
+                                PieceType::Knight,
+                                false,
+                            ));
                         }
-                        if let Some(square_offset) = square.offset(1, 1) {
-                            if let Some(piece) = board.get_piece(square_offset) {
-                                if piece.color != self.color {
+                        if let Some(target_square) = square.offset(1, 1) {
+                            if let Some(target_piece) = board.get_piece(target_square) {
+                                if target_piece.color != self.color {
                                     moves.push(Move::fromPromotionCapture(
                                         square,
-                                        square_offset,
+                                        target_square,
                                         PieceType::Queen,
-                                        board.determine_threat(piece),
+                                        board.determine_threat(PieceType::Queen, target_square),
                                     ));
                                     moves.push(Move::fromPromotionCapture(
                                         square,
-                                        square_offset,
+                                        target_square,
                                         PieceType::Rook,
-                                        board.determine_threat(piece),
+                                        board.determine_threat(PieceType::Rook, target_square),
                                     ));
                                     moves.push(Move::fromPromotionCapture(
                                         square,
-                                        square_offset,
+                                        target_square,
                                         PieceType::Bishop,
-                                        board.determine_threat(piece),
+                                        board.determine_threat(PieceType::Bishop, target_square),
                                     ));
                                     moves.push(Move::fromPromotionCapture(
                                         square,
-                                        square_offset,
+                                        target_square,
                                         PieceType::Knight,
                                         false,
                                     ));
@@ -128,41 +126,39 @@ impl Piece {
                     } else {
                         if let Some(enpassant_square) = board.enpassent_square {
                             if enpassant_square.rank == Rank::_5 && square.rank == Rank::_5 {
-                                if let Some(left_square) = square.offset(-1, 0) {
-                                    if left_square == enpassant_square {
+                                if let Some(left_target_square) = square.offset(-1, 0) {
+                                    if left_target_square == enpassant_square {
                                         moves.push(Move::fromEnpassent(
                                             square,
-                                            left_square.offset(0, 1).unwrap(),
+                                            left_target_square.offset(0, 1).unwrap(),
                                         ));
                                     }
                                 }
-                                if let Some(right_square) = square.offset(1, 0) {
-                                    if right_square == enpassant_square {
+                                if let Some(right_target_square) = square.offset(1, 0) {
+                                    if right_target_square == enpassant_square {
                                         moves.push(Move::fromEnpassent(
                                             square,
-                                            right_square.offset(0, 1).unwrap(),
+                                            right_target_square.offset(0, 1).unwrap(),
                                         ));
                                     }
                                 }
                             }
                         }
-                        if let Some(square_offset) = square.offset(-1, 1) {
-                            if let Some(piece) = board.get_piece(square_offset) {
-                                if piece.color != self.color {
-                                    moves.push(Move::fromCapture(square, square_offset));
+                        if let Some(target_square) = square.offset(-1, 1) {
+                            if let Some(target_piece) = board.get_piece(target_square) {
+                                if target_piece.color != self.color {
+                                    moves.push(Move::fromCapture(square, target_square));
                                 }
                             }
                         }
-                        let square_offset = square.offset(0, 1).unwrap();
-                        if let Some(piece) = board.get_piece(square_offset) {
-                            if piece.color != self.color {
-                                moves.push(Move::fromNormal(square, square_offset));
-                            }
+                        let target_square = square.offset(0, 1).unwrap();
+                        if let None = board.get_piece(target_square) {
+                            moves.push(Move::fromNormal(square, target_square));
                         }
-                        if let Some(square_offset) = square.offset(1, 1) {
-                            if let Some(piece) = board.get_piece(square_offset) {
-                                if piece.color != self.color {
-                                    moves.push(Move::fromCapture(square, square_offset));
+                        if let Some(target_square) = square.offset(1, 1) {
+                            if let Some(target_piece) = board.get_piece(target_square) {
+                                if target_piece.color != self.color {
+                                    moves.push(Move::fromCapture(square, target_square));
                                 }
                             }
                         }
@@ -191,5 +187,7 @@ impl Piece {
                 Color::Black => todo!(),
             },
         }
+
+        moves
     }
 }

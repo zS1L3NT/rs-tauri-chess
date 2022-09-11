@@ -8,9 +8,9 @@ use super::{
 };
 
 pub struct Board {
-    pieces: HashMap<Square, Piece>,
+    pub pieces: HashMap<Square, Piece>,
     threats: HashMap<Color, Vec<Square>>,
-	pub enpassent_square: Option<Square>
+    pub enpassent_square: Option<Square>,
 }
 
 impl Board {
@@ -147,7 +147,24 @@ impl Board {
                 ),
             ]),
             threats: HashMap::from([(Color::White, vec![]), (Color::Black, vec![])]),
-			enpassent_square: None
+            enpassent_square: None,
+        }
+    }
+
+    pub fn empty() -> Board {
+        Board {
+            pieces: HashMap::from([
+                (
+                    Square::from(File::E, Rank::_8),
+                    Piece::new(4, PieceType::King, Color::Black),
+                ),
+                (
+                    Square::from(File::E, Rank::_1),
+                    Piece::new(28, PieceType::King, Color::White),
+                ),
+            ]),
+            threats: HashMap::from([(Color::White, vec![]), (Color::Black, vec![])]),
+            enpassent_square: None,
         }
     }
 
@@ -165,7 +182,7 @@ impl Board {
 
     pub fn execute(r#move: Move) {}
 
-	pub fn determine_threat(&self, piece: &Piece) -> bool {
-		true
-	}
+    pub fn determine_threat(&self, r#type: PieceType, square: Square) -> bool {
+        true
+    }
 }

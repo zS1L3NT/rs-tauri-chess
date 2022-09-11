@@ -1,5 +1,6 @@
 use super::{piece::PieceType, square::Square};
 
+#[derive(Debug, PartialEq)]
 pub enum MoveType {
     Normal,
     Capture,
@@ -10,6 +11,7 @@ pub enum MoveType {
     Castle,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct Move {
     pub from: Square,
     pub to: Square,
