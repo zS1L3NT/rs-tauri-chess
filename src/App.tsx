@@ -19,7 +19,7 @@ const App = () => {
 			}}>
 			<Board />
 			<MoveHover />
-			{selected ? <Highlight square={selected} /> : null}
+			{selected ? <Highlight square={selected.square} /> : null}
 			{pieces.map(piece => (
 				<Piece
 					key={piece.id}
