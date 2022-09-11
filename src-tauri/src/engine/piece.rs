@@ -302,10 +302,28 @@ impl Piece {
                     }
                 }
             },
-            PieceType::Knight => match self.color {
-                Color::White => todo!(),
-                Color::Black => todo!(),
-            },
+            PieceType::Knight => {
+                for (file, rank) in [
+					(1, 2),
+					(2, 1),
+					(2, -1),
+					(1, -2),
+					(-1, -2),
+					(-2, -1),
+					(-2, 1),
+                    (-1, 2),
+                ] {
+                    if let Some(target_square) = square.offset(file, rank) {
+                        if let Some(target_piece) = board.get_piece(target_square) {
+                            if target_piece.color != self.color {
+                                moves.push(Move::fromCapture(square, target_square));
+                            }
+                        } else {
+                            moves.push(Move::fromNormal(square, target_square));
+                        }
+                    }
+                }
+            }
             PieceType::Bishop => match self.color {
                 Color::White => todo!(),
                 Color::Black => todo!(),

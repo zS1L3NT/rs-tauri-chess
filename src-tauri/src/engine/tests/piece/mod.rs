@@ -1,1 +1,2 @@
+mod knight;
 mod pawn;

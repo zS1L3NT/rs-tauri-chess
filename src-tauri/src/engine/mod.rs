@@ -19,42 +19,66 @@ macro_rules! square {
 
 #[macro_export]
 macro_rules! pawn {
-    ($id:tt, $team:tt) => {
-        Piece::new($id, PieceType::Pawn, Color::$team)
+    ($id:tt, $color:tt) => {
+        crate::engine::piece::Piece::new(
+            $id,
+            crate::engine::piece::PieceType::Pawn,
+            crate::engine::color::Color::$color,
+        )
     };
 }
 
 #[macro_export]
 macro_rules! knight {
-    ($id:tt, $team:tt) => {
-        Piece::new($id, PieceType::Knight, Color::$team)
+    ($id:tt, $color:tt) => {
+        crate::engine::piece::Piece::new(
+            $id,
+            crate::engine::piece::PieceType::Knight,
+            crate::engine::color::Color::$color,
+        )
     };
 }
 
 #[macro_export]
 macro_rules! bishop {
-    ($id:tt, $team:tt) => {
-        Piece::new($id, PieceType::Bishop, Color::$team)
+    ($id:tt, $color:tt) => {
+        crate::engine::piece::Piece::new(
+            $id,
+            crate::engine::piece::PieceType::Bishop,
+            crate::engine::color::Color::$color,
+        )
     };
 }
 
 #[macro_export]
 macro_rules! rook {
-    ($id:tt, $team:tt) => {
-        Piece::new($id, PieceType::Rook, Color::$team)
+    ($id:tt, $color:tt) => {
+        crate::engine::piece::Piece::new(
+            $id,
+            crate::engine::piece::PieceType::Rook,
+            crate::engine::color::Color::$color,
+        )
     };
 }
 
 #[macro_export]
 macro_rules! queen {
-    ($id:tt, $team:tt) => {
-        Piece::new($id, PieceType::Queen, Color::$team)
+    ($id:tt, $color:tt) => {
+        crate::engine::piece::Piece::new(
+            $id,
+            crate::engine::piece::PieceType::Queen,
+            crate::engine::color::Color::$color,
+        )
     };
 }
 
 #[macro_export]
 macro_rules! king {
-    ($id:tt, $team:tt) => {
-        Piece::new($id, PieceType::King, Color::$team)
+    ($id:tt, $color:tt) => {
+        crate::engine::piece::Piece::new(
+            $id,
+            crate::engine::piece::PieceType::King,
+            crate::engine::color::Color::$color,
+        )
     };
 }
