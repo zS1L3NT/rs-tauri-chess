@@ -1,11 +1,14 @@
 import { useContext } from "react"
 
 import Board from "./components/Board"
+import Highlight from "./components/Highlight"
 import MoveHover from "./components/MoveHover"
 import Piece from "./components/Piece"
+import CursorContext from "./contexts/CursorContext"
 import PiecesContext from "./contexts/PiecesContext"
 
 const App = () => {
+	const { selected } = useContext(CursorContext)
 	const { pieces } = useContext(PiecesContext)
 
 	return (
@@ -16,6 +19,7 @@ const App = () => {
 			}}>
 			<Board />
 			<MoveHover />
+			{selected ? <Highlight square={selected} /> : null}
 			{pieces.map(piece => (
 				<Piece
 					key={piece.id}

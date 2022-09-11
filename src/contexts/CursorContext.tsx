@@ -2,15 +2,9 @@ import { createContext, Dispatch, PropsWithChildren, SetStateAction, useState } 
 
 import { Square } from "../types"
 
-export enum CursorState {
-	Idle,
-	Click,
-	Drag
-}
-
 type iCursorData = {
-	cursorState: CursorState
-	setCursorState: Dispatch<SetStateAction<CursorState>>
+	isDragging: boolean
+	setIsDragging: Dispatch<SetStateAction<boolean>>
 	hovered: Square | null
 	setHovered: Dispatch<SetStateAction<Square | null>>
 	selected: Square | null
@@ -18,8 +12,8 @@ type iCursorData = {
 }
 
 const context = createContext<iCursorData>({
-	cursorState: CursorState.Idle,
-	setCursorState: () => {},
+	isDragging: false,
+	setIsDragging: () => {},
 	hovered: null,
 	setHovered: () => {},
 	selected: null,
@@ -27,14 +21,14 @@ const context = createContext<iCursorData>({
 })
 
 export const CursorProvider = ({ children }: PropsWithChildren<{}>) => {
-	const [cursorState, setCursorState] = useState(CursorState.Idle)
+	const [isDragging, setIsDragging] = useState(false)
 	const [hovered, setHovered] = useState<Square | null>(null)
 	const [selected, setSelected] = useState<Square | null>(null)
 	return (
 		<context.Provider
 			value={{
-				cursorState,
-				setCursorState,
+				isDragging,
+				setIsDragging,
 				hovered,
 				setHovered,
 				selected,

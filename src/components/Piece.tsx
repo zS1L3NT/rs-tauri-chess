@@ -1,14 +1,14 @@
 import { motion, useMotionValue } from "framer-motion"
 import { MouseEvent, useContext, useEffect, useRef } from "react"
 
-import CursorContext, { CursorState } from "../contexts/CursorContext"
+import CursorContext from "../contexts/CursorContext"
 import PiecesContext from "../contexts/PiecesContext"
 import calculateSquareFromCss from "../functions/calculateSquareFromCss"
 import { Piece as iPiece } from "../types"
 
 const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 	const ref = useRef<HTMLDivElement>(null)
-	const { cursorState, setCursorState, setHovered, selected, setSelected } =
+	const { isDragging, setIsDragging, setHovered, selected, setSelected } =
 		useContext(CursorContext)
 	const { setPieces } = useContext(PiecesContext)
 	const x = useMotionValue(0)
@@ -24,36 +24,27 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 	}, [ref.current, square])
 
 	const handleMouseDown = (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
-		setCursorState(CursorState.Click)
+		setIsDragging(true)
+		setSelected(isSelected ? null : square)
+		setHovered(calculateSquareFromCss(e.currentTarget.style))
 	}
 
 	const handleMouseMove = (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
-		if (cursorState !== CursorState.Idle) {
-			if (cursorState === CursorState.Click) {
-				setCursorState(CursorState.Drag)
-			}
-
+		if (isDragging) {
 			setHovered(calculateSquareFromCss(e.currentTarget.style))
 		}
 	}
 
 	const handleMouseUp = (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
-		setCursorState(CursorState.Idle)
+		setIsDragging(false)
 		setHovered(null)
 
-		if (cursorState === CursorState.Click) {
-			setSelected(isSelected ? null : square)
-		}
-
-		if (cursorState === CursorState.Drag) {
-			setPieces(pieces =>
-				pieces.map(p =>
-					p.id === id
-						? { ...p, square: calculateSquareFromCss(e.currentTarget.style) }
-						: p
-				)
+		// ! Validate before finalizing the move
+		setPieces(pieces =>
+			pieces.map(p =>
+				p.id === id ? { ...p, square: calculateSquareFromCss(e.currentTarget.style) } : p
 			)
-		}
+		)
 	}
 
 	return (
@@ -62,7 +53,6 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 			style={{
 				backgroundImage: `url(./assets/${color}-${type}.png)`,
 				backgroundSize: "cover",
-				backgroundColor: isSelected ? "rgba(245, 204, 42, .5)" : "rgba(245, 204, 42, 0)",
 				width: 100,
 				height: 100,
 				cursor: "grab",
