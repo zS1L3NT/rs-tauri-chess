@@ -15,7 +15,7 @@ const context = createContext<iPiecesData>({
 export const PiecesProvider = ({ children }: PropsWithChildren<{}>) => {
 	const [pieces, setPieces] = useState<Piece[]>([
 		{
-			id: 1,
+			id: 60,
 			color: Color.White,
 			type: Type.King,
 			square: {

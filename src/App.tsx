@@ -1,8 +1,7 @@
 import { useContext } from "react"
 
-
-
 import Board from "./components/Board"
+import MoveHover from "./components/MoveHover"
 import Piece from "./components/Piece"
 import PiecesContext from "./contexts/PiecesContext"
 
@@ -16,6 +15,7 @@ const App = () => {
 				overflow: "hidden"
 			}}>
 			<Board />
+			<MoveHover />
 			{pieces.map(piece => (
 				<Piece
 					key={piece.id}
