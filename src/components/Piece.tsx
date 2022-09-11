@@ -1,5 +1,5 @@
 import { motion, useMotionValue } from "framer-motion"
-import { MouseEvent, useContext, useEffect, useRef } from "react"
+import { MouseEvent, useContext, useEffect, useRef, useState } from "react"
 
 import CursorContext from "../contexts/CursorContext"
 import PiecesContext from "../contexts/PiecesContext"
@@ -15,6 +15,15 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 	const x = useMotionValue(0)
 	const y = useMotionValue(0)
 
+	/**
+	 * Tracks whether the current click has intentions of de-selecting the piece
+	 *
+	 * When null, the piece is not being tracked
+	 * When false, the piece didn't move at all so it should be de-selected
+	 * When true, the piece moved so it should stay selected
+	 */
+	const [moved, setMoved] = useState<boolean | null>(null)
+
 	useEffect(() => {
 		if (ref.current) {
 			x.set(0)
@@ -23,6 +32,11 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 	}, [ref.current, square])
 
 	const handleMouseDown = (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
+		// Piece is already selected, track what happens to it
+		if (selected?.id === id) {
+			setMoved(false)
+		}
+
 		setIsDragging(true)
 		setSelected({ id, color, type, square })
 		setHovered(calculateSquareFromCss(e.currentTarget.style))
@@ -30,6 +44,11 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 
 	const handleMouseMove = (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
 		if (isDragging) {
+			// If it's moved, it should stay selected
+			if (moved !== null) {
+				setMoved(true)
+			}
+
 			setHovered(calculateSquareFromCss(e.currentTarget.style))
 		}
 	}
@@ -38,6 +57,13 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 		if (selected?.id === id) {
 			setIsDragging(false)
 			setHovered(null)
+			setMoved(null)
+
+			// If it didn't move, de-select it
+			if (moved === false) {
+				setSelected(null)
+				return
+			}
 
 			// ! Validate before finalizing the move
 			const targetSquare = calculateSquareFromCss(e.currentTarget.style)
