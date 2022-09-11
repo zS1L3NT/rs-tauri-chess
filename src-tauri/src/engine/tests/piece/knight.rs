@@ -10,8 +10,8 @@ fn a1_corner() {
 
     assert_eq!(
         vec![
-            Move::fromNormal(square!(A _1), square!(B _3)),
-            Move::fromNormal(square!(A _1), square!(C _2)),
+            Move::from_normal(square!(A _1), square!(B _3)),
+            Move::from_normal(square!(A _1), square!(C _2)),
         ],
         board.get_piece(square!(A _1)).unwrap().get_moves(&board)
     );
@@ -24,9 +24,9 @@ fn a2_corner() {
 
     assert_eq!(
         vec![
-            Move::fromNormal(square!(A _2), square!(B _4)),
-            Move::fromNormal(square!(A _2), square!(C _3)),
-            Move::fromNormal(square!(A _2), square!(C _1)),
+            Move::from_normal(square!(A _2), square!(B _4)),
+            Move::from_normal(square!(A _2), square!(C _3)),
+            Move::from_normal(square!(A _2), square!(C _1)),
         ],
         board.get_piece(square!(A _2)).unwrap().get_moves(&board)
     );
@@ -39,9 +39,9 @@ fn b1_corner() {
 
     assert_eq!(
         vec![
-            Move::fromNormal(square!(B _1), square!(C _3)),
-            Move::fromNormal(square!(B _1), square!(D _2)),
-            Move::fromNormal(square!(B _1), square!(A _3)),
+            Move::from_normal(square!(B _1), square!(C _3)),
+            Move::from_normal(square!(B _1), square!(D _2)),
+            Move::from_normal(square!(B _1), square!(A _3)),
         ],
         board.get_piece(square!(B _1)).unwrap().get_moves(&board)
     );
@@ -54,10 +54,10 @@ fn b2_corner() {
 
     assert_eq!(
         vec![
-            Move::fromNormal(square!(B _2), square!(C _4)),
-            Move::fromNormal(square!(B _2), square!(D _3)),
-            Move::fromNormal(square!(B _2), square!(D _1)),
-            Move::fromNormal(square!(B _2), square!(A _4)),
+            Move::from_normal(square!(B _2), square!(C _4)),
+            Move::from_normal(square!(B _2), square!(D _3)),
+            Move::from_normal(square!(B _2), square!(D _1)),
+            Move::from_normal(square!(B _2), square!(A _4)),
         ],
         board.get_piece(square!(B _2)).unwrap().get_moves(&board)
     );
@@ -70,10 +70,10 @@ fn a3_corner() {
 
     assert_eq!(
         vec![
-            Move::fromNormal(square!(A _3), square!(B _5)),
-            Move::fromNormal(square!(A _3), square!(C _4)),
-            Move::fromNormal(square!(A _3), square!(C _2)),
-            Move::fromNormal(square!(A _3), square!(B _1)),
+            Move::from_normal(square!(A _3), square!(B _5)),
+            Move::from_normal(square!(A _3), square!(C _4)),
+            Move::from_normal(square!(A _3), square!(C _2)),
+            Move::from_normal(square!(A _3), square!(B _1)),
         ],
         board.get_piece(square!(A _3)).unwrap().get_moves(&board)
     );
@@ -86,12 +86,12 @@ fn b3_corner() {
 
     assert_eq!(
         vec![
-            Move::fromNormal(square!(B _3), square!(C _5)),
-            Move::fromNormal(square!(B _3), square!(D _4)),
-            Move::fromNormal(square!(B _3), square!(D _2)),
-            Move::fromNormal(square!(B _3), square!(C _1)),
-            Move::fromNormal(square!(B _3), square!(A _1)),
-            Move::fromNormal(square!(B _3), square!(A _5)),
+            Move::from_normal(square!(B _3), square!(C _5)),
+            Move::from_normal(square!(B _3), square!(D _4)),
+            Move::from_normal(square!(B _3), square!(D _2)),
+            Move::from_normal(square!(B _3), square!(C _1)),
+            Move::from_normal(square!(B _3), square!(A _1)),
+            Move::from_normal(square!(B _3), square!(A _5)),
         ],
         board.get_piece(square!(B _3)).unwrap().get_moves(&board)
     );
@@ -104,14 +104,14 @@ fn c3_corner() {
 
     assert_eq!(
         vec![
-            Move::fromNormal(square!(C _3), square!(D _5)),
-            Move::fromNormal(square!(C _3), square!(E _4)),
-            Move::fromNormal(square!(C _3), square!(E _2)),
-            Move::fromNormal(square!(C _3), square!(D _1)),
-            Move::fromNormal(square!(C _3), square!(B _1)),
-            Move::fromNormal(square!(C _3), square!(A _2)),
-            Move::fromNormal(square!(C _3), square!(A _4)),
-            Move::fromNormal(square!(C _3), square!(B _5)),
+            Move::from_normal(square!(C _3), square!(D _5)),
+            Move::from_normal(square!(C _3), square!(E _4)),
+            Move::from_normal(square!(C _3), square!(E _2)),
+            Move::from_normal(square!(C _3), square!(D _1)),
+            Move::from_normal(square!(C _3), square!(B _1)),
+            Move::from_normal(square!(C _3), square!(A _2)),
+            Move::from_normal(square!(C _3), square!(A _4)),
+            Move::from_normal(square!(C _3), square!(B _5)),
         ],
         board.get_piece(square!(C _3)).unwrap().get_moves(&board)
     );
@@ -126,12 +126,12 @@ fn c2_corner() {
 
     assert_eq!(
         vec![
-            Move::fromNormal(square!(C _2), square!(D _4)),
-            Move::fromNormal(square!(C _2), square!(E _3)),
-            Move::fromNormal(square!(C _2), square!(E _1)),
-            Move::fromNormal(square!(C _2), square!(A _1)),
-            Move::fromNormal(square!(C _2), square!(A _3)),
-            Move::fromNormal(square!(C _2), square!(B _4)),
+            Move::from_normal(square!(C _2), square!(D _4)),
+            Move::from_normal(square!(C _2), square!(E _3)),
+            Move::from_normal(square!(C _2), square!(E _1)),
+            Move::from_normal(square!(C _2), square!(A _1)),
+            Move::from_normal(square!(C _2), square!(A _3)),
+            Move::from_normal(square!(C _2), square!(B _4)),
         ],
         board.get_piece(square!(C _2)).unwrap().get_moves(&board)
     );
@@ -144,10 +144,10 @@ fn c1_corner() {
 
     assert_eq!(
         vec![
-            Move::fromNormal(square!(C _1), square!(D _3)),
-            Move::fromNormal(square!(C _1), square!(E _2)),
-            Move::fromNormal(square!(C _1), square!(A _2)),
-            Move::fromNormal(square!(C _1), square!(B _3)),
+            Move::from_normal(square!(C _1), square!(D _3)),
+            Move::from_normal(square!(C _1), square!(E _2)),
+            Move::from_normal(square!(C _1), square!(A _2)),
+            Move::from_normal(square!(C _1), square!(B _3)),
         ],
         board.get_piece(square!(C _1)).unwrap().get_moves(&board)
     );
@@ -161,8 +161,8 @@ fn captures() {
 
     assert_eq!(
         vec![
-            Move::fromCapture(square!(A _1), square!(B _3)),
-            Move::fromNormal(square!(A _1), square!(C _2)),
+            Move::from_capture(square!(A _1), square!(B _3)),
+            Move::from_normal(square!(A _1), square!(C _2)),
         ],
         board.get_piece(square!(A _1)).unwrap().get_moves(&board)
     );
@@ -175,7 +175,7 @@ fn no_team_captures() {
     board.pieces.insert(square!(B _3), pawn!(33, White));
 
     assert_eq!(
-        vec![Move::fromNormal(square!(A _1), square!(C _2)),],
+        vec![Move::from_normal(square!(A _1), square!(C _2)),],
         board.get_piece(square!(A _1)).unwrap().get_moves(&board)
     );
 }

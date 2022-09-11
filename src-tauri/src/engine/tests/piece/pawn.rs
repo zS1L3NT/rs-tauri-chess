@@ -9,7 +9,7 @@ fn white_normal() {
     board.pieces.insert(square!(E _4), pawn!(32, Black));
 
     assert_eq!(
-        vec![Move::fromNormal(square!(E _2), square!(E _3))],
+        vec![Move::from_normal(square!(E _2), square!(E _3))],
         board.get_piece(square!(E _2)).unwrap().get_moves(&board)
     );
 }
@@ -20,7 +20,7 @@ fn black_normal() {
     board.pieces.insert(square!(E _5), pawn!(32, White));
 
     assert_eq!(
-        vec![Move::fromNormal(square!(E _7), square!(E _6))],
+        vec![Move::from_normal(square!(E _7), square!(E _6))],
         board.get_piece(square!(E _7)).unwrap().get_moves(&board)
     );
 }
@@ -31,8 +31,8 @@ fn white_normal_jump() {
 
     assert_eq!(
         vec![
-            Move::fromPawnJump(square!(E _2), square!(E _4)),
-            Move::fromNormal(square!(E _2), square!(E _3)),
+            Move::from_pawn_jump(square!(E _2), square!(E _4)),
+            Move::from_normal(square!(E _2), square!(E _3)),
         ],
         board.get_piece(square!(E _2)).unwrap().get_moves(&board)
     );
@@ -44,8 +44,8 @@ fn black_normal_jump() {
 
     assert_eq!(
         vec![
-            Move::fromPawnJump(square!(E _7), square!(E _5)),
-            Move::fromNormal(square!(E _7), square!(E _6)),
+            Move::from_pawn_jump(square!(E _7), square!(E _5)),
+            Move::from_normal(square!(E _7), square!(E _6)),
         ],
         board.get_piece(square!(E _7)).unwrap().get_moves(&board)
     );
@@ -86,8 +86,8 @@ fn white_captures() {
 
     assert_eq!(
         vec![
-            Move::fromCapture(square!(E _2), square!(D _3)),
-            Move::fromCapture(square!(E _2), square!(F _3)),
+            Move::from_capture(square!(E _2), square!(D _3)),
+            Move::from_capture(square!(E _2), square!(F _3)),
         ],
         board.get_piece(square!(E _2)).unwrap().get_moves(&board)
     );
@@ -102,8 +102,8 @@ fn black_captures() {
 
     assert_eq!(
         vec![
-            Move::fromCapture(square!(E _7), square!(D _6)),
-            Move::fromCapture(square!(E _7), square!(F _6)),
+            Move::from_capture(square!(E _7), square!(D _6)),
+            Move::from_capture(square!(E _7), square!(F _6)),
         ],
         board.get_piece(square!(E _7)).unwrap().get_moves(&board)
     );
@@ -117,10 +117,10 @@ fn white_normal_jump_captures() {
 
     assert_eq!(
         vec![
-            Move::fromPawnJump(square!(E _2), square!(E _4)),
-            Move::fromCapture(square!(E _2), square!(D _3)),
-            Move::fromNormal(square!(E _2), square!(E _3)),
-            Move::fromCapture(square!(E _2), square!(F _3)),
+            Move::from_pawn_jump(square!(E _2), square!(E _4)),
+            Move::from_capture(square!(E _2), square!(D _3)),
+            Move::from_normal(square!(E _2), square!(E _3)),
+            Move::from_capture(square!(E _2), square!(F _3)),
         ],
         board.get_piece(square!(E _2)).unwrap().get_moves(&board)
     );
@@ -134,10 +134,10 @@ fn black_normal_jump_captures() {
 
     assert_eq!(
         vec![
-            Move::fromPawnJump(square!(E _7), square!(E _5)),
-            Move::fromCapture(square!(E _7), square!(D _6)),
-            Move::fromNormal(square!(E _7), square!(E _6)),
-            Move::fromCapture(square!(E _7), square!(F _6)),
+            Move::from_pawn_jump(square!(E _7), square!(E _5)),
+            Move::from_capture(square!(E _7), square!(D _6)),
+            Move::from_normal(square!(E _7), square!(E _6)),
+            Move::from_capture(square!(E _7), square!(F _6)),
         ],
         board.get_piece(square!(E _7)).unwrap().get_moves(&board)
     );
@@ -152,8 +152,8 @@ fn white_normal_enpassent() {
 
     assert_eq!(
         vec![
-            Move::fromEnpassent(square!(E _5), square!(D _6)),
-            Move::fromNormal(square!(E _5), square!(E _6)),
+            Move::from_enpassant(square!(E _5), square!(D _6)),
+            Move::from_normal(square!(E _5), square!(E _6)),
         ],
         board.get_piece(square!(E _5)).unwrap().get_moves(&board)
     );
@@ -168,8 +168,8 @@ fn black_normal_enpassent() {
 
     assert_eq!(
         vec![
-            Move::fromEnpassent(square!(E _4), square!(D _3)),
-            Move::fromNormal(square!(E _4), square!(E _3)),
+            Move::from_enpassant(square!(E _4), square!(D _3)),
+            Move::from_normal(square!(E _4), square!(E _3)),
         ],
         board.get_piece(square!(E _4)).unwrap().get_moves(&board)
     );
@@ -210,18 +210,18 @@ fn white_tiple_promotion() {
 
     assert_eq!(
         vec![
-            Move::fromPromotionCapture(square!(B _7), square!(A _8), PieceType::Queen, true),
-            Move::fromPromotionCapture(square!(B _7), square!(A _8), PieceType::Rook, true),
-            Move::fromPromotionCapture(square!(B _7), square!(A _8), PieceType::Bishop, true),
-            Move::fromPromotionCapture(square!(B _7), square!(A _8), PieceType::Knight, false),
-            Move::fromPromotion(square!(B _7), square!(B _8), PieceType::Queen, true),
-            Move::fromPromotion(square!(B _7), square!(B _8), PieceType::Rook, true),
-            Move::fromPromotion(square!(B _7), square!(B _8), PieceType::Bishop, true),
-            Move::fromPromotion(square!(B _7), square!(B _8), PieceType::Knight, false),
-            Move::fromPromotionCapture(square!(B _7), square!(C _8), PieceType::Queen, true),
-            Move::fromPromotionCapture(square!(B _7), square!(C _8), PieceType::Rook, true),
-            Move::fromPromotionCapture(square!(B _7), square!(C _8), PieceType::Bishop, true),
-            Move::fromPromotionCapture(square!(B _7), square!(C _8), PieceType::Knight, false),
+            Move::from_promotion_capture(square!(B _7), square!(A _8), PieceType::Queen, true),
+            Move::from_promotion_capture(square!(B _7), square!(A _8), PieceType::Rook, true),
+            Move::from_promotion_capture(square!(B _7), square!(A _8), PieceType::Bishop, true),
+            Move::from_promotion_capture(square!(B _7), square!(A _8), PieceType::Knight, false),
+            Move::from_promotion(square!(B _7), square!(B _8), PieceType::Queen, true),
+            Move::from_promotion(square!(B _7), square!(B _8), PieceType::Rook, true),
+            Move::from_promotion(square!(B _7), square!(B _8), PieceType::Bishop, true),
+            Move::from_promotion(square!(B _7), square!(B _8), PieceType::Knight, false),
+            Move::from_promotion_capture(square!(B _7), square!(C _8), PieceType::Queen, true),
+            Move::from_promotion_capture(square!(B _7), square!(C _8), PieceType::Rook, true),
+            Move::from_promotion_capture(square!(B _7), square!(C _8), PieceType::Bishop, true),
+            Move::from_promotion_capture(square!(B _7), square!(C _8), PieceType::Knight, false),
         ],
         board.get_piece(square!(B _7)).unwrap().get_moves(&board)
     );
@@ -236,18 +236,18 @@ fn black_tiple_promotion() {
 
     assert_eq!(
         vec![
-            Move::fromPromotionCapture(square!(B _2), square!(A _1), PieceType::Queen, true),
-            Move::fromPromotionCapture(square!(B _2), square!(A _1), PieceType::Rook, true),
-            Move::fromPromotionCapture(square!(B _2), square!(A _1), PieceType::Bishop, true),
-            Move::fromPromotionCapture(square!(B _2), square!(A _1), PieceType::Knight, false),
-            Move::fromPromotion(square!(B _2), square!(B _1), PieceType::Queen, true),
-            Move::fromPromotion(square!(B _2), square!(B _1), PieceType::Rook, true),
-            Move::fromPromotion(square!(B _2), square!(B _1), PieceType::Bishop, true),
-            Move::fromPromotion(square!(B _2), square!(B _1), PieceType::Knight, false),
-            Move::fromPromotionCapture(square!(B _2), square!(C _1), PieceType::Queen, true),
-            Move::fromPromotionCapture(square!(B _2), square!(C _1), PieceType::Rook, true),
-            Move::fromPromotionCapture(square!(B _2), square!(C _1), PieceType::Bishop, true),
-            Move::fromPromotionCapture(square!(B _2), square!(C _1), PieceType::Knight, false),
+            Move::from_promotion_capture(square!(B _2), square!(A _1), PieceType::Queen, true),
+            Move::from_promotion_capture(square!(B _2), square!(A _1), PieceType::Rook, true),
+            Move::from_promotion_capture(square!(B _2), square!(A _1), PieceType::Bishop, true),
+            Move::from_promotion_capture(square!(B _2), square!(A _1), PieceType::Knight, false),
+            Move::from_promotion(square!(B _2), square!(B _1), PieceType::Queen, true),
+            Move::from_promotion(square!(B _2), square!(B _1), PieceType::Rook, true),
+            Move::from_promotion(square!(B _2), square!(B _1), PieceType::Bishop, true),
+            Move::from_promotion(square!(B _2), square!(B _1), PieceType::Knight, false),
+            Move::from_promotion_capture(square!(B _2), square!(C _1), PieceType::Queen, true),
+            Move::from_promotion_capture(square!(B _2), square!(C _1), PieceType::Rook, true),
+            Move::from_promotion_capture(square!(B _2), square!(C _1), PieceType::Bishop, true),
+            Move::from_promotion_capture(square!(B _2), square!(C _1), PieceType::Knight, false),
         ],
         board.get_piece(square!(B _2)).unwrap().get_moves(&board)
     );
@@ -261,14 +261,14 @@ fn white_side_promotion() {
 
     assert_eq!(
         vec![
-            Move::fromPromotion(square!(A _7), square!(A _8), PieceType::Queen, true),
-            Move::fromPromotion(square!(A _7), square!(A _8), PieceType::Rook, true),
-            Move::fromPromotion(square!(A _7), square!(A _8), PieceType::Bishop, true),
-            Move::fromPromotion(square!(A _7), square!(A _8), PieceType::Knight, false),
-            Move::fromPromotionCapture(square!(A _7), square!(B _8), PieceType::Queen, true),
-            Move::fromPromotionCapture(square!(A _7), square!(B _8), PieceType::Rook, true),
-            Move::fromPromotionCapture(square!(A _7), square!(B _8), PieceType::Bishop, true),
-            Move::fromPromotionCapture(square!(A _7), square!(B _8), PieceType::Knight, false),
+            Move::from_promotion(square!(A _7), square!(A _8), PieceType::Queen, true),
+            Move::from_promotion(square!(A _7), square!(A _8), PieceType::Rook, true),
+            Move::from_promotion(square!(A _7), square!(A _8), PieceType::Bishop, true),
+            Move::from_promotion(square!(A _7), square!(A _8), PieceType::Knight, false),
+            Move::from_promotion_capture(square!(A _7), square!(B _8), PieceType::Queen, true),
+            Move::from_promotion_capture(square!(A _7), square!(B _8), PieceType::Rook, true),
+            Move::from_promotion_capture(square!(A _7), square!(B _8), PieceType::Bishop, true),
+            Move::from_promotion_capture(square!(A _7), square!(B _8), PieceType::Knight, false),
         ],
         board.get_piece(square!(A _7)).unwrap().get_moves(&board)
     );
@@ -282,14 +282,14 @@ fn black_side_promotion() {
 
     assert_eq!(
         vec![
-            Move::fromPromotion(square!(A _2), square!(A _1), PieceType::Queen, true),
-            Move::fromPromotion(square!(A _2), square!(A _1), PieceType::Rook, true),
-            Move::fromPromotion(square!(A _2), square!(A _1), PieceType::Bishop, true),
-            Move::fromPromotion(square!(A _2), square!(A _1), PieceType::Knight, false),
-            Move::fromPromotionCapture(square!(A _2), square!(B _1), PieceType::Queen, true),
-            Move::fromPromotionCapture(square!(A _2), square!(B _1), PieceType::Rook, true),
-            Move::fromPromotionCapture(square!(A _2), square!(B _1), PieceType::Bishop, true),
-            Move::fromPromotionCapture(square!(A _2), square!(B _1), PieceType::Knight, false),
+            Move::from_promotion(square!(A _2), square!(A _1), PieceType::Queen, true),
+            Move::from_promotion(square!(A _2), square!(A _1), PieceType::Rook, true),
+            Move::from_promotion(square!(A _2), square!(A _1), PieceType::Bishop, true),
+            Move::from_promotion(square!(A _2), square!(A _1), PieceType::Knight, false),
+            Move::from_promotion_capture(square!(A _2), square!(B _1), PieceType::Queen, true),
+            Move::from_promotion_capture(square!(A _2), square!(B _1), PieceType::Rook, true),
+            Move::from_promotion_capture(square!(A _2), square!(B _1), PieceType::Bishop, true),
+            Move::from_promotion_capture(square!(A _2), square!(B _1), PieceType::Knight, false),
         ],
         board.get_piece(square!(A _2)).unwrap().get_moves(&board)
     );

@@ -21,7 +21,7 @@ pub struct Move {
 }
 
 impl Move {
-    pub fn fromNormal(from: Square, to: Square) -> Move {
+    pub fn from_normal(from: Square, to: Square) -> Move {
         assert_ne!(from, to);
         Move {
             from: from.clone(),
@@ -32,7 +32,7 @@ impl Move {
         }
     }
 
-    pub fn fromPawnJump(from: Square, to: Square) -> Move {
+    pub fn from_pawn_jump(from: Square, to: Square) -> Move {
         assert_ne!(from, to);
         assert_eq!(from.file, to.file);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 2);
@@ -45,7 +45,7 @@ impl Move {
         }
     }
 
-    pub fn fromCapture(from: Square, to: Square) -> Move {
+    pub fn from_capture(from: Square, to: Square) -> Move {
         assert_ne!(from, to);
         Move {
             from: from.clone(),
@@ -56,7 +56,7 @@ impl Move {
         }
     }
 
-    pub fn fromPromotion(from: Square, to: Square, promotion: PieceType, threat: bool) -> Move {
+    pub fn from_promotion(from: Square, to: Square, promotion: PieceType, threat: bool) -> Move {
         assert_ne!(from, to);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 1);
         assert_ne!(promotion, PieceType::Pawn);
@@ -71,7 +71,7 @@ impl Move {
         }
     }
 
-    pub fn fromPromotionCapture(
+    pub fn from_promotion_capture(
         from: Square,
         to: Square,
         promotion: PieceType,
@@ -91,7 +91,7 @@ impl Move {
         }
     }
 
-    pub fn fromEnpassent(from: Square, to: Square) -> Move {
+    pub fn from_enpassant(from: Square, to: Square) -> Move {
         assert_ne!(from, to);
         assert_eq!((from.file as i8 - to.file as i8).abs(), 1);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 1);
@@ -104,7 +104,7 @@ impl Move {
         }
     }
 
-    pub fn fromCastle(from: Square, to: Square) -> Move {
+    pub fn from_castle(from: Square, to: Square) -> Move {
         assert_ne!(from, to);
         assert_eq!((from.file as i8 - to.file as i8).abs(), 2);
         Move {
