@@ -304,13 +304,13 @@ impl Piece {
             },
             PieceType::Knight => {
                 for (file, rank) in [
-					(1, 2),
-					(2, 1),
-					(2, -1),
-					(1, -2),
-					(-1, -2),
-					(-2, -1),
-					(-2, 1),
+                    (1, 2),
+                    (2, 1),
+                    (2, -1),
+                    (1, -2),
+                    (-1, -2),
+                    (-2, -1),
+                    (-2, 1),
                     (-1, 2),
                 ] {
                     if let Some(target_square) = square.offset(file, rank) {
@@ -324,24 +324,72 @@ impl Piece {
                     }
                 }
             }
-            PieceType::Bishop => match self.color {
-                Color::White => todo!(),
-                Color::Black => todo!(),
-            },
-            PieceType::Rook => match self.color {
-                Color::White => todo!(),
-                Color::Black => todo!(),
-            },
-            PieceType::Queen => match self.color {
-                Color::White => todo!(),
-                Color::Black => todo!(),
-            },
-            PieceType::King => match self.color {
-                Color::White => todo!(),
-                Color::Black => todo!(),
-            },
+            PieceType::Bishop => {
+                self.get_straight_moves(board, &mut moves, &[(1, 1), (1, -1), (-1, -1), (-1, 1)])
+            }
+            PieceType::Rook => {
+                self.get_straight_moves(board, &mut moves, &[(0, 1), (1, 0), (0, -1), (-1, 0)])
+            }
+            PieceType::Queen => self.get_straight_moves(
+                board,
+                &mut moves,
+                &[
+                    (0, 1),
+                    (1, 1),
+                    (1, 0),
+                    (1, -1),
+                    (0, -1),
+                    (-1, -1),
+                    (-1, 0),
+                    (-1, 1),
+                ],
+            ),
+            PieceType::King => {
+                for (file, rank) in [
+                    (0, 1),
+                    (1, 1),
+                    (1, 0),
+                    (1, -1),
+                    (0, -1),
+                    (-1, -1),
+                    (-1, 0),
+                    (-1, 1),
+                ] {
+                    if let Some(target_square) = square.offset(file, rank) {
+                        if let Some(target_piece) = board.get_piece(target_square) {
+                            if target_piece.color != self.color {
+                                moves.push(Move::from_capture(square, target_square));
+                            }
+                        } else {
+                            moves.push(Move::from_normal(square, target_square));
+                        }
+                    }
+                }
+
+				// ! Castling
+            }
         }
 
         moves
+    }
+
+    fn get_straight_moves(&self, board: &Board, moves: &mut Vec<Move>, directions: &[(i8, i8)]) {
+        let square = board.get_square(self);
+
+        for (file, rank) in directions {
+            let mut target_offset = (*file, *rank);
+            while let Some(target_square) = square.offset(target_offset.0, target_offset.1) {
+                if let Some(target_piece) = board.get_piece(target_square) {
+                    if target_piece.color != self.color {
+                        moves.push(Move::from_capture(square, target_square));
+                    }
+                    break;
+                } else {
+                    moves.push(Move::from_normal(square, target_square));
+                }
+                target_offset.0 += file;
+                target_offset.1 += rank;
+            }
+        }
     }
 }
