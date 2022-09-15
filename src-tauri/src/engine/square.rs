@@ -1,4 +1,4 @@
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum File {
     A = 0,
     B = 1,
@@ -39,7 +39,7 @@ impl File {
     }
 }
 
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Rank {
     _1 = 0,
     _2 = 1,
@@ -80,7 +80,7 @@ impl Rank {
     }
 }
 
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct Square {
     pub file: File,
     pub rank: Rank,
