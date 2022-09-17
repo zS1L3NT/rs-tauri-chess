@@ -71,21 +71,21 @@ impl Piece {
                 let team_multiplier = if self.color == Color::White { 1 } else { -1 };
                 for (file, rank) in [(-1, team_multiplier), (1, team_multiplier)] {
                     if let Some(target_square) = square.offset(file, rank) {
-                        attack_lines.push(vec![square, target_square]);
+                        attack_lines.push(vec![target_square]);
                     }
                 }
             }
             PieceType::Knight => {
                 for (file, rank) in Directions::KNIGHT {
                     if let Some(target_square) = square.offset(file, rank) {
-                        attack_lines.push(vec![square, target_square]);
+                        attack_lines.push(vec![target_square]);
                     }
                 }
             }
             PieceType::Bishop => {
                 for (file, rank) in Directions::BISHOP {
                     let mut current_square = square;
-                    let mut line = vec![current_square];
+                    let mut line = vec![];
                     while let Some(target_square) = current_square.offset(file, rank) {
                         if target_square == opposite_king {
                             lines_with_king = Some(attack_lines.len());
@@ -103,7 +103,7 @@ impl Piece {
             PieceType::Rook => {
                 for (file, rank) in Directions::ROOK {
                     let mut current_square = square;
-                    let mut line = vec![current_square];
+                    let mut line = vec![];
                     while let Some(target_square) = current_square.offset(file, rank) {
                         if target_square == opposite_king {
                             lines_with_king = Some(attack_lines.len());
@@ -121,7 +121,7 @@ impl Piece {
             PieceType::Queen => {
                 for (file, rank) in Directions::QUEEN {
                     let mut current_square = square;
-                    let mut line = vec![current_square];
+                    let mut line = vec![];
                     while let Some(target_square) = current_square.offset(file, rank) {
                         if target_square == opposite_king {
                             lines_with_king = Some(attack_lines.len());
@@ -139,12 +139,12 @@ impl Piece {
             PieceType::King => {
                 for (file, rank) in Directions::KING {
                     if let Some(target_square) = square.offset(file, rank) {
-                        attack_lines.push(vec![square, target_square]);
+                        attack_lines.push(vec![target_square]);
                     }
                 }
             }
         }
 
-        AttackLines::new(attack_lines, lines_with_king)
+        AttackLines::new(square, attack_lines, lines_with_king)
     }
 }

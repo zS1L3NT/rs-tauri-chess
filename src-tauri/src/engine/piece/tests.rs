@@ -10,10 +10,8 @@ mod pawn {
 
         assert_eq!(
             AttackLines::new(
-                vec![
-                    vec![square!(E _2), square!(D _3)],
-                    vec![square!(E _2), square!(F _3)]
-                ],
+                square!(E _2),
+                vec![vec![square!(D _3)], vec![square!(F _3)]],
                 None
             ),
             board
@@ -29,7 +27,7 @@ mod pawn {
         let board = Board::new();
 
         assert_eq!(
-            AttackLines::new(vec![vec![square!(A _2), square!(B _3)]], None),
+            AttackLines::new(square!(A _2), vec![vec![square!(B _3)]], None),
             board
                 .pieces
                 .get(&square!(A _2))
@@ -43,7 +41,7 @@ mod pawn {
         let board = Board::new();
 
         assert_eq!(
-            AttackLines::new(vec![vec![square!(H _2), square!(G _3)]], None),
+            AttackLines::new(square!(H _2), vec![vec![square!(G _3)]], None),
             board
                 .pieces
                 .get(&square!(H _2))
@@ -58,10 +56,8 @@ mod pawn {
 
         assert_eq!(
             AttackLines::new(
-                vec![
-                    vec![square!(E _7), square!(D _6)],
-                    vec![square!(E _7), square!(F _6)]
-                ],
+                square!(E _7),
+                vec![vec![square!(D _6)], vec![square!(F _6)]],
                 None
             ),
             board
@@ -77,7 +73,7 @@ mod pawn {
         let board = Board::new();
 
         assert_eq!(
-            AttackLines::new(vec![vec![square!(A _7), square!(B _6)]], None),
+            AttackLines::new(square!(A _7), vec![vec![square!(B _6)]], None),
             board
                 .pieces
                 .get(&square!(A _7))
@@ -91,7 +87,7 @@ mod pawn {
         let board = Board::new();
 
         assert_eq!(
-            AttackLines::new(vec![vec![square!(H _7), square!(G _6)]], None),
+            AttackLines::new(square!(H _7), vec![vec![square!(G _6)]], None),
             board
                 .pieces
                 .get(&square!(H _7))
@@ -113,10 +109,11 @@ mod knight {
 
         assert_eq!(
             AttackLines::new(
+                square!(B _1),
                 vec![
-                    vec![square!(B _1), square!(C _3)],
-                    vec![square!(B _1), square!(D _2)],
-                    vec![square!(B _1), square!(A _3)]
+                    vec![square!(C _3)],
+                    vec![square!(D _2)],
+                    vec![square!(A _3)]
                 ],
                 None
             ),
@@ -142,16 +139,16 @@ mod bishop {
 
         assert_eq!(
             AttackLines::new(
+                square!(C _1),
                 vec![
                     vec![
-                        square!(C _1),
                         square!(D _2),
                         square!(E _3),
                         square!(F _4),
                         square!(G _5),
                         square!(H _6)
                     ],
-                    vec![square!(C _1), square!(B _2), square!(A _3)],
+                    vec![square!(B _2), square!(A _3)],
                 ],
                 None
             ),
@@ -170,15 +167,10 @@ mod bishop {
 
         assert_eq!(
             AttackLines::new(
+                square!(H _5),
                 vec![
-                    vec![
-                        square!(H _5),
-                        square!(G _4),
-                        square!(F _3),
-                        square!(E _2),
-                        square!(D _1),
-                    ],
-                    vec![square!(H _5), square!(G _6), square!(F _7), square!(E _8)],
+                    vec![square!(G _4), square!(F _3), square!(E _2), square!(D _1),],
+                    vec![square!(G _6), square!(F _7), square!(E _8)],
                 ],
                 Some(1)
             ),
@@ -203,9 +195,9 @@ mod rook {
 
         assert_eq!(
             AttackLines::new(
+                square!(A _1),
                 vec![
                     vec![
-                        square!(A _1),
                         square!(A _2),
                         square!(A _3),
                         square!(A _4),
@@ -215,7 +207,6 @@ mod rook {
                         square!(A _8)
                     ],
                     vec![
-                        square!(A _1),
                         square!(B _1),
                         square!(C _1),
                         square!(D _1),
@@ -242,24 +233,18 @@ mod rook {
 
         assert_eq!(
             AttackLines::new(
+                square!(E _3),
                 vec![
                     vec![
-                        square!(E _3),
                         square!(E _4),
                         square!(E _5),
                         square!(E _6),
                         square!(E _7),
                         square!(E _8),
                     ],
-                    vec![square!(E _3), square!(F _3), square!(G _3), square!(H _3),],
-                    vec![square!(E _3), square!(E _2), square!(E _1),],
-                    vec![
-                        square!(E _3),
-                        square!(D _3),
-                        square!(C _3),
-                        square!(B _3),
-                        square!(A _3),
-                    ],
+                    vec![square!(F _3), square!(G _3), square!(H _3),],
+                    vec![square!(E _2), square!(E _1),],
+                    vec![square!(D _3), square!(C _3), square!(B _3), square!(A _3),],
                 ],
                 Some(0)
             ),
@@ -284,9 +269,9 @@ mod queen {
 
         assert_eq!(
             AttackLines::new(
+                square!(D _1),
                 vec![
                     vec![
-                        square!(D _1),
                         square!(D _2),
                         square!(D _3),
                         square!(D _4),
@@ -295,22 +280,10 @@ mod queen {
                         square!(D _7),
                         square!(D _8)
                     ],
-                    vec![
-                        square!(D _1),
-                        square!(E _2),
-                        square!(F _3),
-                        square!(G _4),
-                        square!(H _5)
-                    ],
-                    vec![
-                        square!(D _1),
-                        square!(E _1),
-                        square!(F _1),
-                        square!(G _1),
-                        square!(H _1)
-                    ],
-                    vec![square!(D _1), square!(C _1), square!(B _1), square!(A _1),],
-                    vec![square!(D _1), square!(C _2), square!(B _3), square!(A _4),],
+                    vec![square!(E _2), square!(F _3), square!(G _4), square!(H _5)],
+                    vec![square!(E _1), square!(F _1), square!(G _1), square!(H _1)],
+                    vec![square!(C _1), square!(B _1), square!(A _1),],
+                    vec![square!(C _2), square!(B _3), square!(A _4),],
                 ],
                 None,
             ),
@@ -329,34 +302,22 @@ mod queen {
 
         assert_eq!(
             AttackLines::new(
+                square!(E _3),
                 vec![
                     vec![
-                        square!(E _3),
                         square!(E _4),
                         square!(E _5),
                         square!(E _6),
                         square!(E _7),
                         square!(E _8),
                     ],
-                    vec![square!(E _3), square!(F _4), square!(G _5), square!(H _6),],
-                    vec![square!(E _3), square!(F _3), square!(G _3), square!(H _3),],
-                    vec![square!(E _3), square!(F _2), square!(G _1),],
-                    vec![square!(E _3), square!(E _2), square!(E _1),],
-                    vec![square!(E _3), square!(D _2), square!(C _1),],
-                    vec![
-                        square!(E _3),
-                        square!(D _3),
-                        square!(C _3),
-                        square!(B _3),
-                        square!(A _3),
-                    ],
-                    vec![
-                        square!(E _3),
-                        square!(D _4),
-                        square!(C _5),
-                        square!(B _6),
-                        square!(A _7),
-                    ],
+                    vec![square!(F _4), square!(G _5), square!(H _6),],
+                    vec![square!(F _3), square!(G _3), square!(H _3),],
+                    vec![square!(F _2), square!(G _1),],
+                    vec![square!(E _2), square!(E _1),],
+                    vec![square!(D _2), square!(C _1),],
+                    vec![square!(D _3), square!(C _3), square!(B _3), square!(A _3),],
+                    vec![square!(D _4), square!(C _5), square!(B _6), square!(A _7),],
                 ],
                 Some(0)
             ),
@@ -375,24 +336,12 @@ mod queen {
 
         assert_eq!(
             AttackLines::new(
+                square!(H _5),
                 vec![
-                    vec![square!(H _5), square!(H _6), square!(H _7), square!(H _8),],
+                    vec![square!(H _6), square!(H _7), square!(H _8),],
+                    vec![square!(H _4), square!(H _3), square!(H _2), square!(H _1)],
+                    vec![square!(G _4), square!(F _3), square!(E _2), square!(D _1),],
                     vec![
-                        square!(H _5),
-                        square!(H _4),
-                        square!(H _3),
-                        square!(H _2),
-                        square!(H _1)
-                    ],
-                    vec![
-                        square!(H _5),
-                        square!(G _4),
-                        square!(F _3),
-                        square!(E _2),
-                        square!(D _1),
-                    ],
-                    vec![
-                        square!(H _5),
                         square!(G _5),
                         square!(F _5),
                         square!(E _5),
@@ -401,7 +350,7 @@ mod queen {
                         square!(B _5),
                         square!(A _5),
                     ],
-                    vec![square!(H _5), square!(G _6), square!(F _7), square!(E _8),],
+                    vec![square!(G _6), square!(F _7), square!(E _8),],
                 ],
                 Some(4)
             ),
@@ -426,12 +375,13 @@ mod king {
 
         assert_eq!(
             AttackLines::new(
+                square!(E _1),
                 vec![
-                    vec![square!(E _1), square!(E _2)],
-                    vec![square!(E _1), square!(F _2)],
-                    vec![square!(E _1), square!(F _1)],
-                    vec![square!(E _1), square!(D _1)],
-                    vec![square!(E _1), square!(D _2)],
+                    vec![square!(E _2)],
+                    vec![square!(F _2)],
+                    vec![square!(F _1)],
+                    vec![square!(D _1)],
+                    vec![square!(D _2)],
                 ],
                 None
             ),
