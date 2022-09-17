@@ -1,5 +1,6 @@
 use super::square::Square;
 
+#[derive(Debug, PartialEq)]
 pub struct AttackLines {
     /// The squares attacked in this line
     ///

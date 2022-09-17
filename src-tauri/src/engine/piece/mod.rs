@@ -1,5 +1,8 @@
 use super::{attack_lines::AttackLines, board::Board, color::Color, square::Square};
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PieceType {
     Pawn,
@@ -19,7 +22,7 @@ pub struct Piece {
 pub struct Directions {}
 
 impl Directions {
-    pub const Knight: [(i8, i8); 8] = [
+    pub const KNIGHT: [(i8, i8); 8] = [
         (1, 2),
         (2, 1),
         (2, -1),
@@ -30,11 +33,11 @@ impl Directions {
         (-1, 2),
     ];
 
-    pub const Bishop: [(i8, i8); 4] = [(1, 1), (1, -1), (-1, -1), (-1, 1)];
+    pub const BISHOP: [(i8, i8); 4] = [(1, 1), (1, -1), (-1, -1), (-1, 1)];
 
-    pub const Rook: [(i8, i8); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
+    pub const ROOK: [(i8, i8); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
 
-    pub const Queen: [(i8, i8); 8] = [
+    pub const QUEEN: [(i8, i8); 8] = [
         (0, 1),
         (1, 1),
         (1, 0),
@@ -45,7 +48,7 @@ impl Directions {
         (-1, 1),
     ];
 
-    pub const King: [(i8, i8); 8] = Directions::Queen;
+    pub const KING: [(i8, i8); 8] = Directions::QUEEN;
 }
 
 impl Piece {
@@ -73,14 +76,14 @@ impl Piece {
                 }
             }
             PieceType::Knight => {
-                for (file, rank) in Directions::Knight {
+                for (file, rank) in Directions::KNIGHT {
                     if let Some(target_square) = square.offset(file, rank) {
                         attack_lines.push(vec![square, target_square]);
                     }
                 }
             }
             PieceType::Bishop => {
-                for (file, rank) in Directions::Bishop {
+                for (file, rank) in Directions::BISHOP {
                     let mut current_square = square;
                     let mut line = vec![current_square];
                     while let Some(target_square) = current_square.offset(file, rank) {
@@ -91,11 +94,14 @@ impl Piece {
                         line.push(target_square);
                         current_square = target_square;
                     }
-                    attack_lines.push(line);
+
+                    if line.len() > 1 {
+                        attack_lines.push(line);
+                    }
                 }
             }
             PieceType::Rook => {
-                for (file, rank) in Directions::Rook {
+                for (file, rank) in Directions::ROOK {
                     let mut current_square = square;
                     let mut line = vec![current_square];
                     while let Some(target_square) = current_square.offset(file, rank) {
@@ -106,11 +112,14 @@ impl Piece {
                         line.push(target_square);
                         current_square = target_square;
                     }
-                    attack_lines.push(line);
+
+                    if line.len() > 1 {
+                        attack_lines.push(line);
+                    }
                 }
             }
             PieceType::Queen => {
-                for (file, rank) in Directions::Queen {
+                for (file, rank) in Directions::QUEEN {
                     let mut current_square = square;
                     let mut line = vec![current_square];
                     while let Some(target_square) = current_square.offset(file, rank) {
@@ -121,11 +130,14 @@ impl Piece {
                         line.push(target_square);
                         current_square = target_square;
                     }
-                    attack_lines.push(line);
+
+                    if line.len() > 1 {
+                        attack_lines.push(line);
+                    }
                 }
             }
             PieceType::King => {
-                for (file, rank) in Directions::King {
+                for (file, rank) in Directions::KING {
                     if let Some(target_square) = square.offset(file, rank) {
                         attack_lines.push(vec![square, target_square]);
                     }
