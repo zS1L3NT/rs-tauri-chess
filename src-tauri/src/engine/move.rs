@@ -17,7 +17,6 @@ pub struct Move {
     pub to: Square,
     pub r#type: MoveType,
     pub promotion: Option<PieceType>,
-    pub threat: bool,
 }
 
 impl Move {
@@ -28,7 +27,6 @@ impl Move {
             to,
             r#type: MoveType::Normal,
             promotion: None,
-            threat: false,
         }
     }
 
@@ -41,7 +39,6 @@ impl Move {
             to,
             r#type: MoveType::PawnJump,
             promotion: None,
-            threat: false,
         }
     }
 
@@ -52,22 +49,19 @@ impl Move {
             to,
             r#type: MoveType::Capture,
             promotion: None,
-            threat: false,
         }
     }
 
-    pub fn from_promotion(from: Square, to: Square, promotion: PieceType, threat: bool) -> Move {
+    pub fn from_promotion(from: Square, to: Square, promotion: PieceType) -> Move {
         assert_ne!(from, to);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 1);
         assert_ne!(promotion, PieceType::Pawn);
         assert_ne!(promotion, PieceType::King);
-        assert_ne!(threat, promotion == PieceType::Knight);
         Move {
             from: from.clone(),
             to,
             r#type: MoveType::Promotion,
             promotion: Some(promotion),
-            threat,
         }
     }
 
@@ -75,19 +69,16 @@ impl Move {
         from: Square,
         to: Square,
         promotion: PieceType,
-        threat: bool,
     ) -> Move {
         assert_ne!(from, to);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 1);
         assert_ne!(promotion, PieceType::Pawn);
         assert_ne!(promotion, PieceType::King);
-        assert_ne!(threat, promotion == PieceType::Knight);
         Move {
             from: from.clone(),
             to,
             r#type: MoveType::PromotionCapture,
             promotion: Some(promotion),
-            threat,
         }
     }
 
@@ -100,7 +91,6 @@ impl Move {
             to,
             r#type: MoveType::Enpassant,
             promotion: None,
-            threat: false,
         }
     }
 
@@ -112,7 +102,6 @@ impl Move {
             to,
             r#type: MoveType::Castle,
             promotion: None,
-            threat: false,
         }
     }
 }

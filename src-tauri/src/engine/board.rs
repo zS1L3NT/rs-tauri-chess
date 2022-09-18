@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::{bishop, king, knight, pawn, queen, rook, square};
 
 use super::{
+    attack_lines::AttackLines,
     color::Color,
     piece::{Directions, Piece, PieceType},
     r#move::Move,
@@ -11,17 +12,10 @@ use super::{
 
 pub struct Board {
     pub pieces: HashMap<Square, Piece>,
-    /// Lines that pin the enemy King
-    ///
-    /// Doesn't matter if there are multiple pieces between the attacker and the King
-    ///
-    /// The order of the Vector starts from the attacker
-    pub pinning_lines: HashMap<Color, Vec<Vec<Square>>>,
-    /// Lines or single tiles that attack the enemy King
-    ///
-    /// The order of the Vector starts from the attacker and ends at the end of the board
-    pub threatening_lines: HashMap<Color, Vec<Vec<Square>>>,
+    pub attack_lines: HashMap<Square, AttackLines>,
     pub enpassent_square: Option<Square>,
+    pub white_king: Square,
+    pub black_king: Square,
 }
 
 impl Board {
@@ -61,21 +55,10 @@ impl Board {
                 (square!(G _1), knight!(30, White)),
                 (square!(H _1), rook!(31, White)),
             ]),
-            pinning_lines: HashMap::from([(Color::White, vec![]), (Color::Black, vec![])]),
-            threatening_lines: HashMap::from([(Color::White, vec![]), (Color::Black, vec![])]),
+            attack_lines: HashMap::new(),
             enpassent_square: None,
-        }
-    }
-
-    pub fn empty() -> Board {
-        Board {
-            pieces: HashMap::from([
-                (square!(E _8), king!(4, Black)),
-                (square!(E _1), king!(28, White)),
-            ]),
-            pinning_lines: HashMap::from([(Color::White, vec![]), (Color::Black, vec![])]),
-            threatening_lines: HashMap::from([(Color::White, vec![]), (Color::Black, vec![])]),
-            enpassent_square: None,
+            white_king: square!(E _1),
+            black_king: square!(E _8),
         }
     }
 
@@ -87,6 +70,7 @@ impl Board {
 
     pub fn get_moves(&self, color: Color) -> Vec<Move> {
         let mut moves = vec![];
+        let mut king_move_indexes = vec![];
 
         let opposite_color = color.opposite();
 
@@ -137,7 +121,6 @@ impl Board {
                                             square,
                                             target_square,
                                             r#type,
-                                            self.determine_threat(r#type, target_square),
                                         ));
                                     }
                                 }
@@ -151,12 +134,7 @@ impl Board {
                                 PieceType::Bishop,
                                 PieceType::Knight,
                             ] {
-                                moves.push(Move::from_promotion(
-                                    square,
-                                    target_square,
-                                    r#type,
-                                    self.determine_threat(r#type, target_square),
-                                ));
+                                moves.push(Move::from_promotion(square, target_square, r#type));
                             }
                         }
                         if let Some(target_square) = square.offset(1, 1 * team_multiplier) {
@@ -172,7 +150,6 @@ impl Board {
                                             square,
                                             target_square,
                                             r#type,
-                                            self.determine_threat(r#type, target_square),
                                         ));
                                     }
                                 }
@@ -226,7 +203,7 @@ impl Board {
                     }
                 }
                 PieceType::Knight => {
-                    for (file, rank) in Directions::Knight {
+                    for (file, rank) in Directions::KNIGHT {
                         if let Some(target_square) = square.offset(file, rank) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != color {
@@ -239,23 +216,25 @@ impl Board {
                     }
                 }
                 PieceType::Bishop => {
-                    self.get_straight_moves(&piece, color, &mut moves, &Directions::Bishop)
+                    self.get_straight_moves(&piece, color, &mut moves, &Directions::BISHOP)
                 }
                 PieceType::Rook => {
-                    self.get_straight_moves(&piece, color, &mut moves, &Directions::Rook)
+                    self.get_straight_moves(&piece, color, &mut moves, &Directions::ROOK)
                 }
                 PieceType::Queen => {
-                    self.get_straight_moves(&piece, color, &mut moves, &Directions::Queen)
+                    self.get_straight_moves(&piece, color, &mut moves, &Directions::QUEEN)
                 }
                 PieceType::King => {
-                    for (file, rank) in Directions::King {
+                    for (file, rank) in Directions::KING {
                         if let Some(target_square) = square.offset(file, rank) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != color {
                                     moves.push(Move::from_capture(square, target_square));
+                                    king_move_indexes.push(moves.len() - 1);
                                 }
                             } else {
                                 moves.push(Move::from_normal(square, target_square));
+                                king_move_indexes.push(moves.len() - 1);
                             }
                         }
                     }
@@ -263,63 +242,39 @@ impl Board {
             }
         }
 
-        let (king_square, king_piece) = self
-            .pieces
-            .iter()
-            .find(|(_, p)| p.color == color && p.r#type == PieceType::King)
-            .expect("Could not find king");
-        let king_square = *king_square;
+        let king_square = if color == Color::White {
+            self.white_king
+        } else {
+            self.black_king
+        };
 
-        let pinned_lines = self.pinning_lines.get(&opposite_color).unwrap();
-        if pinned_lines.len() > 0 {
-            moves.retain(|r#move| {
-                // If a the piece moving is in the pinned line
-                if let Some(pinned_line) =
-                    pinned_lines.iter().find(|line| line.contains(&r#move.from))
-                {
-                    // Loop through every pinned square except the pinning piece's tile
-                    for pinned_square in pinned_line[1..].iter() {
-                        let pinned_square = *pinned_square;
-
-                        // If the move is not the candidate move AND another piece is in the way of the king
-                        if pinned_square != r#move.from && self.pieces.get(&pinned_square).is_some()
-                        {
-                            // Ignore the move since it isn't actually pinning the king
-                            return true;
-                        }
+        for square in Square::ALL {
+            if let Some(piece) = self.pieces.get(&square) {
+                if piece.color != color {
+                    let attack_lines = piece.get_attack_lines(&self, square);
+                    if let Some(index) = attack_lines.lines_with_king {
+                        let line = attack_lines
+                            .lines
+                            .get(index)
+                            .expect("Invalid lines_with_king index");
+                        self.filter_line(&mut moves, attack_lines.origin, line, king_square);
                     }
 
-                    // No other pieces in the way of the king except candidate, restrict candidate
-                    if !pinned_line.contains(&r#move.to) {
-                        return false;
+                    for line in &attack_lines.lines {
+                        let mut index = 0;
+                        moves.retain(|r#move| {
+                            if king_move_indexes.contains(&index) {
+                                if self.is_clear_line(line, r#move.to) {
+                                    index += 1;
+                                    return false;
+                                }
+                            }
+
+                            index += 1;
+                            true
+                        });
                     }
                 }
-
-                return true;
-            });
-        }
-
-        let threatened_lines = self.threatening_lines.get(&opposite_color).unwrap();
-        if threatened_lines.len() > 0 {
-            // If there is more than 1 threat, the king is the only piece that can resolve that
-            if threatened_lines.len() > 1 {
-                moves.retain(|r#move| {
-                    // ! Moves that keep king in check
-                    r#move.from == king_square
-                        && !threatened_lines
-                            .iter()
-                            .any(|line| line.contains(&r#move.to))
-                });
-            } else {
-                let threatened_line = threatened_lines[0];
-                moves.retain(|r#move| {
-                    // If the move is made by the King
-                    if r#move.from == king_square {
-                        // ! Moves that keep king in check
-                    } else {
-                        return threatened_line.contains(&r#move.to);
-                    }
-                });
             }
         }
 
@@ -352,9 +307,73 @@ impl Board {
         }
     }
 
-    pub fn execute(r#move: Move) {}
+    fn filter_line(
+        &self,
+        moves: &mut Vec<Move>,
+        origin: Square,
+        line: &Vec<Square>,
+        king_square: Square,
+    ) {
+        // The number of pieces between the origin and the opponent King
+        let mut blocking_pieces = 0;
 
-    pub fn determine_threat(&self, r#type: PieceType, square: Square) -> bool {
-        true
+        // Squares that resolve the check if a piece moves to them
+        let mut resolving_squares = vec![origin];
+
+        for line_square in line {
+            let line_square = *line_square;
+
+            if let Some(_) = self.pieces.get(&line_square) {
+                if line_square == king_square {
+                    match blocking_pieces {
+                        0 => {
+                            // Move that checks the King
+                            moves.retain(|r#move| {
+                                if r#move.from == king_square {
+                                    return true;
+                                }
+
+                                if resolving_squares.contains(&r#move.to) {
+                                    return true;
+                                }
+
+                                return false;
+                            });
+                        }
+                        1 => {
+                            // Move that pins another piece
+                            moves.retain(|r#move| {
+                                if r#move.from != line_square {
+                                    return true;
+                                }
+
+                                if resolving_squares.contains(&r#move.to) {
+                                    return true;
+                                }
+
+                                return false;
+                            });
+                        }
+                        _ => {}
+                    }
+
+                    break;
+                } else {
+                    blocking_pieces += 1;
+                }
+            }
+
+            resolving_squares.push(line_square);
+        }
+    }
+
+    fn is_clear_line(&self, line: &Vec<Square>, king_square: Square) -> bool {
+        assert!(line.len() >= 2);
+        for square in line.iter() {
+            if let Some(_) = self.pieces.get(&square) {
+                return *square == king_square;
+            }
+        }
+        return true;
     }
 }
