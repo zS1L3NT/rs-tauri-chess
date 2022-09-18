@@ -5,8 +5,8 @@ pub mod r#move;
 pub mod piece;
 pub mod square;
 
-#[cfg(test)]
-mod tests;
+// #[cfg(test)]
+// mod tests;
 
 #[macro_export]
 macro_rules! square {
