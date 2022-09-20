@@ -25,23 +25,41 @@ export interface Square {
 	rank: Rank
 }
 
-export enum Type {
-	King = "king",
-	Queen = "queen",
-	Rook = "rook",
-	Bishop = "bishop",
-	Knight = "knight",
-	Pawn = "pawn"
+export enum Color {
+	White = "White",
+	Black = "Black"
 }
 
-export enum Color {
-	White = "white",
-	Black = "black"
+export enum PieceType {
+	King = "King",
+	Queen = "Queen",
+	Rook = "Rook",
+	Bishop = "Bishop",
+	Knight = "Knight",
+	Pawn = "Pawn"
 }
 
 export interface Piece {
 	id: number
-	type: Type
+	type: PieceType
 	color: Color
 	square: Square
+}
+
+export enum MoveType {
+	Normal = "Normal",
+	Capture = "Capture",
+	Promotion = "Promotion",
+	PromotionCapture = "PromotionCapture",
+	PawnJump = "PawnJump",
+	Enpassant = "Enpassant",
+	Castle = "Castle"
+}
+
+export interface Move {
+	from: Square
+	to: Square
+	type: MoveType
+	captured: Piece | null
+	promotion: PieceType | null
 }

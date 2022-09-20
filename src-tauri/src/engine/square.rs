@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::square;
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum File {
     A = 0,
     B = 1,
@@ -12,6 +12,24 @@ pub enum File {
     F = 5,
     G = 6,
     H = 7,
+}
+
+impl Serialize for File {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_u8(match self {
+            File::A => 0,
+            File::B => 1,
+            File::C => 2,
+            File::D => 3,
+            File::E => 4,
+            File::F => 5,
+            File::G => 6,
+            File::H => 7,
+        })
+    }
 }
 
 impl File {
@@ -43,7 +61,7 @@ impl File {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Rank {
     _1 = 0,
     _2 = 1,
@@ -53,6 +71,24 @@ pub enum Rank {
     _6 = 5,
     _7 = 6,
     _8 = 7,
+}
+
+impl Serialize for Rank {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_u8(match self {
+            Rank::_1 => 0,
+            Rank::_2 => 1,
+            Rank::_3 => 2,
+            Rank::_4 => 3,
+            Rank::_5 => 4,
+            Rank::_6 => 5,
+            Rank::_7 => 6,
+            Rank::_8 => 7,
+        })
+    }
 }
 
 impl Rank {

@@ -1,9 +1,9 @@
-import { Color, File, Piece, Rank, Type } from "./types"
+import { Color, File, Piece, Rank, PieceType } from "./types"
 
 export default <Piece[]>[
 	{
 		id: 0,
-		type: Type.Rook,
+		type: PieceType.Rook,
 		color: Color.Black,
 		square: {
 			file: File.A,
@@ -12,7 +12,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 1,
-		type: Type.Knight,
+		type: PieceType.Knight,
 		color: Color.Black,
 		square: {
 			file: File.B,
@@ -21,7 +21,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 2,
-		type: Type.Bishop,
+		type: PieceType.Bishop,
 		color: Color.Black,
 		square: {
 			file: File.C,
@@ -30,7 +30,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 3,
-		type: Type.Queen,
+		type: PieceType.Queen,
 		color: Color.Black,
 		square: {
 			file: File.D,
@@ -39,7 +39,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 4,
-		type: Type.King,
+		type: PieceType.King,
 		color: Color.Black,
 		square: {
 			file: File.E,
@@ -48,7 +48,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 5,
-		type: Type.Bishop,
+		type: PieceType.Bishop,
 		color: Color.Black,
 		square: {
 			file: File.F,
@@ -57,7 +57,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 6,
-		type: Type.Knight,
+		type: PieceType.Knight,
 		color: Color.Black,
 		square: {
 			file: File.G,
@@ -66,7 +66,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 7,
-		type: Type.Rook,
+		type: PieceType.Rook,
 		color: Color.Black,
 		square: {
 			file: File.H,
@@ -75,7 +75,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 8,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.Black,
 		square: {
 			file: File.A,
@@ -84,7 +84,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 9,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.Black,
 		square: {
 			file: File.B,
@@ -93,7 +93,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 10,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.Black,
 		square: {
 			file: File.C,
@@ -102,7 +102,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 11,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.Black,
 		square: {
 			file: File.D,
@@ -111,7 +111,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 12,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.Black,
 		square: {
 			file: File.E,
@@ -120,7 +120,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 13,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.Black,
 		square: {
 			file: File.F,
@@ -129,7 +129,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 14,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.Black,
 		square: {
 			file: File.G,
@@ -138,7 +138,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 15,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.Black,
 		square: {
 			file: File.H,
@@ -147,7 +147,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 16,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.White,
 		square: {
 			file: File.A,
@@ -156,7 +156,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 17,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.White,
 		square: {
 			file: File.B,
@@ -165,7 +165,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 18,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.White,
 		square: {
 			file: File.C,
@@ -174,7 +174,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 19,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.White,
 		square: {
 			file: File.D,
@@ -183,7 +183,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 20,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.White,
 		square: {
 			file: File.E,
@@ -192,7 +192,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 21,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.White,
 		square: {
 			file: File.F,
@@ -201,7 +201,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 22,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.White,
 		square: {
 			file: File.G,
@@ -210,7 +210,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 23,
-		type: Type.Pawn,
+		type: PieceType.Pawn,
 		color: Color.White,
 		square: {
 			file: File.H,
@@ -219,7 +219,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 24,
-		type: Type.Rook,
+		type: PieceType.Rook,
 		color: Color.White,
 		square: {
 			file: File.A,
@@ -228,7 +228,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 25,
-		type: Type.Knight,
+		type: PieceType.Knight,
 		color: Color.White,
 		square: {
 			file: File.B,
@@ -237,7 +237,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 26,
-		type: Type.Bishop,
+		type: PieceType.Bishop,
 		color: Color.White,
 		square: {
 			file: File.C,
@@ -246,7 +246,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 27,
-		type: Type.Queen,
+		type: PieceType.Queen,
 		color: Color.White,
 		square: {
 			file: File.D,
@@ -255,7 +255,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 28,
-		type: Type.King,
+		type: PieceType.King,
 		color: Color.White,
 		square: {
 			file: File.E,
@@ -264,7 +264,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 29,
-		type: Type.Bishop,
+		type: PieceType.Bishop,
 		color: Color.White,
 		square: {
 			file: File.F,
@@ -273,7 +273,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 30,
-		type: Type.Knight,
+		type: PieceType.Knight,
 		color: Color.White,
 		square: {
 			file: File.G,
@@ -282,7 +282,7 @@ export default <Piece[]>[
 	},
 	{
 		id: 31,
-		type: Type.Rook,
+		type: PieceType.Rook,
 		color: Color.White,
 		square: {
 			file: File.H,

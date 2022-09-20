@@ -15,19 +15,6 @@ pub enum PieceType {
     King,
 }
 
-impl ToString for PieceType {
-    fn to_string(&self) -> String {
-		match self {
-			PieceType::Pawn => "pawn".into(),
-			PieceType::Knight => "knight".into(),
-			PieceType::Bishop => "bishop".into(),
-			PieceType::Rook => "rook".into(),
-			PieceType::Queen => "queen".into(),
-			PieceType::King => "king".into(),
-		}
-	}
-}
-
 #[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct Piece {
     pub id: u8,

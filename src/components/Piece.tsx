@@ -88,7 +88,7 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 		<motion.div
 			ref={ref}
 			style={{
-				backgroundImage: `url(./assets/${color}-${type}.png)`,
+				backgroundImage: `url(./assets/${color}${type}.png)`,
 				backgroundSize: "cover",
 				width: 100,
 				height: 100,

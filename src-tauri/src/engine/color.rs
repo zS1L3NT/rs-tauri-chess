@@ -6,15 +6,6 @@ pub enum Color {
     Black,
 }
 
-impl ToString for Color {
-    fn to_string(&self) -> String {
-        match self {
-            Color::White => "white".into(),
-            Color::Black => "black".into(),
-        }
-    }
-}
-
 impl Color {
     pub fn opposite(self) -> Color {
         match self {
