@@ -1,6 +1,5 @@
 import { createContext, Dispatch, PropsWithChildren, SetStateAction, useState } from "react"
 
-import defaultBoard from "../defaultBoard"
 import { Piece } from "../types"
 
 type iPiecesData = {
@@ -14,7 +13,7 @@ const context = createContext<iPiecesData>({
 })
 
 export const PiecesProvider = ({ children }: PropsWithChildren<{}>) => {
-	const [pieces, setPieces] = useState<Piece[]>(defaultBoard)
+	const [pieces, setPieces] = useState<Piece[]>([])
 
 	return (
 		<context.Provider
