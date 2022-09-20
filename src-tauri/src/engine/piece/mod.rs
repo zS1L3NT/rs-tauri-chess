@@ -5,7 +5,7 @@ use super::{attack_lines::AttackLines, board::Board, color::Color, square::Squar
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize)]
 pub enum PieceType {
     Pawn,
     Knight,

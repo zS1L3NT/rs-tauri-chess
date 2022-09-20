@@ -1,4 +1,7 @@
 import { useContext } from "react"
+import useAsyncEffect from "use-async-effect"
+
+import { invoke } from "@tauri-apps/api"
 
 import Board from "./components/Board"
 import Highlight from "./components/Highlight"
@@ -10,6 +13,10 @@ import PiecesContext from "./contexts/PiecesContext"
 const App = () => {
 	const { selected } = useContext(CursorContext)
 	const { pieces } = useContext(PiecesContext)
+
+	useAsyncEffect(async () => {
+		console.log(await invoke("state"))
+	}, [])
 
 	return (
 		<div

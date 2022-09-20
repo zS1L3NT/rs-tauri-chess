@@ -4,6 +4,7 @@ use crate::{bishop, king, knight, pawn, queen, rook, square};
 
 use super::{
     attack_lines::AttackLines,
+    client::{ClientBoard, ClientPiece},
     color::Color,
     piece::{Directions, Piece, PieceType},
     r#move::Move,
@@ -11,6 +12,7 @@ use super::{
 };
 
 pub struct Board {
+    pub history: Vec<Move>,
     pub pieces: HashMap<Square, Piece>,
     pub attack_lines: HashMap<Square, AttackLines>,
     pub enpassent_square: Option<Square>,
@@ -20,7 +22,8 @@ pub struct Board {
 
 impl Board {
     pub fn new() -> Board {
-        Board {
+        let mut board = Board {
+            history: vec![],
             pieces: HashMap::from([
                 (square!(A _8), rook!(0, Black)),
                 (square!(B _8), knight!(1, Black)),
@@ -59,7 +62,15 @@ impl Board {
             enpassent_square: None,
             white_king: square!(E _1),
             black_king: square!(E _8),
-        }
+        };
+
+        board.attack_lines = board
+            .pieces
+            .iter()
+            .map(|(s, p)| (*s, p.get_attack_lines(&board, *s)))
+            .collect::<HashMap<_, _>>();
+
+        board
     }
 
     pub fn get_square(&self, piece: &Piece) -> Option<Square> {
@@ -68,7 +79,23 @@ impl Board {
             .find_map(|(s, p)| if p.id == piece.id { Some(*s) } else { None })
     }
 
-    pub fn get_moves(&self, color: Color) -> Vec<Move> {
+    pub fn to_client_board(&self) -> ClientBoard {
+        ClientBoard::new(
+            self.pieces
+                .iter()
+                .map(|(s, p)| ClientPiece::from(p, *s))
+                .collect::<Vec<_>>(),
+            self.get_moves(),
+        )
+    }
+
+    pub fn get_moves(&self) -> Vec<Move> {
+        let color = if self.history.len() % 2 == 0 {
+            Color::White
+        } else {
+            Color::Black
+        };
+
         let mut moves = vec![];
         let mut king_move_indexes = vec![];
 
