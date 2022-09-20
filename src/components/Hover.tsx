@@ -2,7 +2,7 @@ import { useContext } from "react"
 
 import CursorContext from "../contexts/CursorContext"
 
-const MoveHover = () => {
+const Hover = () => {
 	const { hovered } = useContext(CursorContext)
 
 	return hovered ? (
@@ -22,4 +22,4 @@ const MoveHover = () => {
 	)
 }
 
-export default MoveHover
+export default Hover

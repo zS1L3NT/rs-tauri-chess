@@ -5,7 +5,7 @@ import { invoke } from "@tauri-apps/api"
 
 import Board from "./components/Board"
 import Highlight from "./components/Highlight"
-import MoveHover from "./components/MoveHover"
+import Hover from "./components/Hover"
 import Piece from "./components/Piece"
 import CursorContext from "./contexts/CursorContext"
 import PiecesContext from "./contexts/PiecesContext"
@@ -25,7 +25,7 @@ const App = () => {
 				overflow: "hidden"
 			}}>
 			<Board />
-			<MoveHover />
+			<Hover />
 			{selected ? <Highlight square={selected.square} /> : null}
 			{pieces.map(piece => (
 				<Piece
