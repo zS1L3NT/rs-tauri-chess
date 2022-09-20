@@ -120,6 +120,7 @@ impl Board {
                                         moves.push(Move::from_promotion_capture(
                                             square,
                                             target_square,
+                                            target_piece.clone(),
                                             r#type,
                                         ));
                                     }
@@ -149,6 +150,7 @@ impl Board {
                                         moves.push(Move::from_promotion_capture(
                                             square,
                                             target_square,
+                                            target_piece.clone(),
                                             r#type,
                                         ));
                                     }
@@ -185,7 +187,11 @@ impl Board {
                         if let Some(target_square) = square.offset(-1, 1 * team_multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != color {
-                                    moves.push(Move::from_capture(square, target_square));
+                                    moves.push(Move::from_capture(
+                                        square,
+                                        target_square,
+                                        target_piece.clone(),
+                                    ));
                                 }
                             }
                         }
@@ -196,7 +202,11 @@ impl Board {
                         if let Some(target_square) = square.offset(1, 1 * team_multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != color {
-                                    moves.push(Move::from_capture(square, target_square));
+                                    moves.push(Move::from_capture(
+                                        square,
+                                        target_square,
+                                        target_piece.clone(),
+                                    ));
                                 }
                             }
                         }
@@ -207,7 +217,11 @@ impl Board {
                         if let Some(target_square) = square.offset(file, rank) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != color {
-                                    moves.push(Move::from_capture(square, target_square));
+                                    moves.push(Move::from_capture(
+                                        square,
+                                        target_square,
+                                        target_piece.clone(),
+                                    ));
                                 }
                             } else {
                                 moves.push(Move::from_normal(square, target_square));
@@ -229,7 +243,11 @@ impl Board {
                         if let Some(target_square) = square.offset(file, rank) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != color {
-                                    moves.push(Move::from_capture(square, target_square));
+                                    moves.push(Move::from_capture(
+                                        square,
+                                        target_square,
+                                        target_piece.clone(),
+                                    ));
                                     king_move_indexes.push(moves.len() - 1);
                                 }
                             } else {
@@ -295,7 +313,11 @@ impl Board {
             while let Some(target_square) = square.offset(file_offset, rank_offset) {
                 if let Some(target_piece) = self.pieces.get(&target_square) {
                     if target_piece.color != color {
-                        moves.push(Move::from_capture(square, target_square));
+                        moves.push(Move::from_capture(
+                            square,
+                            target_square,
+                            target_piece.clone(),
+                        ));
                     }
                     break;
                 } else {
