@@ -43,7 +43,8 @@ const App = () => {
 								square={m.to}
 								isCapture={
 									m.type === MoveType.Capture ||
-									m.type === MoveType.PromotionCapture
+									m.type === MoveType.PromotionCapture ||
+									m.type === MoveType.Enpassant
 								}
 							/>
 						))

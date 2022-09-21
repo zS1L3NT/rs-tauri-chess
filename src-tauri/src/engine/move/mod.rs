@@ -109,7 +109,7 @@ impl Move {
         }
     }
 
-    pub fn from_enpassant(from: Square, to: Square) -> Move {
+    pub fn from_enpassant(from: Square, to: Square, captured: Piece) -> Move {
         assert_ne!(from, to);
         assert_eq!((from.file as i8 - to.file as i8).abs(), 1);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 1);
@@ -117,7 +117,7 @@ impl Move {
             from: from.clone(),
             to,
             r#type: MoveType::Enpassant,
-            captured: None,
+            captured: Some(captured),
             promotion: None,
         }
     }

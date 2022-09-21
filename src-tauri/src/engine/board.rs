@@ -197,6 +197,7 @@ impl Board {
                                             left_target_square
                                                 .offset(0, 1 * team_multiplier)
                                                 .unwrap(),
+                                            self.pieces.get(&enpassant_square).unwrap().clone(),
                                         ));
                                     }
                                 }
@@ -207,6 +208,7 @@ impl Board {
                                             right_target_square
                                                 .offset(0, 1 * team_multiplier)
                                                 .unwrap(),
+                                            self.pieces.get(&enpassant_square).unwrap().clone(),
                                         ));
                                     }
                                 }
@@ -445,7 +447,12 @@ impl Board {
 
                 self.pieces.insert(r#move.to, piece);
             }
-            MoveType::Capture => todo!(),
+            MoveType::Capture => {
+                let piece = self.pieces.remove(&r#move.from).unwrap();
+                self.attack_lines.remove(&r#move.from);
+
+                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+            }
             MoveType::Promotion => todo!(),
             MoveType::PromotionCapture => todo!(),
             MoveType::PawnJump => todo!(),
