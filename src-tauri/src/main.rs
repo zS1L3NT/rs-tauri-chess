@@ -3,23 +3,28 @@
     windows_subsystem = "windows"
 )]
 
-use engine::{board::Board, client::ClientBoard};
+use std::sync::Mutex;
+
+use engine::{board::Board, client::ClientBoard, r#move::Move};
 
 mod engine;
 
 #[tauri::command]
-fn state(board: tauri::State<Board>) -> ClientBoard {
-    board.to_client_board()
+fn state(state: tauri::State<Mutex<Board>>) -> ClientBoard {
+	let board = state.lock().unwrap();
+	board.to_client_board()
 }
 
 #[tauri::command]
-fn execute(board: tauri::State<Board>) -> ClientBoard {
+fn execute(state: tauri::State<Mutex<Board>>, r#move: Move) -> ClientBoard {
+	let mut board = state.lock().unwrap();
+	board.execute(r#move);
     board.to_client_board()
 }
 
 fn main() {
     tauri::Builder::default()
-        .manage(Board::new())
+        .manage(Mutex::new(Board::new()))
         .invoke_handler(tauri::generate_handler![state, execute])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

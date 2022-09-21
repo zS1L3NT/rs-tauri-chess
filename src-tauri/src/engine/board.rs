@@ -3,14 +3,15 @@ use std::collections::HashMap;
 use crate::{bishop, king, knight, pawn, queen, rook, square};
 
 use super::{
-    attack_lines::AttackLines,
+    attack_lines::{AttackLines, self},
     client::{ClientBoard, ClientPiece},
     color::Color,
     piece::{Directions, Piece, PieceType},
-    r#move::Move,
+    r#move::{Move, MoveType},
     square::{Rank, Square},
 };
 
+#[derive(Debug)]
 pub struct Board {
     pub history: Vec<Move>,
     pub pieces: HashMap<Square, Piece>,
@@ -417,12 +418,41 @@ impl Board {
     }
 
     fn is_clear_line(&self, line: &Vec<Square>, king_square: Square) -> bool {
-        assert!(line.len() >= 2);
         for square in line.iter() {
             if let Some(_) = self.pieces.get(&square) {
                 return *square == king_square;
             }
         }
         return true;
+    }
+
+    pub fn execute(&mut self, r#move: Move) {
+        match r#move.r#type {
+            MoveType::Normal => {
+				let piece = self.pieces.remove(&r#move.from).unwrap();
+				self.attack_lines.remove(&r#move.from);
+				
+				let attack_lines = piece.get_attack_lines(&self, r#move.to);
+				self.attack_lines.insert(r#move.to, attack_lines);
+
+				if let PieceType::King = piece.r#type {
+					if piece.color == Color::White {
+						self.white_king = r#move.to;
+					} else {
+						self.black_king = r#move.to;
+					}
+				}
+
+				self.pieces.insert(r#move.to, piece);
+			},
+            MoveType::Capture => todo!(),
+            MoveType::Promotion => todo!(),
+            MoveType::PromotionCapture => todo!(),
+            MoveType::PawnJump => todo!(),
+            MoveType::Enpassant => todo!(),
+            MoveType::Castle => todo!(),
+        }
+
+		self.history.push(r#move);
     }
 }

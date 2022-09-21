@@ -1,11 +1,11 @@
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
 use super::{
     piece::{Piece, PieceType},
     square::Square,
 };
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub enum MoveType {
     Normal,
     Capture,
@@ -16,7 +16,7 @@ pub enum MoveType {
     Castle,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct Move {
     pub from: Square,
     pub to: Square,

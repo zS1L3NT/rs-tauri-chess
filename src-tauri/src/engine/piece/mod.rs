@@ -1,11 +1,11 @@
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
 use super::{attack_lines::AttackLines, board::Board, color::Color, square::Square};
 
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone, Copy, Debug, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum PieceType {
     Pawn,
     Knight,
@@ -15,7 +15,7 @@ pub enum PieceType {
     King,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct Piece {
     pub id: u8,
     pub r#type: PieceType,

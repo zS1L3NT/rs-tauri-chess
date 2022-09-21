@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::square;
 
@@ -29,6 +29,26 @@ impl Serialize for File {
             File::G => 6,
             File::H => 7,
         })
+    }
+}
+
+impl<'de> Deserialize<'de> for File {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let file = u8::deserialize(deserializer)?;
+        match file {
+            0 => Ok(File::A),
+            1 => Ok(File::B),
+            2 => Ok(File::C),
+            3 => Ok(File::D),
+            4 => Ok(File::E),
+            5 => Ok(File::F),
+            6 => Ok(File::G),
+            7 => Ok(File::H),
+            _ => Err(serde::de::Error::custom("invalid file")),
+        }
     }
 }
 
@@ -91,6 +111,26 @@ impl Serialize for Rank {
     }
 }
 
+impl<'de> Deserialize<'de> for Rank {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let index = u8::deserialize(deserializer)?;
+        match index {
+            0 => Ok(Rank::_1),
+            1 => Ok(Rank::_2),
+            2 => Ok(Rank::_3),
+            3 => Ok(Rank::_4),
+            4 => Ok(Rank::_5),
+            5 => Ok(Rank::_6),
+            6 => Ok(Rank::_7),
+            7 => Ok(Rank::_8),
+            _ => Err(serde::de::Error::custom("invalid rank")),
+        }
+    }
+}
+
 impl Rank {
     pub fn from_index(index: i8) -> Option<Rank> {
         match index {
@@ -120,7 +160,7 @@ impl Rank {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Square {
     pub file: File,
     pub rank: Rank,
