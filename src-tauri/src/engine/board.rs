@@ -432,32 +432,95 @@ impl Board {
         match r#move.r#type {
             MoveType::Normal => {
                 let piece = self.pieces.remove(&r#move.from).unwrap();
+
                 self.attack_lines.remove(&r#move.from);
 
                 let attack_lines = piece.get_attack_lines(&self, r#move.to);
                 self.attack_lines.insert(r#move.to, attack_lines);
-
-                if let PieceType::King = piece.r#type {
-                    if piece.color == Color::White {
-                        self.white_king = r#move.to;
-                    } else {
-                        self.black_king = r#move.to;
-                    }
-                }
-
                 self.pieces.insert(r#move.to, piece);
             }
             MoveType::Capture => {
                 let piece = self.pieces.remove(&r#move.from).unwrap();
+
+                self.pieces.remove(&r#move.to);
+                self.attack_lines.remove(&r#move.from);
+                self.attack_lines.remove(&r#move.to);
+
+                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
+            }
+            MoveType::Promotion => {
+                let mut piece = self.pieces.remove(&r#move.from).unwrap();
+                piece.r#type = r#move.promotion.unwrap();
+
                 self.attack_lines.remove(&r#move.from);
 
                 let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
             }
-            MoveType::Promotion => todo!(),
-            MoveType::PromotionCapture => todo!(),
-            MoveType::PawnJump => todo!(),
-            MoveType::Enpassant => todo!(),
+            MoveType::PromotionCapture => {
+                let mut piece = self.pieces.remove(&r#move.from).unwrap();
+                piece.r#type = r#move.promotion.unwrap();
+
+                self.pieces.remove(&r#move.to);
+                self.attack_lines.remove(&r#move.from);
+                self.attack_lines.remove(&r#move.to);
+
+                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
+            }
+            MoveType::PawnJump => {
+                let piece = self.pieces.remove(&r#move.from).unwrap();
+
+                self.attack_lines.remove(&r#move.from);
+
+                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
+
+                self.enpassent_square = Some(r#move.to);
+            }
+            MoveType::Enpassant => {
+                let piece = self.pieces.remove(&r#move.from).unwrap();
+
+                let target_square = &r#move
+                    .from
+                    .offset(r#move.to.file.to_index() - r#move.from.file.to_index(), 0)
+                    .unwrap();
+                self.pieces.remove(target_square);
+                self.attack_lines.remove(&r#move.from);
+                self.attack_lines.remove(target_square);
+
+                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
+            }
             MoveType::Castle => todo!(),
+        }
+
+        if let PieceType::King = self.pieces.get(&r#move.to).unwrap().r#type {
+            let color = if self.history.len() % 2 == 0 {
+                self.white_king = r#move.to;
+                Color::White
+            } else {
+                self.black_king = r#move.to;
+                Color::Black
+            };
+
+            for (square, attack_lines) in self.attack_lines.iter_mut() {
+                if self.pieces.get(square).unwrap().color != color {
+                    for attack_line in &attack_lines.lines {
+                        if let Some(index) = attack_line.iter().position(|s| s == &r#move.to) {
+                            attack_lines.lines_with_king = Some(index);
+                        } else {
+                            attack_lines.lines_with_king = None;
+                        }
+                    }
+                }
+            }
         }
 
         self.history.push(r#move);
