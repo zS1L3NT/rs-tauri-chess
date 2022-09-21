@@ -8,7 +8,7 @@ const Board = () => {
 	return (
 		<div
 			style={{
-				backgroundImage: "url(./assets/board.png)",
+				backgroundImage: "url(./assets/Board.png)",
 				backgroundSize: "contain",
 				width: "800px",
 				height: "800px"

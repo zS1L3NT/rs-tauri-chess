@@ -1,16 +1,20 @@
 import { motion, useMotionValue } from "framer-motion"
-import { MouseEvent, useContext, useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
+
+import { invoke } from "@tauri-apps/api"
 
 import CursorContext from "../contexts/CursorContext"
+import MovesContext from "../contexts/MovesContext"
 import PiecesContext from "../contexts/PiecesContext"
 import calculateSquareFromCss from "../functions/calculateSquareFromCss"
 import equalSquares from "../functions/equalSquares"
-import { Piece as iPiece } from "../types"
+import { Board, Piece as iPiece } from "../types"
 
 const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 	const ref = useRef<HTMLDivElement>(null)
 	const { isDragging, setIsDragging, setHovered, selected, setSelected } =
 		useContext(CursorContext)
+	const { moves, setMoves } = useContext(MovesContext)
 	const { pieces, setPieces } = useContext(PiecesContext)
 	const x = useMotionValue(0)
 	const y = useMotionValue(0)
@@ -25,13 +29,13 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 	const [moved, setMoved] = useState<boolean | null>(null)
 
 	useEffect(() => {
-		if (ref.current) {
+		if (ref.current && !isDragging) {
 			x.set(0)
 			y.set(0)
 		}
-	}, [ref.current, square])
+	}, [ref.current, isDragging, square])
 
-	const handleMouseDown = (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
+	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (e.button !== 0) return
 
 		// Piece is already selected, track what happens to it
@@ -44,7 +48,7 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 		setHovered(calculateSquareFromCss(e.currentTarget.style))
 	}
 
-	const handleMouseMove = (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
+	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (e.button !== 0) return
 		if (!isDragging) return
 
@@ -56,7 +60,7 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 		setHovered(calculateSquareFromCss(e.currentTarget.style))
 	}
 
-	const handleMouseUp = (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
+	const handleMouseUp = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (e.button !== 0) return
 		if (selected?.id !== id) return
 
@@ -70,25 +74,34 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 			return
 		}
 
-		// ! Validate before finalizing the move
 		const targetSquare = calculateSquareFromCss(e.currentTarget.style)
-		const targetPiece = pieces.find(p => equalSquares(p.square, targetSquare))
-		if (targetPiece && targetPiece.id !== id) {
-			setPieces(
-				pieces
-					.map(p => (p.id === id ? { ...p, square: targetSquare } : p))
-					.filter(p => p.id !== targetPiece.id)
-			)
-		} else {
-			setPieces(pieces.map(p => (p.id === id ? { ...p, square: targetSquare } : p)))
+		const move = moves.find(
+			m => equalSquares(m.from, square) && equalSquares(m.to, targetSquare)
+		)
+		if (move) {
+			const board = await invoke<Board>("execute", { move })
+			setPieces(board.pieces)
+			setMoves(board.moves)
 		}
+
+		// ! Validate before finalizing the move
+		// const targetPiece = pieces.find(p => equalSquares(p.square, targetSquare))
+		// if (targetPiece && targetPiece.id !== id) {
+		// 	setPieces(
+		// 		pieces
+		// 			.map(p => (p.id === id ? { ...p, square: targetSquare } : p))
+		// 			.filter(p => p.id !== targetPiece.id)
+		// 	)
+		// } else {
+		// 	setPieces(pieces.map(p => (p.id === id ? { ...p, square: targetSquare } : p)))
+		// }
 	}
 
 	return (
 		<motion.div
 			ref={ref}
 			style={{
-				backgroundImage: `url(./assets/${color}-${type}.png)`,
+				backgroundImage: `url(./assets/${color}${type}.png)`,
 				backgroundSize: "cover",
 				width: 100,
 				height: 100,
