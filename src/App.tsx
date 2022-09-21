@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext } from "react"
 import useAsyncEffect from "use-async-effect"
 
 import { invoke } from "@tauri-apps/api"
@@ -9,21 +9,20 @@ import Hover from "./components/Hover"
 import Piece from "./components/Piece"
 import Target from "./components/Target"
 import CursorContext from "./contexts/CursorContext"
+import MovesContext from "./contexts/MovesContext"
 import PiecesContext from "./contexts/PiecesContext"
 import equalSquares from "./functions/equalSquares"
-import { Move, MoveType, Piece as iPiece } from "./types"
+import { Board as iBoard, MoveType } from "./types"
 
 const App = () => {
 	const { selected } = useContext(CursorContext)
+	const { moves, setMoves } = useContext(MovesContext)
 	const { pieces, setPieces } = useContext(PiecesContext)
 
-	const [moves, setMoves] = useState<Move[]>([])
-
 	useAsyncEffect(async () => {
-		const { pieces, moves } = await invoke<{ pieces: iPiece[]; moves: Move[] }>("state")
-
-		setPieces(pieces)
-		setMoves(moves)
+		const board = await invoke<iBoard>("state")
+		setPieces(board.pieces)
+		setMoves(board.moves)
 	}, [])
 
 	return (
@@ -40,6 +39,7 @@ const App = () => {
 						.filter(m => equalSquares(m.from, selected.square))
 						.map(m => (
 							<Target
+								key={`${m.to.file}${m.to.rank}`}
 								square={m.to}
 								isCapture={
 									m.type === MoveType.Capture ||

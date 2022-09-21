@@ -63,3 +63,8 @@ export interface Move {
 	captured: Piece | null
 	promotion: PieceType | null
 }
+
+export interface Board {
+	pieces: Piece[]
+	moves: Move[]
+}
