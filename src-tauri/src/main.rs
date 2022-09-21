@@ -23,9 +23,10 @@ fn execute(state: tauri::State<Mutex<Board>>, r#move: Move) -> ClientBoard {
 }
 
 fn main() {
-    tauri::Builder::default()
-        .manage(Mutex::new(Board::new()))
-        .invoke_handler(tauri::generate_handler![state, execute])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+	println!("{:#?}", Board::new().get_moves());
+    // tauri::Builder::default()
+    //     .manage(Mutex::new(Board::new()))
+    //     .invoke_handler(tauri::generate_handler![state, execute])
+    //     .run(tauri::generate_context!())
+    //     .expect("error while running tauri application");
 }

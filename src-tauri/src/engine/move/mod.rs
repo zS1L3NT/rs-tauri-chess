@@ -1,28 +1,43 @@
-use serde::{Serialize, Deserialize};
+mod move_type;
+#[cfg(test)]
+mod tests;
+
+pub use move_type::MoveType;
+
+use serde::{Deserialize, Serialize};
 
 use super::{
     piece::{Piece, PieceType},
     square::Square,
 };
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-pub enum MoveType {
-    Normal,
-    Capture,
-    Promotion,
-    PromotionCapture,
-    PawnJump,
-    Enpassant,
-    Castle,
-}
-
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Deserialize, PartialEq, Serialize)]
 pub struct Move {
     pub from: Square,
     pub to: Square,
     pub r#type: MoveType,
     pub captured: Option<Piece>,
     pub promotion: Option<PieceType>,
+}
+
+impl std::fmt::Debug for Move {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{:?}Move({:?}->{:?}{}{})",
+            self.r#type,
+            self.from,
+            self.to,
+            match &self.captured {
+                Some(captured) => format!(" ~{:?}", captured),
+                None => "".into(),
+            },
+            match &self.promotion {
+                Some(promotion) => format!(" ^{:?}", promotion),
+                None => "".into(),
+            }
+        )
+    }
 }
 
 impl Move {

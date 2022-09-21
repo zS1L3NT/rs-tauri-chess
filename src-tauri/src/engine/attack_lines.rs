@@ -1,6 +1,6 @@
 use super::square::Square;
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 pub struct AttackLines {
     /// The square of the attacker
     pub origin: Square,
@@ -12,6 +12,35 @@ pub struct AttackLines {
     ///
     /// Doesn't matter if there are multiple pieces between the attacker and the King
     pub lines_with_king: Option<usize>,
+}
+
+impl std::fmt::Debug for AttackLines {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "AttackLines({:#?})",
+            self.lines
+                .iter()
+                .enumerate()
+                .map(|(i, line)| format!(
+                    "{}{:?}->{}{}",
+                    match self.lines_with_king {
+                        Some(index) if index == i => "*",
+                        _ => "",
+                    },
+                    self.origin,
+                    line.iter()
+                        .map(|s| format!("{:?}", s))
+                        .collect::<Vec<_>>()
+                        .join("->"),
+                    match self.lines_with_king {
+                        Some(index) if index == i => "*",
+                        _ => "",
+                    },
+                ))
+                .collect::<Vec<_>>()
+        )
+    }
 }
 
 impl AttackLines {

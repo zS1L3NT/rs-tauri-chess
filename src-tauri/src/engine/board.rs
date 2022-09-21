@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{bishop, king, knight, pawn, queen, rook, square};
 
 use super::{
-    attack_lines::{AttackLines, self},
+    attack_lines::AttackLines,
     client::{ClientBoard, ClientPiece},
     color::Color,
     piece::{Directions, Piece, PieceType},
@@ -429,22 +429,22 @@ impl Board {
     pub fn execute(&mut self, r#move: Move) {
         match r#move.r#type {
             MoveType::Normal => {
-				let piece = self.pieces.remove(&r#move.from).unwrap();
-				self.attack_lines.remove(&r#move.from);
-				
-				let attack_lines = piece.get_attack_lines(&self, r#move.to);
-				self.attack_lines.insert(r#move.to, attack_lines);
+                let piece = self.pieces.remove(&r#move.from).unwrap();
+                self.attack_lines.remove(&r#move.from);
 
-				if let PieceType::King = piece.r#type {
-					if piece.color == Color::White {
-						self.white_king = r#move.to;
-					} else {
-						self.black_king = r#move.to;
-					}
-				}
+                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
 
-				self.pieces.insert(r#move.to, piece);
-			},
+                if let PieceType::King = piece.r#type {
+                    if piece.color == Color::White {
+                        self.white_king = r#move.to;
+                    } else {
+                        self.black_king = r#move.to;
+                    }
+                }
+
+                self.pieces.insert(r#move.to, piece);
+            }
             MoveType::Capture => todo!(),
             MoveType::Promotion => todo!(),
             MoveType::PromotionCapture => todo!(),
@@ -453,6 +453,6 @@ impl Board {
             MoveType::Castle => todo!(),
         }
 
-		self.history.push(r#move);
+        self.history.push(r#move);
     }
 }

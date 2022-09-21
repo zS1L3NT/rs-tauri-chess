@@ -1,57 +1,26 @@
-use serde::{Serialize, Deserialize};
-
-use super::{attack_lines::AttackLines, board::Board, color::Color, square::Square};
-
+mod directions;
+mod piece_type;
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
-pub enum PieceType {
-    Pawn,
-    Knight,
-    Bishop,
-    Rook,
-    Queen,
-    King,
-}
+pub use directions::Directions;
+pub use piece_type::PieceType;
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+use serde::{Deserialize, Serialize};
+
+use super::{attack_lines::AttackLines, board::Board, color::Color, square::Square};
+
+#[derive(Clone, Deserialize, PartialEq, Serialize)]
 pub struct Piece {
     pub id: u8,
     pub r#type: PieceType,
     pub color: Color,
 }
 
-pub struct Directions {}
-
-impl Directions {
-    pub const KNIGHT: [(i8, i8); 8] = [
-        (1, 2),
-        (2, 1),
-        (2, -1),
-        (1, -2),
-        (-1, -2),
-        (-2, -1),
-        (-2, 1),
-        (-1, 2),
-    ];
-
-    pub const BISHOP: [(i8, i8); 4] = [(1, 1), (1, -1), (-1, -1), (-1, 1)];
-
-    pub const ROOK: [(i8, i8); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
-
-    pub const QUEEN: [(i8, i8); 8] = [
-        (0, 1),
-        (1, 1),
-        (1, 0),
-        (1, -1),
-        (0, -1),
-        (-1, -1),
-        (-1, 0),
-        (-1, 1),
-    ];
-
-    pub const KING: [(i8, i8); 8] = Directions::QUEEN;
+impl std::fmt::Debug for Piece {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}{:?}{:0<2}", self.color, self.r#type, self.id)
+    }
 }
 
 impl Piece {

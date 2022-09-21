@@ -19,6 +19,7 @@ const Target = ({ square, isCapture }: { square: Square; isCapture: boolean }) =
 		)!
 
 		const board = await invoke<Board>("execute", { move })
+		console.log(board)
 		setPieces(board.pieces)
 		setMoves(board.moves)
 	}

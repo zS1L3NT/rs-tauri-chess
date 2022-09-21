@@ -80,6 +80,7 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 		)
 		if (move) {
 			const board = await invoke<Board>("execute", { move })
+			console.log(board)
 			setPieces(board.pieces)
 			setMoves(board.moves)
 		}
