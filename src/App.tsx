@@ -20,6 +20,9 @@ const App = () => {
 	const { pieces, setPieces } = useContext(PiecesContext)
 
 	useAsyncEffect(async () => {
+		// @ts-ignore
+		window.invoke = invoke
+
 		const board = await invoke<iBoard>("state")
 		setPieces(board.pieces)
 		setMoves(board.moves)
