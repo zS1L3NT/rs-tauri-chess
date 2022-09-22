@@ -16,7 +16,6 @@ pub struct Board {
     pub history: Vec<Move>,
     pub pieces: HashMap<Square, Piece>,
     pub attack_lines: HashMap<Square, Vec<Vec<Square>>>,
-    pub enpassent_square: Option<Square>,
     pub white_king: Square,
     pub black_king: Square,
 }
@@ -60,7 +59,6 @@ impl Board {
                 (square!(H1), rook!(31, White)),
             ]),
             attack_lines: HashMap::new(),
-            enpassent_square: None,
             white_king: square!(E1),
             black_king: square!(E8),
         };
@@ -184,30 +182,33 @@ impl Board {
                             }
                         }
                     } else {
-                        if let Some(enpassant_square) = self.enpassent_square {
-                            if enpassant_square.rank == team_rank(Rank::_5, Rank::_4)
-                                && square.rank == team_rank(Rank::_5, Rank::_4)
-                            {
-                                if let Some(left_target_square) = square.offset(-1, 0) {
-                                    if left_target_square == enpassant_square {
-                                        moves.push(Move::from_enpassant(
-                                            square,
-                                            left_target_square
-                                                .offset(0, 1 * team_multiplier)
-                                                .unwrap(),
-                                            self.pieces.get(&enpassant_square).unwrap().clone(),
-                                        ));
+                        if let Some(last_move) = self.history.last() {
+                            if last_move.r#type == MoveType::PawnJump {
+                                let enpassant_square = last_move.to;
+                                if enpassant_square.rank == team_rank(Rank::_5, Rank::_4)
+                                    && square.rank == team_rank(Rank::_5, Rank::_4)
+                                {
+                                    if let Some(left_target_square) = square.offset(-1, 0) {
+                                        if left_target_square == enpassant_square {
+                                            moves.push(Move::from_enpassant(
+                                                square,
+                                                left_target_square
+                                                    .offset(0, 1 * team_multiplier)
+                                                    .unwrap(),
+                                                self.pieces.get(&enpassant_square).unwrap().clone(),
+                                            ));
+                                        }
                                     }
-                                }
-                                if let Some(right_target_square) = square.offset(1, 0) {
-                                    if right_target_square == enpassant_square {
-                                        moves.push(Move::from_enpassant(
-                                            square,
-                                            right_target_square
-                                                .offset(0, 1 * team_multiplier)
-                                                .unwrap(),
-                                            self.pieces.get(&enpassant_square).unwrap().clone(),
-                                        ));
+                                    if let Some(right_target_square) = square.offset(1, 0) {
+                                        if right_target_square == enpassant_square {
+                                            moves.push(Move::from_enpassant(
+                                                square,
+                                                right_target_square
+                                                    .offset(0, 1 * team_multiplier)
+                                                    .unwrap(),
+                                                self.pieces.get(&enpassant_square).unwrap().clone(),
+                                            ));
+                                        }
                                     }
                                 }
                             }
@@ -449,8 +450,6 @@ impl Board {
                 let attack_lines = piece.get_attack_lines(r#move.to);
                 self.attack_lines.insert(r#move.to, attack_lines);
                 self.pieces.insert(r#move.to, piece);
-
-                self.enpassent_square = Some(r#move.to);
             }
             MoveType::Enpassant => {
                 let piece = self.pieces.remove(&r#move.from).unwrap();
