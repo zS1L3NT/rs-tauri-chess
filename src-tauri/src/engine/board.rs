@@ -8,7 +8,7 @@ use super::{
     color::Color,
     piece::{Directions, Piece, PieceType},
     r#move::{Move, MoveType},
-    square::{Rank, Square},
+    square::{File, Rank, Square},
 };
 
 #[derive(Debug)]
@@ -353,6 +353,69 @@ impl Board {
 
                             true
                         });
+                    }
+                }
+            }
+        }
+
+        let initial_king_rank = if color == Color::White {
+            Rank::_1
+        } else {
+            Rank::_8
+        };
+
+        if self
+            .history
+            .iter()
+            .find(|m| m.from == Square::from(File::E, initial_king_rank))
+            .is_none()
+        {
+            for castle_squares in vec![
+                vec![
+                    Square::from(File::A, initial_king_rank),
+                    Square::from(File::B, initial_king_rank),
+                    Square::from(File::C, initial_king_rank),
+                    Square::from(File::D, initial_king_rank),
+                ],
+                vec![
+                    Square::from(File::H, initial_king_rank),
+                    Square::from(File::G, initial_king_rank),
+                    Square::from(File::F, initial_king_rank),
+                ],
+            ] {
+                if castle_squares[1..]
+                    .iter()
+                    .all(|s| self.pieces.get(s).is_none())
+                    && self
+                        .history
+                        .iter()
+                        .find(|m| m.from == *castle_squares.first().unwrap())
+                        .is_none()
+                {
+                    let mut can_castle = true;
+                    'square_loop: for square in Square::ALL {
+                        if let Some(piece) = self.pieces.get(&square) {
+                            if piece.color != color {
+                                let attack_lines = piece.get_attack_lines(square);
+                                for attack_line in attack_lines {
+                                    if attack_line.iter().any(|s| castle_squares[1..].contains(s)) {
+                                        for square in attack_line {
+                                            if let Some(_) = self.pieces.get(&square) {
+                                                can_castle = false;
+                                                break 'square_loop;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if can_castle {
+                        moves.push(Move::from_castle(
+                            Square::from(File::E, initial_king_rank),
+                            *castle_squares.get(castle_squares.len() - 2).unwrap(),
+                        ))
                     }
                 }
             }
