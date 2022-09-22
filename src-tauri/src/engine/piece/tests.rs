@@ -1,8 +1,6 @@
 mod pawn {
-    use crate::{
-        engine::{attack_lines::AttackLines, board::Board},
-        square,
-    };
+    use crate::engine::{attack_lines::AttackLines, board::Board};
+    use rs_tauri_chess::square;
 
     #[test]
     fn white_normal() {
@@ -10,15 +8,15 @@ mod pawn {
 
         assert_eq!(
             AttackLines::new(
-                square!(E _2),
-                vec![vec![square!(D _3)], vec![square!(F _3)]],
+                square!(E2),
+                vec![vec![square!(D3)], vec![square!(F3)]],
                 None
             ),
             board
                 .pieces
-                .get(&square!(E _2))
+                .get(&square!(E2))
                 .unwrap()
-                .get_attack_lines(&board, square!(E _2))
+                .get_attack_lines(&board, square!(E2))
         );
     }
 
@@ -27,12 +25,12 @@ mod pawn {
         let board = Board::new();
 
         assert_eq!(
-            AttackLines::new(square!(A _2), vec![vec![square!(B _3)]], None),
+            AttackLines::new(square!(A2), vec![vec![square!(B3)]], None),
             board
                 .pieces
-                .get(&square!(A _2))
+                .get(&square!(A2))
                 .unwrap()
-                .get_attack_lines(&board, square!(A _2))
+                .get_attack_lines(&board, square!(A2))
         );
     }
 
@@ -41,12 +39,12 @@ mod pawn {
         let board = Board::new();
 
         assert_eq!(
-            AttackLines::new(square!(H _2), vec![vec![square!(G _3)]], None),
+            AttackLines::new(square!(H2), vec![vec![square!(G3)]], None),
             board
                 .pieces
-                .get(&square!(H _2))
+                .get(&square!(H2))
                 .unwrap()
-                .get_attack_lines(&board, square!(H _2))
+                .get_attack_lines(&board, square!(H2))
         );
     }
 
@@ -56,15 +54,15 @@ mod pawn {
 
         assert_eq!(
             AttackLines::new(
-                square!(E _7),
-                vec![vec![square!(D _6)], vec![square!(F _6)]],
+                square!(E7),
+                vec![vec![square!(D6)], vec![square!(F6)]],
                 None
             ),
             board
                 .pieces
-                .get(&square!(E _7))
+                .get(&square!(E7))
                 .unwrap()
-                .get_attack_lines(&board, square!(E _7))
+                .get_attack_lines(&board, square!(E7))
         );
     }
 
@@ -73,12 +71,12 @@ mod pawn {
         let board = Board::new();
 
         assert_eq!(
-            AttackLines::new(square!(A _7), vec![vec![square!(B _6)]], None),
+            AttackLines::new(square!(A7), vec![vec![square!(B6)]], None),
             board
                 .pieces
-                .get(&square!(A _7))
+                .get(&square!(A7))
                 .unwrap()
-                .get_attack_lines(&board, square!(A _7))
+                .get_attack_lines(&board, square!(A7))
         );
     }
 
@@ -87,21 +85,19 @@ mod pawn {
         let board = Board::new();
 
         assert_eq!(
-            AttackLines::new(square!(H _7), vec![vec![square!(G _6)]], None),
+            AttackLines::new(square!(H7), vec![vec![square!(G6)]], None),
             board
                 .pieces
-                .get(&square!(H _7))
+                .get(&square!(H7))
                 .unwrap()
-                .get_attack_lines(&board, square!(H _7))
+                .get_attack_lines(&board, square!(H7))
         );
     }
 }
 
 mod knight {
-    use crate::{
-        engine::{attack_lines::AttackLines, board::Board},
-        square,
-    };
+    use crate::engine::{attack_lines::AttackLines, board::Board};
+    use rs_tauri_chess::square;
 
     #[test]
     fn normal() {
@@ -109,19 +105,15 @@ mod knight {
 
         assert_eq!(
             AttackLines::new(
-                square!(B _1),
-                vec![
-                    vec![square!(C _3)],
-                    vec![square!(D _2)],
-                    vec![square!(A _3)]
-                ],
+                square!(B1),
+                vec![vec![square!(C3)], vec![square!(D2)], vec![square!(A3)]],
                 None
             ),
             board
                 .pieces
-                .get(&square!(B _1))
+                .get(&square!(B1))
                 .unwrap()
-                .get_attack_lines(&board, square!(B _1))
+                .get_attack_lines(&board, square!(B1))
         );
     }
 }
@@ -130,8 +122,8 @@ mod bishop {
     use crate::{
         bishop,
         engine::{attack_lines::AttackLines, board::Board},
-        square,
     };
+    use rs_tauri_chess::square;
 
     #[test]
     fn normal() {
@@ -139,46 +131,46 @@ mod bishop {
 
         assert_eq!(
             AttackLines::new(
-                square!(C _1),
+                square!(C1),
                 vec![
                     vec![
-                        square!(D _2),
-                        square!(E _3),
-                        square!(F _4),
-                        square!(G _5),
-                        square!(H _6)
+                        square!(D2),
+                        square!(E3),
+                        square!(F4),
+                        square!(G5),
+                        square!(H6)
                     ],
-                    vec![square!(B _2), square!(A _3)],
+                    vec![square!(B2), square!(A3)],
                 ],
                 None
             ),
             board
                 .pieces
-                .get(&square!(C _1))
+                .get(&square!(C1))
                 .unwrap()
-                .get_attack_lines(&board, square!(C _1))
+                .get_attack_lines(&board, square!(C1))
         );
     }
 
     #[test]
     fn lines_with_king() {
         let mut board = Board::new();
-        board.pieces.insert(square!(H _5), bishop!(32, White));
+        board.pieces.insert(square!(H5), bishop!(32, White));
 
         assert_eq!(
             AttackLines::new(
-                square!(H _5),
+                square!(H5),
                 vec![
-                    vec![square!(G _4), square!(F _3), square!(E _2), square!(D _1),],
-                    vec![square!(G _6), square!(F _7), square!(E _8)],
+                    vec![square!(G4), square!(F3), square!(E2), square!(D1),],
+                    vec![square!(G6), square!(F7), square!(E8)],
                 ],
                 Some(1)
             ),
             board
                 .pieces
-                .get(&square!(H _5))
+                .get(&square!(H5))
                 .unwrap()
-                .get_attack_lines(&board, square!(H _5))
+                .get_attack_lines(&board, square!(H5))
         );
     }
 }
@@ -186,8 +178,9 @@ mod bishop {
 mod rook {
     use crate::{
         engine::{attack_lines::AttackLines, board::Board},
-        rook, square,
+        rook,
     };
+    use rs_tauri_chess::square;
 
     #[test]
     fn normal() {
@@ -195,64 +188,64 @@ mod rook {
 
         assert_eq!(
             AttackLines::new(
-                square!(A _1),
+                square!(A1),
                 vec![
                     vec![
-                        square!(A _2),
-                        square!(A _3),
-                        square!(A _4),
-                        square!(A _5),
-                        square!(A _6),
-                        square!(A _7),
-                        square!(A _8)
+                        square!(A2),
+                        square!(A3),
+                        square!(A4),
+                        square!(A5),
+                        square!(A6),
+                        square!(A7),
+                        square!(A8)
                     ],
                     vec![
-                        square!(B _1),
-                        square!(C _1),
-                        square!(D _1),
-                        square!(E _1),
-                        square!(F _1),
-                        square!(G _1),
-                        square!(H _1)
+                        square!(B1),
+                        square!(C1),
+                        square!(D1),
+                        square!(E1),
+                        square!(F1),
+                        square!(G1),
+                        square!(H1)
                     ],
                 ],
                 None
             ),
             board
                 .pieces
-                .get(&square!(A _1))
+                .get(&square!(A1))
                 .unwrap()
-                .get_attack_lines(&board, square!(A _1))
+                .get_attack_lines(&board, square!(A1))
         );
     }
 
     #[test]
     fn lines_with_king() {
         let mut board = Board::new();
-        board.pieces.insert(square!(E _3), rook!(32, White));
+        board.pieces.insert(square!(E3), rook!(32, White));
 
         assert_eq!(
             AttackLines::new(
-                square!(E _3),
+                square!(E3),
                 vec![
                     vec![
-                        square!(E _4),
-                        square!(E _5),
-                        square!(E _6),
-                        square!(E _7),
-                        square!(E _8),
+                        square!(E4),
+                        square!(E5),
+                        square!(E6),
+                        square!(E7),
+                        square!(E8),
                     ],
-                    vec![square!(F _3), square!(G _3), square!(H _3),],
-                    vec![square!(E _2), square!(E _1),],
-                    vec![square!(D _3), square!(C _3), square!(B _3), square!(A _3),],
+                    vec![square!(F3), square!(G3), square!(H3),],
+                    vec![square!(E2), square!(E1),],
+                    vec![square!(D3), square!(C3), square!(B3), square!(A3),],
                 ],
                 Some(0)
             ),
             board
                 .pieces
-                .get(&square!(E _3))
+                .get(&square!(E3))
                 .unwrap()
-                .get_attack_lines(&board, square!(E _3))
+                .get_attack_lines(&board, square!(E3))
         );
     }
 }
@@ -260,8 +253,9 @@ mod rook {
 mod queen {
     use crate::{
         engine::{attack_lines::AttackLines, board::Board},
-        queen, square,
+        queen,
     };
+    use rs_tauri_chess::square;
 
     #[test]
     fn normal() {
@@ -269,105 +263,103 @@ mod queen {
 
         assert_eq!(
             AttackLines::new(
-                square!(D _1),
+                square!(D1),
                 vec![
                     vec![
-                        square!(D _2),
-                        square!(D _3),
-                        square!(D _4),
-                        square!(D _5),
-                        square!(D _6),
-                        square!(D _7),
-                        square!(D _8)
+                        square!(D2),
+                        square!(D3),
+                        square!(D4),
+                        square!(D5),
+                        square!(D6),
+                        square!(D7),
+                        square!(D8)
                     ],
-                    vec![square!(E _2), square!(F _3), square!(G _4), square!(H _5)],
-                    vec![square!(E _1), square!(F _1), square!(G _1), square!(H _1)],
-                    vec![square!(C _1), square!(B _1), square!(A _1),],
-                    vec![square!(C _2), square!(B _3), square!(A _4),],
+                    vec![square!(E2), square!(F3), square!(G4), square!(H5)],
+                    vec![square!(E1), square!(F1), square!(G1), square!(H1)],
+                    vec![square!(C1), square!(B1), square!(A1),],
+                    vec![square!(C2), square!(B3), square!(A4),],
                 ],
                 None,
             ),
             board
                 .pieces
-                .get(&square!(D _1))
+                .get(&square!(D1))
                 .unwrap()
-                .get_attack_lines(&board, square!(D _1))
+                .get_attack_lines(&board, square!(D1))
         );
     }
 
     #[test]
     fn lines_with_king_straight() {
         let mut board = Board::new();
-        board.pieces.insert(square!(E _3), queen!(32, White));
+        board.pieces.insert(square!(E3), queen!(32, White));
 
         assert_eq!(
             AttackLines::new(
-                square!(E _3),
+                square!(E3),
                 vec![
                     vec![
-                        square!(E _4),
-                        square!(E _5),
-                        square!(E _6),
-                        square!(E _7),
-                        square!(E _8),
+                        square!(E4),
+                        square!(E5),
+                        square!(E6),
+                        square!(E7),
+                        square!(E8),
                     ],
-                    vec![square!(F _4), square!(G _5), square!(H _6),],
-                    vec![square!(F _3), square!(G _3), square!(H _3),],
-                    vec![square!(F _2), square!(G _1),],
-                    vec![square!(E _2), square!(E _1),],
-                    vec![square!(D _2), square!(C _1),],
-                    vec![square!(D _3), square!(C _3), square!(B _3), square!(A _3),],
-                    vec![square!(D _4), square!(C _5), square!(B _6), square!(A _7),],
+                    vec![square!(F4), square!(G5), square!(H6),],
+                    vec![square!(F3), square!(G3), square!(H3),],
+                    vec![square!(F2), square!(G1),],
+                    vec![square!(E2), square!(E1),],
+                    vec![square!(D2), square!(C1),],
+                    vec![square!(D3), square!(C3), square!(B3), square!(A3),],
+                    vec![square!(D4), square!(C5), square!(B6), square!(A7),],
                 ],
                 Some(0)
             ),
             board
                 .pieces
-                .get(&square!(E _3))
+                .get(&square!(E3))
                 .unwrap()
-                .get_attack_lines(&board, square!(E _3))
+                .get_attack_lines(&board, square!(E3))
         );
     }
 
     #[test]
     fn lines_with_king_diagonal() {
         let mut board = Board::new();
-        board.pieces.insert(square!(H _5), queen!(32, White));
+        board.pieces.insert(square!(H5), queen!(32, White));
 
         assert_eq!(
             AttackLines::new(
-                square!(H _5),
+                square!(H5),
                 vec![
-                    vec![square!(H _6), square!(H _7), square!(H _8),],
-                    vec![square!(H _4), square!(H _3), square!(H _2), square!(H _1)],
-                    vec![square!(G _4), square!(F _3), square!(E _2), square!(D _1),],
+                    vec![square!(H6), square!(H7), square!(H8),],
+                    vec![square!(H4), square!(H3), square!(H2), square!(H1)],
+                    vec![square!(G4), square!(F3), square!(E2), square!(D1),],
                     vec![
-                        square!(G _5),
-                        square!(F _5),
-                        square!(E _5),
-                        square!(D _5),
-                        square!(C _5),
-                        square!(B _5),
-                        square!(A _5),
+                        square!(G5),
+                        square!(F5),
+                        square!(E5),
+                        square!(D5),
+                        square!(C5),
+                        square!(B5),
+                        square!(A5),
                     ],
-                    vec![square!(G _6), square!(F _7), square!(E _8),],
+                    vec![square!(G6), square!(F7), square!(E8),],
                 ],
                 Some(4)
             ),
             board
                 .pieces
-                .get(&square!(H _5))
+                .get(&square!(H5))
                 .unwrap()
-                .get_attack_lines(&board, square!(H _5))
+                .get_attack_lines(&board, square!(H5))
         );
     }
 }
 
 mod king {
-    use crate::{
-        engine::{attack_lines::AttackLines, board::Board},
-        square,
-    };
+    use crate::engine::{attack_lines::AttackLines, board::Board};
+    use rs_tauri_chess::square;
 
     #[test]
     fn normal() {
@@ -375,21 +367,21 @@ mod king {
 
         assert_eq!(
             AttackLines::new(
-                square!(E _1),
+                square!(E1),
                 vec![
-                    vec![square!(E _2)],
-                    vec![square!(F _2)],
-                    vec![square!(F _1)],
-                    vec![square!(D _1)],
-                    vec![square!(D _2)],
+                    vec![square!(E2)],
+                    vec![square!(F2)],
+                    vec![square!(F1)],
+                    vec![square!(D1)],
+                    vec![square!(D2)],
                 ],
                 None
             ),
             board
                 .pieces
-                .get(&square!(E _1))
+                .get(&square!(E1))
                 .unwrap()
-                .get_attack_lines(&board, square!(E _1))
+                .get_attack_lines(&board, square!(E1))
         );
     }
 }

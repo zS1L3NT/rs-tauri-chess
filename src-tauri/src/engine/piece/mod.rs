@@ -67,7 +67,7 @@ impl Piece {
                         current_square = target_square;
                     }
 
-                    if line.len() > 1 {
+                    if line.len() >= 1 {
                         attack_lines.push(line);
                     }
                 }
@@ -85,7 +85,7 @@ impl Piece {
                         current_square = target_square;
                     }
 
-                    if line.len() > 1 {
+                    if line.len() >= 1 {
                         attack_lines.push(line);
                     }
                 }
@@ -103,7 +103,7 @@ impl Piece {
                         current_square = target_square;
                     }
 
-                    if line.len() > 1 {
+                    if line.len() >= 1 {
                         attack_lines.push(line);
                     }
                 }

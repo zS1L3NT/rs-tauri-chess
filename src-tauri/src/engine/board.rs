@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use crate::{bishop, king, knight, pawn, queen, rook, square};
+use crate::{bishop, king, knight, pawn, queen, rook};
+use rs_tauri_chess::square;
 
 use super::{
     attack_lines::AttackLines,
@@ -26,43 +27,43 @@ impl Board {
         let mut board = Board {
             history: vec![],
             pieces: HashMap::from([
-                (square!(A _8), rook!(0, Black)),
-                (square!(B _8), knight!(1, Black)),
-                (square!(C _8), bishop!(2, Black)),
-                (square!(D _8), queen!(3, Black)),
-                (square!(E _8), king!(4, Black)),
-                (square!(F _8), bishop!(5, Black)),
-                (square!(G _8), knight!(6, Black)),
-                (square!(H _8), rook!(7, Black)),
-                (square!(A _7), pawn!(8, Black)),
-                (square!(B _7), pawn!(9, Black)),
-                (square!(C _7), pawn!(10, Black)),
-                (square!(D _7), pawn!(11, Black)),
-                (square!(E _7), pawn!(12, Black)),
-                (square!(F _7), pawn!(13, Black)),
-                (square!(G _7), pawn!(14, Black)),
-                (square!(H _7), pawn!(15, Black)),
-                (square!(A _2), pawn!(16, White)),
-                (square!(B _2), pawn!(17, White)),
-                (square!(C _2), pawn!(18, White)),
-                (square!(D _2), pawn!(19, White)),
-                (square!(E _2), pawn!(20, White)),
-                (square!(F _2), pawn!(21, White)),
-                (square!(G _2), pawn!(22, White)),
-                (square!(H _2), pawn!(23, White)),
-                (square!(A _1), rook!(24, White)),
-                (square!(B _1), knight!(25, White)),
-                (square!(C _1), bishop!(26, White)),
-                (square!(D _1), queen!(27, White)),
-                (square!(E _1), king!(28, White)),
-                (square!(F _1), bishop!(29, White)),
-                (square!(G _1), knight!(30, White)),
-                (square!(H _1), rook!(31, White)),
+                (square!(A8), rook!(0, Black)),
+                (square!(B8), knight!(1, Black)),
+                (square!(C8), bishop!(2, Black)),
+                (square!(D8), queen!(3, Black)),
+                (square!(E8), king!(4, Black)),
+                (square!(F8), bishop!(5, Black)),
+                (square!(G8), knight!(6, Black)),
+                (square!(H8), rook!(7, Black)),
+                (square!(A7), pawn!(8, Black)),
+                (square!(B7), pawn!(9, Black)),
+                (square!(C7), pawn!(10, Black)),
+                (square!(D7), pawn!(11, Black)),
+                (square!(E7), pawn!(12, Black)),
+                (square!(F7), pawn!(13, Black)),
+                (square!(G7), pawn!(14, Black)),
+                (square!(H7), pawn!(15, Black)),
+                (square!(A2), pawn!(16, White)),
+                (square!(B2), pawn!(17, White)),
+                (square!(C2), pawn!(18, White)),
+                (square!(D2), pawn!(19, White)),
+                (square!(E2), pawn!(20, White)),
+                (square!(F2), pawn!(21, White)),
+                (square!(G2), pawn!(22, White)),
+                (square!(H2), pawn!(23, White)),
+                (square!(A1), rook!(24, White)),
+                (square!(B1), knight!(25, White)),
+                (square!(C1), bishop!(26, White)),
+                (square!(D1), queen!(27, White)),
+                (square!(E1), king!(28, White)),
+                (square!(F1), bishop!(29, White)),
+                (square!(G1), knight!(30, White)),
+                (square!(H1), rook!(31, White)),
             ]),
             attack_lines: HashMap::new(),
             enpassent_square: None,
-            white_king: square!(E _1),
-            black_king: square!(E _8),
+            white_king: square!(E1),
+            black_king: square!(E8),
         };
 
         board.attack_lines = board
@@ -98,8 +99,6 @@ impl Board {
         };
 
         let mut moves = vec![];
-        let mut king_move_indexes = vec![];
-
         let opposite_color = color.opposite();
 
         for (square, piece) in &self.pieces {
@@ -278,11 +277,9 @@ impl Board {
                                         target_square,
                                         target_piece.clone(),
                                     ));
-                                    king_move_indexes.push(moves.len() - 1);
                                 }
                             } else {
                                 moves.push(Move::from_normal(square, target_square));
-                                king_move_indexes.push(moves.len() - 1);
                             }
                         }
                     }
@@ -308,17 +305,19 @@ impl Board {
                         self.filter_line(&mut moves, attack_lines.origin, line, king_square);
                     }
 
+                    // Allow moves that keep our King safe
                     for line in &attack_lines.lines {
-                        let mut index = 0;
                         moves.retain(|r#move| {
-                            if king_move_indexes.contains(&index) {
-                                if self.is_clear_line(line, r#move.to) {
-                                    index += 1;
-                                    return false;
+                            if r#move.from != king_square {
+                                return true;
+                            }
+
+                            for square in line {
+                                if let Some(_) = self.pieces.get(&square) {
+                                    return *square != king_square;
                                 }
                             }
 
-                            index += 1;
                             true
                         });
                     }
@@ -395,15 +394,8 @@ impl Board {
                         1 => {
                             // Move that pins another piece
                             moves.retain(|r#move| {
-                                if r#move.from != line_square {
-                                    return true;
-                                }
-
-                                if resolving_squares.contains(&r#move.to) {
-                                    return true;
-                                }
-
-                                return false;
+                                !resolving_squares.contains(&r#move.from)
+                                    || resolving_squares.contains(&r#move.to)
                             });
                         }
                         _ => {}
@@ -417,15 +409,6 @@ impl Board {
 
             resolving_squares.push(line_square);
         }
-    }
-
-    fn is_clear_line(&self, line: &Vec<Square>, king_square: Square) -> bool {
-        for square in line.iter() {
-            if let Some(_) = self.pieces.get(&square) {
-                return *square == king_square;
-            }
-        }
-        return true;
     }
 
     pub fn execute(&mut self, r#move: Move) {
