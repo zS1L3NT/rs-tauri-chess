@@ -296,25 +296,64 @@ impl Board {
         for square in Square::ALL {
             if let Some(piece) = self.pieces.get(&square) {
                 if piece.color != color {
+                    // This block of code runs where {piece} is every piece
+                    // on the enemy team
+
                     let attack_lines = piece.get_attack_lines(&self, square);
                     if let Some(index) = attack_lines.lines_with_king {
                         let line = attack_lines
                             .lines
                             .get(index)
                             .expect("Invalid lines_with_king index");
-                        self.filter_line(&mut moves, attack_lines.origin, line, king_square);
-                    }
 
-                    // Allow moves that keep our King safe
-                    for line in &attack_lines.lines {
-                        moves.retain(|r#move| {
-                            if r#move.from != king_square {
-                                return true;
+                        let mut blocking_pieces = 0;
+                        let mut resolving_squares = vec![attack_lines.origin];
+
+                        for square in line {
+                            let square = *square;
+
+                            if let Some(_) = self.pieces.get(&square) {
+                                if square == king_square {
+                                    match blocking_pieces {
+                                        0 => {
+                                            // Move that checks the King
+                                            moves.retain(|r#move| {
+                                                (r#move.from == king_square
+                                                    && !line.contains(&r#move.to))
+                                                    || resolving_squares.contains(&r#move.to)
+                                            });
+                                        }
+                                        1 => {
+                                            // Move that pins another piece
+                                            moves.retain(|r#move| {
+                                                !resolving_squares.contains(&r#move.from)
+                                                    || resolving_squares.contains(&r#move.to)
+                                            });
+                                        }
+                                        _ => {}
+                                    }
+
+                                    break;
+                                } else {
+                                    blocking_pieces += 1;
+                                }
                             }
 
-                            for square in line {
-                                if let Some(_) = self.pieces.get(&square) {
-                                    return *square != king_square;
+                            resolving_squares.push(square);
+                        }
+                    }
+
+                    // This block of code filter moves that regard our King
+                    // moving into a check
+                    for line in &attack_lines.lines {
+                        moves.retain(|r#move| {
+                            if r#move.from == king_square {
+                                for square in line {
+                                    if let Some(_) = self.pieces.get(&square) {
+                                        return *square != r#move.to;
+                                    } else if *square == r#move.to {
+                                        return false;
+                                    }
                                 }
                             }
 
@@ -355,59 +394,6 @@ impl Board {
                 file_offset += file;
                 rank_offset += rank;
             }
-        }
-    }
-
-    fn filter_line(
-        &self,
-        moves: &mut Vec<Move>,
-        origin: Square,
-        line: &Vec<Square>,
-        king_square: Square,
-    ) {
-        // The number of pieces between the origin and the opponent King
-        let mut blocking_pieces = 0;
-
-        // Squares that resolve the check if a piece moves to them
-        let mut resolving_squares = vec![origin];
-
-        for line_square in line {
-            let line_square = *line_square;
-
-            if let Some(_) = self.pieces.get(&line_square) {
-                if line_square == king_square {
-                    match blocking_pieces {
-                        0 => {
-                            // Move that checks the King
-                            moves.retain(|r#move| {
-                                if r#move.from == king_square {
-                                    return true;
-                                }
-
-                                if resolving_squares.contains(&r#move.to) {
-                                    return true;
-                                }
-
-                                return false;
-                            });
-                        }
-                        1 => {
-                            // Move that pins another piece
-                            moves.retain(|r#move| {
-                                !resolving_squares.contains(&r#move.from)
-                                    || resolving_squares.contains(&r#move.to)
-                            });
-                        }
-                        _ => {}
-                    }
-
-                    break;
-                } else {
-                    blocking_pieces += 1;
-                }
-            }
-
-            resolving_squares.push(line_square);
         }
     }
 
