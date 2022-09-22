@@ -8,7 +8,7 @@ pub use piece_type::PieceType;
 
 use serde::{Deserialize, Serialize};
 
-use super::{attack_lines::AttackLines, board::Board, color::Color, square::Square};
+use super::{board::Board, color::Color, square::Square};
 
 #[derive(Clone, Deserialize, PartialEq, Serialize)]
 pub struct Piece {
@@ -28,16 +28,8 @@ impl Piece {
         Piece { id, r#type, color }
     }
 
-    pub fn get_attack_lines(&self, board: &Board, square: Square) -> AttackLines {
+    pub fn get_attack_lines(&self, square: Square) -> Vec<Vec<Square>> {
         let mut attack_lines = vec![];
-        let mut lines_with_king = None;
-
-        let opposite_king = if self.color == Color::White {
-            board.black_king
-        } else {
-            board.white_king
-        };
-
         match self.r#type {
             PieceType::Pawn => {
                 let team_multiplier = if self.color == Color::White { 1 } else { -1 };
@@ -59,10 +51,6 @@ impl Piece {
                     let mut current_square = square;
                     let mut line = vec![];
                     while let Some(target_square) = current_square.offset(file, rank) {
-                        if target_square == opposite_king {
-                            lines_with_king = Some(attack_lines.len());
-                        }
-
                         line.push(target_square);
                         current_square = target_square;
                     }
@@ -77,10 +65,6 @@ impl Piece {
                     let mut current_square = square;
                     let mut line = vec![];
                     while let Some(target_square) = current_square.offset(file, rank) {
-                        if target_square == opposite_king {
-                            lines_with_king = Some(attack_lines.len());
-                        }
-
                         line.push(target_square);
                         current_square = target_square;
                     }
@@ -95,10 +79,6 @@ impl Piece {
                     let mut current_square = square;
                     let mut line = vec![];
                     while let Some(target_square) = current_square.offset(file, rank) {
-                        if target_square == opposite_king {
-                            lines_with_king = Some(attack_lines.len());
-                        }
-
                         line.push(target_square);
                         current_square = target_square;
                     }
@@ -117,6 +97,6 @@ impl Piece {
             }
         }
 
-        AttackLines::new(square, attack_lines, lines_with_king)
+        attack_lines
     }
 }

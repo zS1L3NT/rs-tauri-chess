@@ -4,7 +4,6 @@ use crate::{bishop, king, knight, pawn, queen, rook};
 use rs_tauri_chess::square;
 
 use super::{
-    attack_lines::AttackLines,
     client::{ClientBoard, ClientPiece},
     color::Color,
     piece::{Directions, Piece, PieceType},
@@ -16,7 +15,7 @@ use super::{
 pub struct Board {
     pub history: Vec<Move>,
     pub pieces: HashMap<Square, Piece>,
-    pub attack_lines: HashMap<Square, AttackLines>,
+    pub attack_lines: HashMap<Square, Vec<Vec<Square>>>,
     pub enpassent_square: Option<Square>,
     pub white_king: Square,
     pub black_king: Square,
@@ -69,7 +68,7 @@ impl Board {
         board.attack_lines = board
             .pieces
             .iter()
-            .map(|(s, p)| (*s, p.get_attack_lines(&board, *s)))
+            .map(|(s, p)| (*s, p.get_attack_lines(*s)))
             .collect::<HashMap<_, _>>();
 
         board
@@ -299,17 +298,18 @@ impl Board {
                     // This block of code runs where {piece} is every piece
                     // on the enemy team
 
-                    let attack_lines = piece.get_attack_lines(&self, square);
-                    if let Some(index) = attack_lines.lines_with_king {
-                        let line = attack_lines
-                            .lines
+                    let attack_lines = piece.get_attack_lines(square);
+                    if let Some(index) =
+                        attack_lines.iter().position(|al| al.contains(&king_square))
+                    {
+                        let attack_line = attack_lines
                             .get(index)
                             .expect("Invalid lines_with_king index");
 
                         let mut blocking_pieces = 0;
-                        let mut resolving_squares = vec![attack_lines.origin];
+                        let mut resolving_squares = vec![square];
 
-                        for square in line {
+                        for square in attack_line {
                             let square = *square;
 
                             if let Some(_) = self.pieces.get(&square) {
@@ -319,7 +319,7 @@ impl Board {
                                             // Move that checks the King
                                             moves.retain(|r#move| {
                                                 (r#move.from == king_square
-                                                    && !line.contains(&r#move.to))
+                                                    && !attack_line.contains(&r#move.to))
                                                     || resolving_squares.contains(&r#move.to)
                                             });
                                         }
@@ -345,10 +345,10 @@ impl Board {
 
                     // This block of code filter moves that regard our King
                     // moving into a check
-                    for line in &attack_lines.lines {
+                    for attack_line in &attack_lines {
                         moves.retain(|r#move| {
                             if r#move.from == king_square {
-                                for square in line {
+                                for square in attack_line {
                                     if let Some(_) = self.pieces.get(&square) {
                                         return *square != r#move.to;
                                     } else if *square == r#move.to {
@@ -404,7 +404,7 @@ impl Board {
 
                 self.attack_lines.remove(&r#move.from);
 
-                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                let attack_lines = piece.get_attack_lines(r#move.to);
                 self.attack_lines.insert(r#move.to, attack_lines);
                 self.pieces.insert(r#move.to, piece);
             }
@@ -415,7 +415,7 @@ impl Board {
                 self.attack_lines.remove(&r#move.from);
                 self.attack_lines.remove(&r#move.to);
 
-                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                let attack_lines = piece.get_attack_lines(r#move.to);
                 self.attack_lines.insert(r#move.to, attack_lines);
                 self.pieces.insert(r#move.to, piece);
             }
@@ -425,7 +425,7 @@ impl Board {
 
                 self.attack_lines.remove(&r#move.from);
 
-                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                let attack_lines = piece.get_attack_lines(r#move.to);
                 self.attack_lines.insert(r#move.to, attack_lines);
                 self.pieces.insert(r#move.to, piece);
             }
@@ -437,7 +437,7 @@ impl Board {
                 self.attack_lines.remove(&r#move.from);
                 self.attack_lines.remove(&r#move.to);
 
-                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                let attack_lines = piece.get_attack_lines(r#move.to);
                 self.attack_lines.insert(r#move.to, attack_lines);
                 self.pieces.insert(r#move.to, piece);
             }
@@ -446,7 +446,7 @@ impl Board {
 
                 self.attack_lines.remove(&r#move.from);
 
-                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                let attack_lines = piece.get_attack_lines(r#move.to);
                 self.attack_lines.insert(r#move.to, attack_lines);
                 self.pieces.insert(r#move.to, piece);
 
@@ -463,7 +463,7 @@ impl Board {
                 self.attack_lines.remove(&r#move.from);
                 self.attack_lines.remove(target_square);
 
-                let attack_lines = piece.get_attack_lines(&self, r#move.to);
+                let attack_lines = piece.get_attack_lines(r#move.to);
                 self.attack_lines.insert(r#move.to, attack_lines);
                 self.pieces.insert(r#move.to, piece);
             }
@@ -471,24 +471,10 @@ impl Board {
         }
 
         if let PieceType::King = self.pieces.get(&r#move.to).unwrap().r#type {
-            let color = if self.history.len() % 2 == 0 {
+            if self.history.len() % 2 == 0 {
                 self.white_king = r#move.to;
-                Color::White
             } else {
                 self.black_king = r#move.to;
-                Color::Black
-            };
-
-            for (square, attack_lines) in self.attack_lines.iter_mut() {
-                if self.pieces.get(square).unwrap().color != color {
-                    for attack_line in &attack_lines.lines {
-                        if let Some(index) = attack_line.iter().position(|s| s == &r#move.to) {
-                            attack_lines.lines_with_king = Some(index);
-                        } else {
-                            attack_lines.lines_with_king = None;
-                        }
-                    }
-                }
             }
         }
 
