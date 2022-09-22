@@ -16,8 +16,7 @@ pub struct Board {
     pub history: Vec<Move>,
     pub pieces: HashMap<Square, Piece>,
     pub attack_lines: HashMap<Square, Vec<Vec<Square>>>,
-    pub white_king: Square,
-    pub black_king: Square,
+    pub kings: HashMap<Color, Square>,
 }
 
 impl Board {
@@ -59,8 +58,7 @@ impl Board {
                 (square!(H1), rook!(31, White)),
             ]),
             attack_lines: HashMap::new(),
-            white_king: square!(E1),
-            black_king: square!(E8),
+            kings: HashMap::from([(Color::White, square!(E1)), (Color::Black, square!(E8))]),
         };
 
         board.attack_lines = board
@@ -287,12 +285,7 @@ impl Board {
             }
         }
 
-        let king_square = if color == Color::White {
-            self.white_king
-        } else {
-            self.black_king
-        };
-
+        let king_square = *self.kings.get(&color).unwrap();
         for square in Square::ALL {
             if let Some(piece) = self.pieces.get(&square) {
                 if piece.color != color {
@@ -318,17 +311,17 @@ impl Board {
                                     match blocking_pieces {
                                         0 => {
                                             // Move that checks the King
-                                            moves.retain(|r#move| {
-                                                (r#move.from == king_square
-                                                    && !attack_line.contains(&r#move.to))
-                                                    || resolving_squares.contains(&r#move.to)
+                                            moves.retain(|m| {
+                                                (m.from == king_square
+                                                    && !attack_line.contains(&m.to))
+                                                    || resolving_squares.contains(&m.to)
                                             });
                                         }
                                         1 => {
                                             // Move that pins another piece
-                                            moves.retain(|r#move| {
-                                                !resolving_squares.contains(&r#move.from)
-                                                    || resolving_squares.contains(&r#move.to)
+                                            moves.retain(|m| {
+                                                !resolving_squares.contains(&m.from)
+                                                    || resolving_squares.contains(&m.to)
                                             });
                                         }
                                         _ => {}
@@ -347,12 +340,12 @@ impl Board {
                     // This block of code filter moves that regard our King
                     // moving into a check
                     for attack_line in &attack_lines {
-                        moves.retain(|r#move| {
-                            if r#move.from == king_square {
+                        moves.retain(|m| {
+                            if m.from == king_square {
                                 for square in attack_line {
                                     if let Some(_) = self.pieces.get(&square) {
-                                        return *square != r#move.to;
-                                    } else if *square == r#move.to {
+                                        return *square != m.to;
+                                    } else if *square == m.to {
                                         return false;
                                     }
                                 }
@@ -471,9 +464,9 @@ impl Board {
 
         if let PieceType::King = self.pieces.get(&r#move.to).unwrap().r#type {
             if self.history.len() % 2 == 0 {
-                self.white_king = r#move.to;
+                *self.kings.get_mut(&Color::White).unwrap() = r#move.to;
             } else {
-                self.black_king = r#move.to;
+                *self.kings.get_mut(&Color::Black).unwrap() = r#move.to;
             }
         }
 

@@ -8,7 +8,7 @@ pub use piece_type::PieceType;
 
 use serde::{Deserialize, Serialize};
 
-use super::{board::Board, color::Color, square::Square};
+use super::{color::Color, square::Square};
 
 #[derive(Clone, Deserialize, PartialEq, Serialize)]
 pub struct Piece {
