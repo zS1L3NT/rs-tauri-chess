@@ -31,6 +31,7 @@ const Target = ({ square, isCapture }: { square: Square; isCapture: boolean }) =
 				height: 100,
 				cursor: "pointer",
 				position: "absolute",
+				zIndex: 3,
 				top: 700 - square.rank * 100,
 				left: square.file * 100
 			}}

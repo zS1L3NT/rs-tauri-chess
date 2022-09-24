@@ -108,7 +108,7 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 				height: 100,
 				cursor: "grab",
 				position: "absolute",
-				zIndex: selected?.id === id ? 10 : 1,
+				zIndex: selected?.id === id ? 2 : 1,
 				top: 700 - square.rank * 100,
 				left: square.file * 100,
 				x,
