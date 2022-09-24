@@ -96,6 +96,19 @@ impl Board {
         let mut moves = vec![];
         let opposite_color = color.opposite();
 
+        let initial_king_rank = if color == Color::White {
+            Rank::_1
+        } else {
+            Rank::_8
+        };
+        let mut in_check = false;
+        let mut unchecked_squares = vec![
+            Square::from(File::C, initial_king_rank),
+            Square::from(File::D, initial_king_rank),
+            Square::from(File::F, initial_king_rank),
+            Square::from(File::G, initial_king_rank),
+        ];
+
         for (square, piece) in &self.pieces {
             if piece.color == opposite_color {
                 continue;
@@ -310,6 +323,8 @@ impl Board {
                                 if square == king_square {
                                     match blocking_pieces {
                                         0 => {
+                                            in_check = true;
+
                                             // Move that checks the King
                                             moves.retain(|m| {
                                                 (m.from == king_square
@@ -353,71 +368,59 @@ impl Board {
 
                             true
                         });
+
+                        if unchecked_squares.iter().any(|s| attack_line.contains(s)) {
+                            for square in attack_line {
+                                if let Some(index) =
+                                    unchecked_squares.iter().position(|s| s == square)
+                                {
+                                    unchecked_squares.remove(index);
+                                    break;
+                                }
+
+                                if self.pieces.get(square).is_some() {
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
 
-        let initial_king_rank = if color == Color::White {
-            Rank::_1
-        } else {
-            Rank::_8
-        };
-
-        if self
-            .history
+        let hasnt_moved = |square: Square| self.history.iter().find(|m| m.from == square).is_none();
+        if !in_check && hasnt_moved(Square::from(File::E, initial_king_rank)) {
+            if [
+                Square::from(File::B, initial_king_rank),
+                Square::from(File::C, initial_king_rank),
+                Square::from(File::D, initial_king_rank),
+            ]
             .iter()
-            .find(|m| m.from == Square::from(File::E, initial_king_rank))
-            .is_none()
-        {
-            for castle_squares in vec![
-                vec![
-                    Square::from(File::A, initial_king_rank),
-                    Square::from(File::B, initial_king_rank),
+            .all(|s| self.pieces.get(s).is_none())
+                && hasnt_moved(Square::from(File::A, initial_king_rank))
+                && unchecked_squares.contains(&Square::from(File::C, initial_king_rank))
+                && unchecked_squares.contains(&Square::from(File::D, initial_king_rank))
+            {
+                moves.push(Move::from_castle(
+                    Square::from(File::E, initial_king_rank),
                     Square::from(File::C, initial_king_rank),
-                    Square::from(File::D, initial_king_rank),
-                ],
-                vec![
-                    Square::from(File::H, initial_king_rank),
-                    Square::from(File::G, initial_king_rank),
-                    Square::from(File::F, initial_king_rank),
-                ],
-            ] {
-                if castle_squares[1..]
-                    .iter()
-                    .all(|s| self.pieces.get(s).is_none())
-                    && self
-                        .history
-                        .iter()
-                        .find(|m| m.from == *castle_squares.first().unwrap())
-                        .is_none()
-                {
-                    let mut can_castle = true;
-                    'square_loop: for square in Square::ALL {
-                        if let Some(piece) = self.pieces.get(&square) {
-                            if piece.color != color {
-                                let attack_lines = piece.get_attack_lines(square);
-                                for attack_line in attack_lines {
-                                    if attack_line.iter().any(|s| castle_squares[1..].contains(s)) {
-                                        for square in attack_line {
-                                            if let Some(_) = self.pieces.get(&square) {
-                                                can_castle = false;
-                                                break 'square_loop;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                ));
+            }
 
-                    if can_castle {
-                        moves.push(Move::from_castle(
-                            Square::from(File::E, initial_king_rank),
-                            *castle_squares.get(castle_squares.len() - 2).unwrap(),
-                        ))
-                    }
-                }
+            if [
+                Square::from(File::F, initial_king_rank),
+                Square::from(File::G, initial_king_rank),
+            ]
+            .iter()
+            .all(|s| self.pieces.get(s).is_none())
+                && hasnt_moved(Square::from(File::H, initial_king_rank))
+                && unchecked_squares.contains(&Square::from(File::F, initial_king_rank))
+                && unchecked_squares.contains(&Square::from(File::G, initial_king_rank))
+            {
+                moves.push(Move::from_castle(
+                    Square::from(File::E, initial_king_rank),
+                    Square::from(File::G, initial_king_rank),
+                ));
             }
         }
 
