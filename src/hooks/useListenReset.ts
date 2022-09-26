@@ -1,14 +1,13 @@
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { invoke } from "@tauri-apps/api"
 
-import MovesContext from "../contexts/MovesContext"
-import PiecesContext from "../contexts/PiecesContext"
+import { setBoard } from "../slices/BoardSlice"
 import { Board } from "../types"
+import useAppDispatch from "./useAppDispatch"
 
 const useListenReset = () => {
-	const { setMoves } = useContext(MovesContext)
-	const { setPieces } = useContext(PiecesContext)
+	const dispatch = useAppDispatch()
 
 	const [tabPressedAt, setTabPressedAt] = useState<number | null>(null)
 
@@ -24,9 +23,7 @@ const useListenReset = () => {
 
 		if (e.key === "Enter") {
 			if (tabPressedAt && Date.now() - tabPressedAt < 1000) {
-				const board = await invoke<Board>("reset")
-				setPieces(board.pieces)
-				setMoves(board.moves)
+				dispatch(setBoard(await invoke<Board>("reset")))
 			}
 		}
 	}

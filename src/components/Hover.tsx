@@ -1,9 +1,7 @@
-import { useContext } from "react"
-
-import CursorContext from "../contexts/CursorContext"
+import useAppSelector from "../hooks/useAppSelector"
 
 const Hover = () => {
-	const { hovered } = useContext(CursorContext)
+	const hovered = useAppSelector(state => state.cursor.hovered)
 
 	return hovered ? (
 		<div

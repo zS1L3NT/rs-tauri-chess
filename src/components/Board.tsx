@@ -1,16 +1,13 @@
-import { useContext } from "react"
-
-import CursorContext from "../contexts/CursorContext"
-import PromotionContext from "../contexts/PromotionContext"
+import useAppDispatch from "../hooks/useAppDispatch"
+import { setCursor } from "../slices/CursorSlice"
+import { setPromotion } from "../slices/PromotionSlice"
 
 const Board = () => {
-	const { setSelected } = useContext(CursorContext)
-	const promotion = useContext(PromotionContext)
+	const dispatch = useAppDispatch()
 
 	const handleClick = () => {
-		setSelected(null)
-		promotion.setFile(null)
-		promotion.setColor(null)
+		dispatch(setCursor({ selected: null }))
+		dispatch(setPromotion(null))
 	}
 
 	return (

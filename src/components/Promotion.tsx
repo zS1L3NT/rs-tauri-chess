@@ -1,24 +1,20 @@
-import { useContext } from "react"
-
 import { invoke } from "@tauri-apps/api"
 
-import MovesContext from "../contexts/MovesContext"
-import PiecesContext from "../contexts/PiecesContext"
-import PromotionContext from "../contexts/PromotionContext"
-import { Board, Color, File, PieceType } from "../types"
+import useAppDispatch from "../hooks/useAppDispatch"
+import useAppSelector from "../hooks/useAppSelector"
+import { setBoard } from "../slices/BoardSlice"
+import { setPromotion } from "../slices/PromotionSlice"
+import { Board, Color, PieceType } from "../types"
 
-const Promotion = ({ color, file }: { color: Color; file: File }) => {
-	const { moves, setMoves } = useContext(MovesContext)
-	const { setPieces } = useContext(PiecesContext)
-	const promotion = useContext(PromotionContext)
+const Promotion = () => {
+	const dispatch = useAppDispatch()
+	const { color, file } = useAppSelector(state => state.promotion)!
+	const moves = useAppSelector(state => state.board.moves)
 
 	const handleClick = async (type: PieceType) => {
 		const move = moves.find(m => m.promotion === type && m.to.file === file)!
-		const board = await invoke<Board>("execute", { move })
-		setPieces(board.pieces)
-		setMoves(board.moves)
-		promotion.setFile(null)
-		promotion.setColor(null)
+		dispatch(setBoard(await invoke<Board>("execute", { move })))
+		dispatch(setPromotion(null))
 	}
 
 	return (
@@ -95,8 +91,7 @@ const Promotion = ({ color, file }: { color: Color; file: File }) => {
 					fontSize: 24
 				}}
 				onClick={() => {
-					promotion.setFile(null)
-					promotion.setColor(null)
+					dispatch(setPromotion(null))
 				}}>
 				&times;
 			</div>

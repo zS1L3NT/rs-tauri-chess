@@ -1,23 +1,23 @@
 import { motion, useMotionValue } from "framer-motion"
-import { useContext, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { invoke } from "@tauri-apps/api"
 
-import CursorContext from "../contexts/CursorContext"
-import MovesContext from "../contexts/MovesContext"
-import PiecesContext from "../contexts/PiecesContext"
-import PromotionContext from "../contexts/PromotionContext"
 import calculateSquareFromCss from "../functions/calculateSquareFromCss"
 import equalSquares from "../functions/equalSquares"
-import { Board, Color, MoveType, Piece as iPiece, Rank } from "../types"
+import useAppDispatch from "../hooks/useAppDispatch"
+import useAppSelector from "../hooks/useAppSelector"
+import { setBoard } from "../slices/BoardSlice"
+import { setCursor } from "../slices/CursorSlice"
+import { setPromotion } from "../slices/PromotionSlice"
+import { Board, MoveType, Piece as iPiece } from "../types"
 
 const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
+	const dispatch = useAppDispatch()
+	const { isDragging, selected } = useAppSelector(state => state.cursor)
+	const moves = useAppSelector(state => state.board.moves)
+
 	const ref = useRef<HTMLDivElement>(null)
-	const { isDragging, setIsDragging, setHovered, selected, setSelected } =
-		useContext(CursorContext)
-	const { moves, setMoves } = useContext(MovesContext)
-	const { setPieces } = useContext(PiecesContext)
-	const promotion = useContext(PromotionContext)
 	const x = useMotionValue(0)
 	const y = useMotionValue(0)
 
@@ -45,9 +45,13 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 			setMoved(false)
 		}
 
-		setIsDragging(true)
-		setSelected({ id, color, type, square })
-		setHovered(calculateSquareFromCss(e.currentTarget.style))
+		dispatch(
+			setCursor({
+				isDragging: true,
+				selected: { id, color, type, square },
+				hovered: calculateSquareFromCss(e.currentTarget.style)
+			})
+		)
 	}
 
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -59,21 +63,32 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 			setMoved(true)
 		}
 
-		setHovered(calculateSquareFromCss(e.currentTarget.style))
+		dispatch(
+			setCursor({
+				hovered: calculateSquareFromCss(e.currentTarget.style)
+			})
+		)
 	}
 
 	const handleMouseUp = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if (e.button !== 0) return
 		if (selected?.id !== id) return
 
-		setIsDragging(false)
-		setHovered(null)
 		setMoved(null)
+		dispatch(
+			setCursor({
+				isDragging: false,
+				hovered: null
+			})
+		)
 
 		// If it didn't move, de-select it
 		if (moved === false) {
-			setSelected(null)
-			return
+			return dispatch(
+				setCursor({
+					selected: null
+				})
+			)
 		}
 
 		const targetSquare = calculateSquareFromCss(e.currentTarget.style)
@@ -82,12 +97,9 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 		)
 		if (move) {
 			if (move.type === MoveType.Promotion) {
-				promotion.setFile(square.file)
-				promotion.setColor(move.to.rank === Rank._8 ? Color.White : Color.Black)
+				dispatch(setPromotion(targetSquare))
 			} else {
-				const board = await invoke<Board>("execute", { move })
-				setPieces(board.pieces)
-				setMoves(board.moves)
+				dispatch(setBoard(await invoke<Board>("execute", { move })))
 			}
 		}
 	}

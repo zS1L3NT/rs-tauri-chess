@@ -1,4 +1,3 @@
-import { useContext } from "react"
 import useAsyncEffect from "use-async-effect"
 
 import { invoke } from "@tauri-apps/api"
@@ -9,19 +8,18 @@ import Hover from "./components/Hover"
 import Piece from "./components/Piece"
 import Promotion from "./components/Promotion"
 import Target from "./components/Target"
-import CursorContext from "./contexts/CursorContext"
-import MovesContext from "./contexts/MovesContext"
-import PiecesContext from "./contexts/PiecesContext"
-import PromotionContext from "./contexts/PromotionContext"
 import equalSquares from "./functions/equalSquares"
-import { Board as iBoard, MoveType, PieceType } from "./types"
+import useAppDispatch from "./hooks/useAppDispatch"
+import useAppSelector from "./hooks/useAppSelector"
 import useListenReset from "./hooks/useListenReset"
+import { setBoard } from "./slices/BoardSlice"
+import { Board as iBoard, MoveType, PieceType } from "./types"
 
 const App = () => {
-	const { selected } = useContext(CursorContext)
-	const { moves, setMoves } = useContext(MovesContext)
-	const { pieces, setPieces } = useContext(PiecesContext)
-	const promotion = useContext(PromotionContext)
+	const dispatch = useAppDispatch()
+	const { moves, pieces } = useAppSelector(state => state.board)
+	const promotion = useAppSelector(state => state.promotion)
+	const selected = useAppSelector(state => state.cursor.selected)
 
 	useListenReset()
 
@@ -29,9 +27,7 @@ const App = () => {
 		// @ts-ignore
 		window.invoke = invoke
 
-		const board = await invoke<iBoard>("state")
-		setPieces(board.pieces)
-		setMoves(board.moves)
+		dispatch(setBoard(await invoke<iBoard>("state")))
 	}, [])
 
 	return (
@@ -42,12 +38,7 @@ const App = () => {
 			}}>
 			<Board />
 			<Hover />
-			{promotion.file && promotion.color ? (
-				<Promotion
-					file={promotion.file}
-					color={promotion.color}
-				/>
-			) : null}
+			{promotion ? <Promotion /> : null}
 			{selected ? <Highlight square={selected.square} /> : null}
 			{selected
 				? moves

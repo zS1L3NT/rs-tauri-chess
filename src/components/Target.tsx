@@ -1,13 +1,11 @@
-import { useContext } from "react"
-
 import { invoke } from "@tauri-apps/api"
 
-import CursorContext from "../contexts/CursorContext"
-import MovesContext from "../contexts/MovesContext"
-import PiecesContext from "../contexts/PiecesContext"
-import PromotionContext from "../contexts/PromotionContext"
 import equalSquares from "../functions/equalSquares"
-import { Board, Color, Rank, Square } from "../types"
+import useAppDispatch from "../hooks/useAppDispatch"
+import useAppSelector from "../hooks/useAppSelector"
+import { setBoard } from "../slices/BoardSlice"
+import { setPromotion } from "../slices/PromotionSlice"
+import { Board, Square } from "../types"
 
 const Target = ({
 	square,
@@ -18,23 +16,18 @@ const Target = ({
 	isCapture: boolean
 	isPromotion: boolean
 }) => {
-	const { selected } = useContext(CursorContext)
-	const { moves, setMoves } = useContext(MovesContext)
-	const { setPieces } = useContext(PiecesContext)
-	const promotion = useContext(PromotionContext)
+	const dispatch = useAppDispatch()
+	const moves = useAppSelector(state => state.board.moves)
+	const selected = useAppSelector(state => state.cursor.selected)
 
-	const handleClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+	const handleClick = async () => {
 		if (isPromotion) {
-			promotion.setFile(square.file)
-			promotion.setColor(square.rank === Rank._8 ? Color.White : Color.Black)
+			dispatch(setPromotion(square))
 		} else {
 			const move = moves.find(
 				m => equalSquares(m.from, selected!.square) && equalSquares(m.to, square)
 			)!
-
-			const board = await invoke<Board>("execute", { move })
-			setPieces(board.pieces)
-			setMoves(board.moves)
+			dispatch(setBoard(await invoke<Board>("execute", { move })))
 		}
 	}
 
