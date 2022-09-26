@@ -6,16 +6,18 @@ import { invoke } from "@tauri-apps/api"
 import CursorContext from "../contexts/CursorContext"
 import MovesContext from "../contexts/MovesContext"
 import PiecesContext from "../contexts/PiecesContext"
+import PromotionContext from "../contexts/PromotionContext"
 import calculateSquareFromCss from "../functions/calculateSquareFromCss"
 import equalSquares from "../functions/equalSquares"
-import { Board, Piece as iPiece } from "../types"
+import { Board, Color, MoveType, Piece as iPiece, Rank } from "../types"
 
 const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 	const ref = useRef<HTMLDivElement>(null)
 	const { isDragging, setIsDragging, setHovered, selected, setSelected } =
 		useContext(CursorContext)
 	const { moves, setMoves } = useContext(MovesContext)
-	const { pieces, setPieces } = useContext(PiecesContext)
+	const { setPieces } = useContext(PiecesContext)
+	const promotion = useContext(PromotionContext)
 	const x = useMotionValue(0)
 	const y = useMotionValue(0)
 
@@ -79,22 +81,15 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 			m => equalSquares(m.from, square) && equalSquares(m.to, targetSquare)
 		)
 		if (move) {
-			const board = await invoke<Board>("execute", { move })
-			setPieces(board.pieces)
-			setMoves(board.moves)
+			if (move.type === MoveType.Promotion) {
+				promotion.setFile(square.file)
+				promotion.setColor(move.to.rank === Rank._8 ? Color.White : Color.Black)
+			} else {
+				const board = await invoke<Board>("execute", { move })
+				setPieces(board.pieces)
+				setMoves(board.moves)
+			}
 		}
-
-		// ! Validate before finalizing the move
-		// const targetPiece = pieces.find(p => equalSquares(p.square, targetSquare))
-		// if (targetPiece && targetPiece.id !== id) {
-		// 	setPieces(
-		// 		pieces
-		// 			.map(p => (p.id === id ? { ...p, square: targetSquare } : p))
-		// 			.filter(p => p.id !== targetPiece.id)
-		// 	)
-		// } else {
-		// 	setPieces(pieces.map(p => (p.id === id ? { ...p, square: targetSquare } : p)))
-		// }
 	}
 
 	return (

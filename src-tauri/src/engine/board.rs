@@ -1,23 +1,22 @@
 use std::collections::HashMap;
 
-use crate::{bishop, king, knight, pawn, queen, rook, square};
+use crate::{bishop, king, knight, pawn, queen, rook};
+use rs_tauri_chess::square;
 
 use super::{
-    attack_lines::AttackLines,
     client::{ClientBoard, ClientPiece},
     color::Color,
     piece::{Directions, Piece, PieceType},
-    r#move::Move,
-    square::{Rank, Square},
+    r#move::{Move, MoveType},
+    square::{File, Rank, Square},
 };
 
+#[derive(Debug)]
 pub struct Board {
     pub history: Vec<Move>,
     pub pieces: HashMap<Square, Piece>,
-    pub attack_lines: HashMap<Square, AttackLines>,
-    pub enpassent_square: Option<Square>,
-    pub white_king: Square,
-    pub black_king: Square,
+    pub attack_lines: HashMap<Square, Vec<Vec<Square>>>,
+    pub kings: HashMap<Color, Square>,
 }
 
 impl Board {
@@ -25,49 +24,47 @@ impl Board {
         let mut board = Board {
             history: vec![],
             pieces: HashMap::from([
-                (square!(A _8), rook!(0, Black)),
-                (square!(B _8), knight!(1, Black)),
-                (square!(C _8), bishop!(2, Black)),
-                (square!(D _8), queen!(3, Black)),
-                (square!(E _8), king!(4, Black)),
-                (square!(F _8), bishop!(5, Black)),
-                (square!(G _8), knight!(6, Black)),
-                (square!(H _8), rook!(7, Black)),
-                (square!(A _7), pawn!(8, Black)),
-                (square!(B _7), pawn!(9, Black)),
-                (square!(C _7), pawn!(10, Black)),
-                (square!(D _7), pawn!(11, Black)),
-                (square!(E _7), pawn!(12, Black)),
-                (square!(F _7), pawn!(13, Black)),
-                (square!(G _7), pawn!(14, Black)),
-                (square!(H _7), pawn!(15, Black)),
-                (square!(A _2), pawn!(16, White)),
-                (square!(B _2), pawn!(17, White)),
-                (square!(C _2), pawn!(18, White)),
-                (square!(D _2), pawn!(19, White)),
-                (square!(E _2), pawn!(20, White)),
-                (square!(F _2), pawn!(21, White)),
-                (square!(G _2), pawn!(22, White)),
-                (square!(H _2), pawn!(23, White)),
-                (square!(A _1), rook!(24, White)),
-                (square!(B _1), knight!(25, White)),
-                (square!(C _1), bishop!(26, White)),
-                (square!(D _1), queen!(27, White)),
-                (square!(E _1), king!(28, White)),
-                (square!(F _1), bishop!(29, White)),
-                (square!(G _1), knight!(30, White)),
-                (square!(H _1), rook!(31, White)),
+                (square!(A8), rook!(0, Black)),
+                (square!(B8), knight!(1, Black)),
+                (square!(C8), bishop!(2, Black)),
+                (square!(D8), queen!(3, Black)),
+                (square!(E8), king!(4, Black)),
+                (square!(F8), bishop!(5, Black)),
+                (square!(G8), knight!(6, Black)),
+                (square!(H8), rook!(7, Black)),
+                (square!(A7), pawn!(8, Black)),
+                (square!(B7), pawn!(9, Black)),
+                (square!(C7), pawn!(10, Black)),
+                (square!(D7), pawn!(11, Black)),
+                (square!(E7), pawn!(12, Black)),
+                (square!(F7), pawn!(13, Black)),
+                (square!(G7), pawn!(14, Black)),
+                (square!(H7), pawn!(15, Black)),
+                (square!(A2), pawn!(16, White)),
+                (square!(B2), pawn!(17, White)),
+                (square!(C2), pawn!(18, White)),
+                (square!(D2), pawn!(19, White)),
+                (square!(E2), pawn!(20, White)),
+                (square!(F2), pawn!(21, White)),
+                (square!(G2), pawn!(22, White)),
+                (square!(H2), pawn!(23, White)),
+                (square!(A1), rook!(24, White)),
+                (square!(B1), knight!(25, White)),
+                (square!(C1), bishop!(26, White)),
+                (square!(D1), queen!(27, White)),
+                (square!(E1), king!(28, White)),
+                (square!(F1), bishop!(29, White)),
+                (square!(G1), knight!(30, White)),
+                (square!(H1), rook!(31, White)),
             ]),
             attack_lines: HashMap::new(),
-            enpassent_square: None,
-            white_king: square!(E _1),
-            black_king: square!(E _8),
+            kings: HashMap::from([(Color::White, square!(E1)), (Color::Black, square!(E8))]),
         };
 
         board.attack_lines = board
             .pieces
             .iter()
-            .map(|(s, p)| (*s, p.get_attack_lines(&board, *s)))
+            .map(|(s, p)| (*s, p.get_attack_lines(*s)))
             .collect::<HashMap<_, _>>();
 
         board
@@ -97,9 +94,20 @@ impl Board {
         };
 
         let mut moves = vec![];
-        let mut king_move_indexes = vec![];
-
         let opposite_color = color.opposite();
+
+        let initial_king_rank = if color == Color::White {
+            Rank::_1
+        } else {
+            Rank::_8
+        };
+        let mut in_check = false;
+        let mut unchecked_squares = vec![
+            Square::from(File::C, initial_king_rank),
+            Square::from(File::D, initial_king_rank),
+            Square::from(File::F, initial_king_rank),
+            Square::from(File::G, initial_king_rank),
+        ];
 
         for (square, piece) in &self.pieces {
             if piece.color == opposite_color {
@@ -185,28 +193,33 @@ impl Board {
                             }
                         }
                     } else {
-                        if let Some(enpassant_square) = self.enpassent_square {
-                            if enpassant_square.rank == team_rank(Rank::_5, Rank::_4)
-                                && square.rank == team_rank(Rank::_5, Rank::_4)
-                            {
-                                if let Some(left_target_square) = square.offset(-1, 0) {
-                                    if left_target_square == enpassant_square {
-                                        moves.push(Move::from_enpassant(
-                                            square,
-                                            left_target_square
-                                                .offset(0, 1 * team_multiplier)
-                                                .unwrap(),
-                                        ));
+                        if let Some(last_move) = self.history.last() {
+                            if last_move.r#type == MoveType::PawnJump {
+                                let enpassant_square = last_move.to;
+                                if enpassant_square.rank == team_rank(Rank::_5, Rank::_4)
+                                    && square.rank == team_rank(Rank::_5, Rank::_4)
+                                {
+                                    if let Some(left_target_square) = square.offset(-1, 0) {
+                                        if left_target_square == enpassant_square {
+                                            moves.push(Move::from_enpassant(
+                                                square,
+                                                left_target_square
+                                                    .offset(0, 1 * team_multiplier)
+                                                    .unwrap(),
+                                                self.pieces.get(&enpassant_square).unwrap().clone(),
+                                            ));
+                                        }
                                     }
-                                }
-                                if let Some(right_target_square) = square.offset(1, 0) {
-                                    if right_target_square == enpassant_square {
-                                        moves.push(Move::from_enpassant(
-                                            square,
-                                            right_target_square
-                                                .offset(0, 1 * team_multiplier)
-                                                .unwrap(),
-                                        ));
+                                    if let Some(right_target_square) = square.offset(1, 0) {
+                                        if right_target_square == enpassant_square {
+                                            moves.push(Move::from_enpassant(
+                                                square,
+                                                right_target_square
+                                                    .offset(0, 1 * team_multiplier)
+                                                    .unwrap(),
+                                                self.pieces.get(&enpassant_square).unwrap().clone(),
+                                            ));
+                                        }
                                     }
                                 }
                             }
@@ -275,11 +288,9 @@ impl Board {
                                         target_square,
                                         target_piece.clone(),
                                     ));
-                                    king_move_indexes.push(moves.len() - 1);
                                 }
                             } else {
                                 moves.push(Move::from_normal(square, target_square));
-                                king_move_indexes.push(moves.len() - 1);
                             }
                         }
                     }
@@ -287,39 +298,129 @@ impl Board {
             }
         }
 
-        let king_square = if color == Color::White {
-            self.white_king
-        } else {
-            self.black_king
-        };
-
+        let king_square = *self.kings.get(&color).unwrap();
         for square in Square::ALL {
             if let Some(piece) = self.pieces.get(&square) {
                 if piece.color != color {
-                    let attack_lines = piece.get_attack_lines(&self, square);
-                    if let Some(index) = attack_lines.lines_with_king {
-                        let line = attack_lines
-                            .lines
+                    // This block of code runs where {piece} is every piece
+                    // on the enemy team
+
+                    let attack_lines = piece.get_attack_lines(square);
+                    if let Some(index) =
+                        attack_lines.iter().position(|al| al.contains(&king_square))
+                    {
+                        let attack_line = attack_lines
                             .get(index)
                             .expect("Invalid lines_with_king index");
-                        self.filter_line(&mut moves, attack_lines.origin, line, king_square);
-                    }
 
-                    for line in &attack_lines.lines {
-                        let mut index = 0;
-                        moves.retain(|r#move| {
-                            if king_move_indexes.contains(&index) {
-                                if self.is_clear_line(line, r#move.to) {
-                                    index += 1;
-                                    return false;
+                        let mut blocking_pieces = 0;
+                        let mut resolving_squares = vec![square];
+
+                        for square in attack_line {
+                            let square = *square;
+
+                            if let Some(_) = self.pieces.get(&square) {
+                                if square == king_square {
+                                    match blocking_pieces {
+                                        0 => {
+                                            in_check = true;
+
+                                            // Move that checks the King
+                                            moves.retain(|m| {
+                                                (m.from == king_square
+                                                    && !attack_line.contains(&m.to))
+                                                    || resolving_squares.contains(&m.to)
+                                            });
+                                        }
+                                        1 => {
+                                            // Move that pins another piece
+                                            moves.retain(|m| {
+                                                !resolving_squares.contains(&m.from)
+                                                    || resolving_squares.contains(&m.to)
+                                            });
+                                        }
+                                        _ => {}
+                                    }
+
+                                    break;
+                                } else {
+                                    blocking_pieces += 1;
                                 }
                             }
 
-                            index += 1;
+                            resolving_squares.push(square);
+                        }
+                    }
+
+                    // This block of code filter moves that regard our King
+                    // moving into a check
+                    for attack_line in &attack_lines {
+                        moves.retain(|m| {
+                            if m.from == king_square {
+                                for square in attack_line {
+                                    if let Some(_) = self.pieces.get(&square) {
+                                        return *square != m.to;
+                                    } else if *square == m.to {
+                                        return false;
+                                    }
+                                }
+                            }
+
                             true
                         });
+
+                        if unchecked_squares.iter().any(|s| attack_line.contains(s)) {
+                            for square in attack_line {
+                                if let Some(index) =
+                                    unchecked_squares.iter().position(|s| s == square)
+                                {
+                                    unchecked_squares.remove(index);
+                                    break;
+                                }
+
+                                if self.pieces.get(square).is_some() {
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
+            }
+        }
+
+        let hasnt_moved = |square: Square| self.history.iter().find(|m| m.from == square).is_none();
+        if !in_check && hasnt_moved(Square::from(File::E, initial_king_rank)) {
+            if [
+                Square::from(File::B, initial_king_rank),
+                Square::from(File::C, initial_king_rank),
+                Square::from(File::D, initial_king_rank),
+            ]
+            .iter()
+            .all(|s| self.pieces.get(s).is_none())
+                && hasnt_moved(Square::from(File::A, initial_king_rank))
+                && unchecked_squares.contains(&Square::from(File::C, initial_king_rank))
+                && unchecked_squares.contains(&Square::from(File::D, initial_king_rank))
+            {
+                moves.push(Move::from_castle(
+                    Square::from(File::E, initial_king_rank),
+                    Square::from(File::C, initial_king_rank),
+                ));
+            }
+
+            if [
+                Square::from(File::F, initial_king_rank),
+                Square::from(File::G, initial_king_rank),
+            ]
+            .iter()
+            .all(|s| self.pieces.get(s).is_none())
+                && hasnt_moved(Square::from(File::H, initial_king_rank))
+                && unchecked_squares.contains(&Square::from(File::F, initial_king_rank))
+                && unchecked_squares.contains(&Square::from(File::G, initial_king_rank))
+            {
+                moves.push(Move::from_castle(
+                    Square::from(File::E, initial_king_rank),
+                    Square::from(File::G, initial_king_rank),
+                ));
             }
         }
 
@@ -356,73 +457,85 @@ impl Board {
         }
     }
 
-    fn filter_line(
-        &self,
-        moves: &mut Vec<Move>,
-        origin: Square,
-        line: &Vec<Square>,
-        king_square: Square,
-    ) {
-        // The number of pieces between the origin and the opponent King
-        let mut blocking_pieces = 0;
+    pub fn execute(&mut self, r#move: Move) {
+        match r#move.r#type {
+            MoveType::Normal => {
+                let piece = self.pieces.remove(&r#move.from).unwrap();
 
-        // Squares that resolve the check if a piece moves to them
-        let mut resolving_squares = vec![origin];
+                self.attack_lines.remove(&r#move.from);
 
-        for line_square in line {
-            let line_square = *line_square;
-
-            if let Some(_) = self.pieces.get(&line_square) {
-                if line_square == king_square {
-                    match blocking_pieces {
-                        0 => {
-                            // Move that checks the King
-                            moves.retain(|r#move| {
-                                if r#move.from == king_square {
-                                    return true;
-                                }
-
-                                if resolving_squares.contains(&r#move.to) {
-                                    return true;
-                                }
-
-                                return false;
-                            });
-                        }
-                        1 => {
-                            // Move that pins another piece
-                            moves.retain(|r#move| {
-                                if r#move.from != line_square {
-                                    return true;
-                                }
-
-                                if resolving_squares.contains(&r#move.to) {
-                                    return true;
-                                }
-
-                                return false;
-                            });
-                        }
-                        _ => {}
-                    }
-
-                    break;
-                } else {
-                    blocking_pieces += 1;
-                }
+                let attack_lines = piece.get_attack_lines(r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
             }
+            MoveType::Capture => {
+                let piece = self.pieces.remove(&r#move.from).unwrap();
 
-            resolving_squares.push(line_square);
+                self.pieces.remove(&r#move.to);
+                self.attack_lines.remove(&r#move.from);
+                self.attack_lines.remove(&r#move.to);
+
+                let attack_lines = piece.get_attack_lines(r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
+            }
+            MoveType::Promotion => {
+                let mut piece = self.pieces.remove(&r#move.from).unwrap();
+                piece.r#type = r#move.promotion.unwrap();
+
+                self.attack_lines.remove(&r#move.from);
+
+                let attack_lines = piece.get_attack_lines(r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
+            }
+            MoveType::PromotionCapture => {
+                let mut piece = self.pieces.remove(&r#move.from).unwrap();
+                piece.r#type = r#move.promotion.unwrap();
+
+                self.pieces.remove(&r#move.to);
+                self.attack_lines.remove(&r#move.from);
+                self.attack_lines.remove(&r#move.to);
+
+                let attack_lines = piece.get_attack_lines(r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
+            }
+            MoveType::PawnJump => {
+                let piece = self.pieces.remove(&r#move.from).unwrap();
+
+                self.attack_lines.remove(&r#move.from);
+
+                let attack_lines = piece.get_attack_lines(r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
+            }
+            MoveType::Enpassant => {
+                let piece = self.pieces.remove(&r#move.from).unwrap();
+
+                let target_square = &r#move
+                    .from
+                    .offset(r#move.to.file.to_index() - r#move.from.file.to_index(), 0)
+                    .unwrap();
+                self.pieces.remove(target_square);
+                self.attack_lines.remove(&r#move.from);
+                self.attack_lines.remove(target_square);
+
+                let attack_lines = piece.get_attack_lines(r#move.to);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                self.pieces.insert(r#move.to, piece);
+            }
+            MoveType::Castle => todo!(),
         }
-    }
 
-    fn is_clear_line(&self, line: &Vec<Square>, king_square: Square) -> bool {
-        assert!(line.len() >= 2);
-        for square in line.iter() {
-            if let Some(_) = self.pieces.get(&square) {
-                return *square == king_square;
+        if let PieceType::King = self.pieces.get(&r#move.to).unwrap().r#type {
+            if self.history.len() % 2 == 0 {
+                *self.kings.get_mut(&Color::White).unwrap() = r#move.to;
+            } else {
+                *self.kings.get_mut(&Color::Black).unwrap() = r#move.to;
             }
         }
-        return true;
+
+        self.history.push(r#move);
     }
 }

@@ -1,28 +1,43 @@
-use serde::Serialize;
+mod move_type;
+#[cfg(test)]
+mod tests;
+
+pub use move_type::MoveType;
+
+use serde::{Deserialize, Serialize};
 
 use super::{
     piece::{Piece, PieceType},
     square::Square,
 };
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
-pub enum MoveType {
-    Normal,
-    Capture,
-    Promotion,
-    PromotionCapture,
-    PawnJump,
-    Enpassant,
-    Castle,
-}
-
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Deserialize, PartialEq, Serialize)]
 pub struct Move {
     pub from: Square,
     pub to: Square,
     pub r#type: MoveType,
     pub captured: Option<Piece>,
     pub promotion: Option<PieceType>,
+}
+
+impl std::fmt::Debug for Move {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{:?}Move({:?}->{:?}{}{})",
+            self.r#type,
+            self.from,
+            self.to,
+            match &self.captured {
+                Some(captured) => format!(" ~{:?}", captured),
+                None => "".into(),
+            },
+            match &self.promotion {
+                Some(promotion) => format!(" ^{:?}", promotion),
+                None => "".into(),
+            }
+        )
+    }
 }
 
 impl Move {
@@ -94,7 +109,7 @@ impl Move {
         }
     }
 
-    pub fn from_enpassant(from: Square, to: Square) -> Move {
+    pub fn from_enpassant(from: Square, to: Square, captured: Piece) -> Move {
         assert_ne!(from, to);
         assert_eq!((from.file as i8 - to.file as i8).abs(), 1);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 1);
@@ -102,7 +117,7 @@ impl Move {
             from: from.clone(),
             to,
             r#type: MoveType::Enpassant,
-            captured: None,
+            captured: Some(captured),
             promotion: None,
         }
     }

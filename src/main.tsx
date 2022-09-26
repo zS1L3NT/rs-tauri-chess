@@ -4,13 +4,16 @@ import App from "./App"
 import { CursorProvider } from "./contexts/CursorContext"
 import { MovesProvider } from "./contexts/MovesContext"
 import { PiecesProvider } from "./contexts/PiecesContext"
+import { PromotionProvider } from "./contexts/PromotionContext"
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	<PiecesProvider>
 		<MovesProvider>
-			<CursorProvider>
-				<App />
-			</CursorProvider>
+			<PromotionProvider>
+				<CursorProvider>
+					<App />
+				</CursorProvider>
+			</PromotionProvider>
 		</MovesProvider>
 	</PiecesProvider>
 )

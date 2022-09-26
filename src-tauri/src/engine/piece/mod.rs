@@ -1,57 +1,26 @@
-use serde::Serialize;
-
-use super::{attack_lines::AttackLines, board::Board, color::Color, square::Square};
-
+mod directions;
+mod piece_type;
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone, Copy, Debug, PartialEq, Serialize)]
-pub enum PieceType {
-    Pawn,
-    Knight,
-    Bishop,
-    Rook,
-    Queen,
-    King,
-}
+pub use directions::Directions;
+pub use piece_type::PieceType;
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+use serde::{Deserialize, Serialize};
+
+use super::{color::Color, square::Square};
+
+#[derive(Clone, Deserialize, PartialEq, Serialize)]
 pub struct Piece {
     pub id: u8,
     pub r#type: PieceType,
     pub color: Color,
 }
 
-pub struct Directions {}
-
-impl Directions {
-    pub const KNIGHT: [(i8, i8); 8] = [
-        (1, 2),
-        (2, 1),
-        (2, -1),
-        (1, -2),
-        (-1, -2),
-        (-2, -1),
-        (-2, 1),
-        (-1, 2),
-    ];
-
-    pub const BISHOP: [(i8, i8); 4] = [(1, 1), (1, -1), (-1, -1), (-1, 1)];
-
-    pub const ROOK: [(i8, i8); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
-
-    pub const QUEEN: [(i8, i8); 8] = [
-        (0, 1),
-        (1, 1),
-        (1, 0),
-        (1, -1),
-        (0, -1),
-        (-1, -1),
-        (-1, 0),
-        (-1, 1),
-    ];
-
-    pub const KING: [(i8, i8); 8] = Directions::QUEEN;
+impl std::fmt::Debug for Piece {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}{:?}{:0<2}", self.color, self.r#type, self.id)
+    }
 }
 
 impl Piece {
@@ -59,16 +28,8 @@ impl Piece {
         Piece { id, r#type, color }
     }
 
-    pub fn get_attack_lines(&self, board: &Board, square: Square) -> AttackLines {
+    pub fn get_attack_lines(&self, square: Square) -> Vec<Vec<Square>> {
         let mut attack_lines = vec![];
-        let mut lines_with_king = None;
-
-        let opposite_king = if self.color == Color::White {
-            board.black_king
-        } else {
-            board.white_king
-        };
-
         match self.r#type {
             PieceType::Pawn => {
                 let team_multiplier = if self.color == Color::White { 1 } else { -1 };
@@ -90,15 +51,11 @@ impl Piece {
                     let mut current_square = square;
                     let mut line = vec![];
                     while let Some(target_square) = current_square.offset(file, rank) {
-                        if target_square == opposite_king {
-                            lines_with_king = Some(attack_lines.len());
-                        }
-
                         line.push(target_square);
                         current_square = target_square;
                     }
 
-                    if line.len() > 1 {
+                    if line.len() >= 1 {
                         attack_lines.push(line);
                     }
                 }
@@ -108,15 +65,11 @@ impl Piece {
                     let mut current_square = square;
                     let mut line = vec![];
                     while let Some(target_square) = current_square.offset(file, rank) {
-                        if target_square == opposite_king {
-                            lines_with_king = Some(attack_lines.len());
-                        }
-
                         line.push(target_square);
                         current_square = target_square;
                     }
 
-                    if line.len() > 1 {
+                    if line.len() >= 1 {
                         attack_lines.push(line);
                     }
                 }
@@ -126,15 +79,11 @@ impl Piece {
                     let mut current_square = square;
                     let mut line = vec![];
                     while let Some(target_square) = current_square.offset(file, rank) {
-                        if target_square == opposite_king {
-                            lines_with_king = Some(attack_lines.len());
-                        }
-
                         line.push(target_square);
                         current_square = target_square;
                     }
 
-                    if line.len() > 1 {
+                    if line.len() >= 1 {
                         attack_lines.push(line);
                     }
                 }
@@ -148,6 +97,6 @@ impl Piece {
             }
         }
 
-        AttackLines::new(square, attack_lines, lines_with_king)
+        attack_lines
     }
 }

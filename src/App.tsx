@@ -7,19 +7,28 @@ import Board from "./components/Board"
 import Highlight from "./components/Highlight"
 import Hover from "./components/Hover"
 import Piece from "./components/Piece"
+import Promotion from "./components/Promotion"
 import Target from "./components/Target"
 import CursorContext from "./contexts/CursorContext"
 import MovesContext from "./contexts/MovesContext"
 import PiecesContext from "./contexts/PiecesContext"
+import PromotionContext from "./contexts/PromotionContext"
 import equalSquares from "./functions/equalSquares"
-import { Board as iBoard, MoveType } from "./types"
+import { Board as iBoard, MoveType, PieceType } from "./types"
+import useListenReset from "./hooks/useListenReset"
 
 const App = () => {
 	const { selected } = useContext(CursorContext)
 	const { moves, setMoves } = useContext(MovesContext)
 	const { pieces, setPieces } = useContext(PiecesContext)
+	const promotion = useContext(PromotionContext)
+
+	useListenReset()
 
 	useAsyncEffect(async () => {
+		// @ts-ignore
+		window.invoke = invoke
+
 		const board = await invoke<iBoard>("state")
 		setPieces(board.pieces)
 		setMoves(board.moves)
@@ -33,20 +42,30 @@ const App = () => {
 			}}>
 			<Board />
 			<Hover />
+			{promotion.file && promotion.color ? (
+				<Promotion
+					file={promotion.file}
+					color={promotion.color}
+				/>
+			) : null}
 			{selected ? <Highlight square={selected.square} /> : null}
 			{selected
 				? moves
 						.filter(m => equalSquares(m.from, selected.square))
-						.map(m => (
-							<Target
-								key={`${m.to.file}${m.to.rank}`}
-								square={m.to}
-								isCapture={
-									m.type === MoveType.Capture ||
-									m.type === MoveType.PromotionCapture
-								}
-							/>
-						))
+						.map(m =>
+							!m.promotion || m.promotion === PieceType.Queen ? (
+								<Target
+									key={`${m.to.file}${m.to.rank}${m.promotion}`}
+									square={m.to}
+									isCapture={
+										m.type === MoveType.Capture ||
+										m.type === MoveType.PromotionCapture ||
+										m.type === MoveType.Enpassant
+									}
+									isPromotion={!!m.promotion}
+								/>
+							) : null
+						)
 				: null}
 			{pieces.map(piece => (
 				<Piece

@@ -1,23 +1,9 @@
-mod attack_lines;
 pub mod board;
 pub mod client;
 pub mod color;
 pub mod r#move;
 pub mod piece;
 pub mod square;
-
-// #[cfg(test)]
-// mod tests;
-
-#[macro_export]
-macro_rules! square {
-    ($file:tt $rank:tt) => {
-        crate::engine::square::Square::from(
-            crate::engine::square::File::$file,
-            crate::engine::square::Rank::$rank,
-        )
-    };
-}
 
 #[macro_export]
 macro_rules! pawn {

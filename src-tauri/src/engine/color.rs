@@ -1,9 +1,24 @@
-use serde::Serialize;
+use std::fmt::{Debug, Formatter, Result};
 
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, Serialize)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Copy, Clone, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum Color {
     White,
     Black,
+}
+
+impl Debug for Color {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Color::White => "W",
+                Color::Black => "B",
+            }
+        )
+    }
 }
 
 impl Color {
