@@ -5,23 +5,37 @@ import { invoke } from "@tauri-apps/api"
 import CursorContext from "../contexts/CursorContext"
 import MovesContext from "../contexts/MovesContext"
 import PiecesContext from "../contexts/PiecesContext"
+import PromotionContext from "../contexts/PromotionContext"
 import equalSquares from "../functions/equalSquares"
-import { Board, Square } from "../types"
+import { Board, Color, Rank, Square } from "../types"
 
-const Target = ({ square, isCapture }: { square: Square; isCapture: boolean }) => {
+const Target = ({
+	square,
+	isCapture,
+	isPromotion
+}: {
+	square: Square
+	isCapture: boolean
+	isPromotion: boolean
+}) => {
 	const { selected } = useContext(CursorContext)
 	const { moves, setMoves } = useContext(MovesContext)
 	const { setPieces } = useContext(PiecesContext)
+	const promotion = useContext(PromotionContext)
 
 	const handleClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		const move = moves.find(
-			m => equalSquares(m.from, selected!.square) && equalSquares(m.to, square)
-		)!
+		if (isPromotion) {
+			promotion.setFile(square.file)
+			promotion.setColor(square.rank === Rank._8 ? Color.White : Color.Black)
+		} else {
+			const move = moves.find(
+				m => equalSquares(m.from, selected!.square) && equalSquares(m.to, square)
+			)!
 
-		const board = await invoke<Board>("execute", { move })
-		console.log(board)
-		setPieces(board.pieces)
-		setMoves(board.moves)
+			const board = await invoke<Board>("execute", { move })
+			setPieces(board.pieces)
+			setMoves(board.moves)
+		}
 	}
 
 	return (
