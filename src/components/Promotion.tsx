@@ -1,6 +1,26 @@
-import { Color, File } from "../types"
+import { useContext } from "react"
+
+import { invoke } from "@tauri-apps/api"
+
+import MovesContext from "../contexts/MovesContext"
+import PiecesContext from "../contexts/PiecesContext"
+import PromotionContext from "../contexts/PromotionContext"
+import { Board, Color, File, PieceType } from "../types"
 
 const Promotion = ({ color, file }: { color: Color; file: File }) => {
+	const { moves, setMoves } = useContext(MovesContext)
+	const { setPieces } = useContext(PiecesContext)
+	const promotion = useContext(PromotionContext)
+
+	const handleClick = async (type: PieceType) => {
+		const move = moves.find(m => m.promotion === type && m.to.file === file)!
+		const board = await invoke<Board>("execute", { move })
+		setPieces(board.pieces)
+		setMoves(board.moves)
+		promotion.setFile(null)
+		promotion.setColor(null)
+	}
+
 	return (
 		<div
 			style={{
@@ -26,6 +46,7 @@ const Promotion = ({ color, file }: { color: Color; file: File }) => {
 					cursor: "pointer",
 					zIndex: 5
 				}}
+				onClick={() => handleClick(PieceType.Queen)}
 			/>
 			<div
 				style={{
@@ -36,6 +57,7 @@ const Promotion = ({ color, file }: { color: Color; file: File }) => {
 					cursor: "pointer",
 					zIndex: 5
 				}}
+				onClick={() => handleClick(PieceType.Knight)}
 			/>
 			<div
 				style={{
@@ -46,6 +68,7 @@ const Promotion = ({ color, file }: { color: Color; file: File }) => {
 					cursor: "pointer",
 					zIndex: 5
 				}}
+				onClick={() => handleClick(PieceType.Rook)}
 			/>
 			<div
 				style={{
@@ -56,6 +79,7 @@ const Promotion = ({ color, file }: { color: Color; file: File }) => {
 					cursor: "pointer",
 					zIndex: 5
 				}}
+				onClick={() => handleClick(PieceType.Bishop)}
 			/>
 			<div
 				style={{
@@ -69,6 +93,10 @@ const Promotion = ({ color, file }: { color: Color; file: File }) => {
 					cursor: "pointer",
 					fontWeight: "900",
 					fontSize: 24
+				}}
+				onClick={() => {
+					promotion.setFile(null)
+					promotion.setColor(null)
 				}}>
 				&times;
 			</div>

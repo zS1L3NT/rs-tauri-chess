@@ -16,7 +16,7 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 	const { isDragging, setIsDragging, setHovered, selected, setSelected } =
 		useContext(CursorContext)
 	const { moves, setMoves } = useContext(MovesContext)
-	const { pieces, setPieces } = useContext(PiecesContext)
+	const { setPieces } = useContext(PiecesContext)
 	const promotion = useContext(PromotionContext)
 	const x = useMotionValue(0)
 	const y = useMotionValue(0)
