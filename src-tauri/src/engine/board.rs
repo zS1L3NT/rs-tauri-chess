@@ -530,7 +530,32 @@ impl Board {
                 self.attack_lines.insert(r#move.to, attack_lines);
                 self.pieces.insert(r#move.to, piece);
             }
-            MoveType::Castle => todo!(),
+            MoveType::Castle => {
+                let (rook_square_from, rook_square_to) = if r#move.to.file == File::C {
+                    (
+                        Square::from(File::A, r#move.to.rank),
+                        Square::from(File::D, r#move.to.rank),
+                    )
+                } else {
+                    (
+                        Square::from(File::H, r#move.to.rank),
+                        Square::from(File::F, r#move.to.rank),
+                    )
+                };
+
+                let king = self.pieces.remove(&r#move.from).unwrap();
+                let rook = self.pieces.remove(&rook_square_from).unwrap();
+
+                self.attack_lines.remove(&r#move.from);
+                self.attack_lines.remove(&rook_square_from);
+
+                let attack_lines = king.get_attack_lines(r#move.to);
+                self.pieces.insert(r#move.to, king);
+                self.attack_lines.insert(r#move.to, attack_lines);
+                let attack_lines = rook.get_attack_lines(rook_square_to);
+                self.pieces.insert(rook_square_to, rook);
+                self.attack_lines.insert(rook_square_to, attack_lines);
+            }
         }
 
         if let PieceType::King = self.pieces.get(&r#move.to).unwrap().r#type {
