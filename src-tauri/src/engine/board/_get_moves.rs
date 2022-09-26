@@ -298,7 +298,7 @@ impl Board {
                         moves.retain(|m| {
                             if m.from == king_square {
                                 for square in attack_line {
-                                    if let Some(_) = self.pieces.get(&square) {
+                                    if let Some(_) = self.pieces.get(square) {
                                         return *square != m.to;
                                     } else if *square == m.to {
                                         return false;

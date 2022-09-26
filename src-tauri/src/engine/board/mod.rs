@@ -2,9 +2,8 @@ mod _execute;
 mod _get_moves;
 mod _undo;
 
-use std::collections::HashMap;
-
 use crate::{bishop, king, knight, pawn, queen, rook};
+use indexmap::{indexmap, IndexMap};
 use rs_tauri_chess::square;
 
 use super::{
@@ -18,58 +17,61 @@ use super::{
 #[derive(Debug)]
 pub struct Board {
     pub history: Vec<Move>,
-    pub pieces: HashMap<Square, Piece>,
-    pub attack_lines: HashMap<Square, Vec<Vec<Square>>>,
-    pub kings: HashMap<Color, Square>,
+    pub pieces: IndexMap<Square, Piece>,
+    pub attack_lines: IndexMap<Square, Vec<Vec<Square>>>,
+    pub kings: IndexMap<Color, Square>,
 }
 
 impl Board {
     pub fn new() -> Board {
         let mut board = Board {
             history: vec![],
-            pieces: HashMap::from([
-                (square!(A8), rook!(0, Black)),
-                (square!(B8), knight!(1, Black)),
-                (square!(C8), bishop!(2, Black)),
-                (square!(D8), queen!(3, Black)),
-                (square!(E8), king!(4, Black)),
-                (square!(F8), bishop!(5, Black)),
-                (square!(G8), knight!(6, Black)),
-                (square!(H8), rook!(7, Black)),
-                (square!(A7), pawn!(8, Black)),
-                (square!(B7), pawn!(9, Black)),
-                (square!(C7), pawn!(10, Black)),
-                (square!(D7), pawn!(11, Black)),
-                (square!(E7), pawn!(12, Black)),
-                (square!(F7), pawn!(13, Black)),
-                (square!(G7), pawn!(14, Black)),
-                (square!(H7), pawn!(15, Black)),
-                (square!(A2), pawn!(16, White)),
-                (square!(B2), pawn!(17, White)),
-                (square!(C2), pawn!(18, White)),
-                (square!(D2), pawn!(19, White)),
-                (square!(E2), pawn!(20, White)),
-                (square!(F2), pawn!(21, White)),
-                (square!(G2), pawn!(22, White)),
-                (square!(H2), pawn!(23, White)),
-                (square!(A1), rook!(24, White)),
-                (square!(B1), knight!(25, White)),
-                (square!(C1), bishop!(26, White)),
-                (square!(D1), queen!(27, White)),
-                (square!(E1), king!(28, White)),
-                (square!(F1), bishop!(29, White)),
-                (square!(G1), knight!(30, White)),
-                (square!(H1), rook!(31, White)),
-            ]),
-            attack_lines: HashMap::new(),
-            kings: HashMap::from([(Color::White, square!(E1)), (Color::Black, square!(E8))]),
+            pieces: indexmap! {
+                square!(A8) => rook!(0, Black),
+                square!(B8) => knight!(1, Black),
+                square!(C8) => bishop!(2, Black),
+                square!(D8) => queen!(3, Black),
+                square!(E8) => king!(4, Black),
+                square!(F8) => bishop!(5, Black),
+                square!(G8) => knight!(6, Black),
+                square!(H8) => rook!(7, Black),
+                square!(A7) => pawn!(8, Black),
+                square!(B7) => pawn!(9, Black),
+                square!(C7) => pawn!(10, Black),
+                square!(D7) => pawn!(11, Black),
+                square!(E7) => pawn!(12, Black),
+                square!(F7) => pawn!(13, Black),
+                square!(G7) => pawn!(14, Black),
+                square!(H7) => pawn!(15, Black),
+                square!(A2) => pawn!(16, White),
+                square!(B2) => pawn!(17, White),
+                square!(C2) => pawn!(18, White),
+                square!(D2) => pawn!(19, White),
+                square!(E2) => pawn!(20, White),
+                square!(F2) => pawn!(21, White),
+                square!(G2) => pawn!(22, White),
+                square!(H2) => pawn!(23, White),
+                square!(A1) => rook!(24, White),
+                square!(B1) => knight!(25, White),
+                square!(C1) => bishop!(26, White),
+                square!(D1) => queen!(27, White),
+                square!(E1) => king!(28, White),
+                square!(F1) => bishop!(29, White),
+                square!(G1) => knight!(30, White),
+                square!(H1) => rook!(31, White),
+            },
+            attack_lines: indexmap! {},
+            kings: indexmap! {
+                Color::White => square!(E1),
+                Color::Black => square!(E8)
+            },
         };
 
         board.attack_lines = board
             .pieces
             .iter()
             .map(|(s, p)| (*s, p.get_attack_lines(*s)))
-            .collect::<HashMap<_, _>>();
+            .collect::<IndexMap<_, _>>();
 
         board
     }

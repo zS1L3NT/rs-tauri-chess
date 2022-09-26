@@ -2212,6 +2212,7 @@ dependencies = [
 name = "rs-tauri-chess"
 version = "0.0.0"
 dependencies = [
+ "indexmap",
  "serde",
  "serde_json",
  "tauri",
