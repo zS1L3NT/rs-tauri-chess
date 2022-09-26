@@ -15,12 +15,15 @@ import PiecesContext from "./contexts/PiecesContext"
 import PromotionContext from "./contexts/PromotionContext"
 import equalSquares from "./functions/equalSquares"
 import { Board as iBoard, MoveType, PieceType } from "./types"
+import useListenReset from "./hooks/useListenReset"
 
 const App = () => {
 	const { selected } = useContext(CursorContext)
 	const { moves, setMoves } = useContext(MovesContext)
 	const { pieces, setPieces } = useContext(PiecesContext)
 	const promotion = useContext(PromotionContext)
+
+	useListenReset()
 
 	useAsyncEffect(async () => {
 		// @ts-ignore

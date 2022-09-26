@@ -22,6 +22,13 @@ fn execute(state: tauri::State<Mutex<Board>>, r#move: Move) -> ClientBoard {
     board.to_client_board()
 }
 
+#[tauri::command]
+fn reset(state: tauri::State<Mutex<Board>>) -> ClientBoard {
+	let mut board = state.lock().unwrap();
+	*board = Board::new();
+	board.to_client_board()
+}
+
 #[allow(unused_macros)]
 macro_rules! execute {
     ($board:tt $square_1:tt $square_2:tt) => {
@@ -43,7 +50,7 @@ macro_rules! execute {
 fn main() {
     tauri::Builder::default()
         .manage(Mutex::new(Board::new()))
-        .invoke_handler(tauri::generate_handler![state, execute])
+        .invoke_handler(tauri::generate_handler![state, execute, reset])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
