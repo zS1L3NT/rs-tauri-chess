@@ -388,8 +388,13 @@ impl Board {
             }
         }
 
-        let hasnt_moved = |square: Square| self.history.iter().find(|m| m.from == square).is_none();
-        if !in_check && hasnt_moved(Square::from(File::E, initial_king_rank)) {
+        let is_untouched = |square: Square| {
+            self.history
+                .iter()
+                .find(|m| m.from == square || m.to == square)
+                .is_none()
+        };
+        if !in_check && is_untouched(Square::from(File::E, initial_king_rank)) {
             if [
                 Square::from(File::B, initial_king_rank),
                 Square::from(File::C, initial_king_rank),
@@ -397,7 +402,7 @@ impl Board {
             ]
             .iter()
             .all(|s| self.pieces.get(s).is_none())
-                && hasnt_moved(Square::from(File::A, initial_king_rank))
+                && is_untouched(Square::from(File::A, initial_king_rank))
                 && unchecked_squares.contains(&Square::from(File::C, initial_king_rank))
                 && unchecked_squares.contains(&Square::from(File::D, initial_king_rank))
             {
@@ -413,7 +418,7 @@ impl Board {
             ]
             .iter()
             .all(|s| self.pieces.get(s).is_none())
-                && hasnt_moved(Square::from(File::H, initial_king_rank))
+                && is_untouched(Square::from(File::H, initial_king_rank))
                 && unchecked_squares.contains(&Square::from(File::F, initial_king_rank))
                 && unchecked_squares.contains(&Square::from(File::G, initial_king_rank))
             {
