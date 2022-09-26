@@ -2,6 +2,8 @@ mod _execute;
 mod _from_fen;
 mod _get_moves;
 mod _undo;
+#[cfg(test)]
+mod tests;
 
 use crate::{bishop, king, knight, pawn, queen, rook};
 use indexmap::{indexmap, IndexMap};
@@ -106,5 +108,21 @@ impl Board {
                 .collect::<Vec<_>>(),
             self.get_moves(),
         )
+    }
+
+    pub fn count_moves(&mut self, depth: usize) -> usize {
+        if depth == 0 {
+            return 1;
+        }
+
+        let mut count = 0;
+
+        for r#move in self.get_moves() {
+            self.execute(r#move);
+            count += self.count_moves(depth - 1);
+            self.undo();
+        }
+
+        count
     }
 }
