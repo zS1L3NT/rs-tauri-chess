@@ -109,6 +109,30 @@ impl Board {
             Square::from(File::G, initial_king_rank),
         ];
 
+        let get_straight_moves = |moves: &mut Vec<Move>, piece: &Piece, directions: &[(i8, i8)]| {
+            let square = self.get_square(piece).unwrap();
+            for (file, rank) in directions {
+                let mut file_offset = *file;
+                let mut rank_offset = *rank;
+                while let Some(target_square) = square.offset(file_offset, rank_offset) {
+                    if let Some(target_piece) = self.pieces.get(&target_square) {
+                        if target_piece.color != color {
+                            moves.push(Move::from_capture(
+                                square,
+                                target_square,
+                                target_piece.clone(),
+                            ));
+                        }
+                        break;
+                    } else {
+                        moves.push(Move::from_normal(square, target_square));
+                    }
+                    file_offset += file;
+                    rank_offset += rank;
+                }
+            }
+        };
+
         for (square, piece) in &self.pieces {
             if piece.color == opposite_color {
                 continue;
@@ -269,15 +293,9 @@ impl Board {
                         }
                     }
                 }
-                PieceType::Bishop => {
-                    self.get_straight_moves(&piece, color, &mut moves, &Directions::BISHOP)
-                }
-                PieceType::Rook => {
-                    self.get_straight_moves(&piece, color, &mut moves, &Directions::ROOK)
-                }
-                PieceType::Queen => {
-                    self.get_straight_moves(&piece, color, &mut moves, &Directions::QUEEN)
-                }
+                PieceType::Bishop => get_straight_moves(&mut moves, &piece, &Directions::BISHOP),
+                PieceType::Rook => get_straight_moves(&mut moves, &piece, &Directions::ROOK),
+                PieceType::Queen => get_straight_moves(&mut moves, &piece, &Directions::QUEEN),
                 PieceType::King => {
                     for (file, rank) in Directions::KING {
                         if let Some(target_square) = square.offset(file, rank) {
@@ -432,34 +450,7 @@ impl Board {
         moves
     }
 
-    fn get_straight_moves(
-        &self,
-        piece: &Piece,
-        color: Color,
-        moves: &mut Vec<Move>,
-        directions: &[(i8, i8)],
-    ) {
-        let square = self.get_square(piece).unwrap();
-        for (file, rank) in directions {
-            let mut file_offset = *file;
-            let mut rank_offset = *rank;
-            while let Some(target_square) = square.offset(file_offset, rank_offset) {
-                if let Some(target_piece) = self.pieces.get(&target_square) {
-                    if target_piece.color != color {
-                        moves.push(Move::from_capture(
-                            square,
-                            target_square,
-                            target_piece.clone(),
-                        ));
-                    }
-                    break;
-                } else {
-                    moves.push(Move::from_normal(square, target_square));
-                }
-                file_offset += file;
-                rank_offset += rank;
-            }
-        }
+        moves
     }
 
     pub fn execute(&mut self, r#move: Move) {
