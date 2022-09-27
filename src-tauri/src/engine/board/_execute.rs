@@ -2,20 +2,36 @@ use crate::engine::{
     color::Color,
     piece::PieceType,
     r#move::{Move, MoveType},
-    square::{File, Square},
+    square::{File, Rank, Square},
 };
 
 use super::Board;
 
 impl Board {
     pub fn execute(&mut self, r#move: Move) {
+        self.halfmove_clock += 1;
+        self.fullmove_number += 1;
+
         match r#move.r#type {
             MoveType::Normal | MoveType::PawnJump => {
                 let piece = self.pieces.remove(&r#move.from).unwrap();
+                let r#type = piece.r#type;
                 self.attack_lines.remove(&r#move.from);
                 self.attack_lines
                     .insert(r#move.to, piece.get_attack_lines(r#move.to));
                 self.pieces.insert(r#move.to, piece);
+
+                if r#type == PieceType::Pawn {
+                    self.halfmove_clock = 0;
+                }
+
+                if r#move.r#type == MoveType::PawnJump {
+                    if r#move.from.rank == Rank::_2 {
+                        self.enpassant_square = Some(Square::from(r#move.from.file, Rank::_3));
+                    } else {
+                        self.enpassant_square = Some(Square::from(r#move.from.file, Rank::_6));
+                    }
+                }
             }
             MoveType::Capture => {
                 let piece = self.pieces.remove(&r#move.from).unwrap();
@@ -23,6 +39,8 @@ impl Board {
                 self.attack_lines
                     .insert(r#move.to, piece.get_attack_lines(r#move.to));
                 self.pieces.insert(r#move.to, piece);
+
+                self.halfmove_clock = 0;
             }
             MoveType::Promotion => {
                 let mut piece = self.pieces.remove(&r#move.from).unwrap();
@@ -39,6 +57,8 @@ impl Board {
                 self.attack_lines
                     .insert(r#move.to, piece.get_attack_lines(r#move.to));
                 self.pieces.insert(r#move.to, piece);
+
+                self.halfmove_clock = 0;
             }
             MoveType::Enpassant => {
                 let piece = self.pieces.remove(&r#move.from).unwrap();
@@ -53,6 +73,8 @@ impl Board {
                     .unwrap();
                 self.pieces.remove(captured_square);
                 self.attack_lines.remove(captured_square);
+
+                self.halfmove_clock = 0;
             }
             MoveType::Castle => {
                 let king = self.pieces.remove(&r#move.from).unwrap();
@@ -77,20 +99,53 @@ impl Board {
                 self.attack_lines
                     .insert(rook_square_to, rook.get_attack_lines(rook_square_to));
                 self.pieces.insert(rook_square_to, rook);
+
+                self.castling_rights.insert(self.turn, [false, false]);
             }
         }
 
         if let PieceType::King = self.pieces.get(&r#move.to).unwrap().r#type {
-            self.kings.insert(
-                if self.history.len() % 2 == 0 {
-                    Color::White
-                } else {
-                    Color::Black
-                },
-                r#move.to,
-            );
+            self.kings.insert(self.turn, r#move.to);
         }
 
         self.history.push(r#move);
+        self.turn = self.turn.opposite();
+
+        for color in [Color::White, Color::Black].iter() {
+            let [queenside, kingside] = *self.castling_rights.get(color).unwrap();
+            let rank = if *color == Color::White {
+                Rank::_1
+            } else {
+                Rank::_8
+            };
+
+            if queenside {
+                let king = self.pieces.get(&Square::from(File::E, rank));
+                let rook = self.pieces.get(&Square::from(File::A, rank));
+
+                if king.is_none()
+                    || rook.is_none()
+                    || king.unwrap().r#type != PieceType::King
+                    || rook.unwrap().r#type != PieceType::Rook
+                    || king.unwrap().color != rook.unwrap().color
+                {
+                    self.castling_rights.insert(*color, [false, kingside]);
+                }
+            }
+
+            if kingside {
+                let king = self.pieces.get(&Square::from(File::E, rank));
+                let rook = self.pieces.get(&Square::from(File::H, rank));
+
+                if king.is_none()
+                    || rook.is_none()
+                    || king.unwrap().r#type != PieceType::King
+                    || rook.unwrap().r#type != PieceType::Rook
+                    || king.unwrap().color != rook.unwrap().color
+                {
+                    self.castling_rights.insert(*color, [queenside, false]);
+                }
+            }
+        }
     }
 }

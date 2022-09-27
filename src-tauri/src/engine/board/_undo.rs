@@ -1,5 +1,4 @@
 use crate::engine::{
-    color::Color,
     piece::PieceType,
     r#move::MoveType,
     square::{File, Square},
@@ -8,8 +7,9 @@ use crate::engine::{
 use super::Board;
 
 impl Board {
-    pub fn undo(&mut self) {
-        let r#move = self.history.last().expect("No moves to undo").clone();
+    pub fn undo(&mut self) -> Option<()> {
+        let r#move = self.history.pop()?;
+        self.turn = self.turn.opposite();
 
         match r#move.r#type {
             MoveType::Normal | MoveType::PawnJump => {
@@ -95,16 +95,9 @@ impl Board {
         }
 
         if let PieceType::King = self.pieces.get(&r#move.from).unwrap().r#type {
-            self.kings.insert(
-                if self.history.len() % 2 == 0 {
-                    Color::White
-                } else {
-                    Color::Black
-                },
-                r#move.from,
-            );
+            self.kings.insert(self.turn, r#move.from);
         }
 
-        self.history.pop();
+        Some(())
     }
 }
