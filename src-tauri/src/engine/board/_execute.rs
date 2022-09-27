@@ -1,3 +1,5 @@
+use rs_tauri_chess::square;
+
 use crate::engine::{
     color::Color,
     piece::PieceType,
@@ -27,9 +29,9 @@ impl Board {
 
                 if r#move.r#type == MoveType::PawnJump {
                     if r#move.from.rank == Rank::_2 {
-                        self.enpassant_square = Some(Square::from(r#move.from.file, Rank::_3));
+                        self.enpassant_square = Some(square!(r#move.from.file 3));
                     } else {
-                        self.enpassant_square = Some(Square::from(r#move.from.file, Rank::_6));
+                        self.enpassant_square = Some(square!(r#move.from.file 6));
                     }
                 }
             }
@@ -84,15 +86,9 @@ impl Board {
                 self.pieces.insert(r#move.to, king);
 
                 let (rook_square_from, rook_square_to) = if r#move.to.file == File::C {
-                    (
-                        Square::from(File::A, r#move.to.rank),
-                        Square::from(File::D, r#move.to.rank),
-                    )
+                    (square!(A r#move.to.rank), square!(D r#move.to.rank))
                 } else {
-                    (
-                        Square::from(File::H, r#move.to.rank),
-                        Square::from(File::F, r#move.to.rank),
-                    )
+                    (square!(H r#move.to.rank), square!(F r#move.to.rank))
                 };
                 let rook = self.pieces.remove(&rook_square_from).unwrap();
                 self.attack_lines.remove(&rook_square_from);
@@ -120,8 +116,8 @@ impl Board {
             };
 
             if queenside {
-                let king = self.pieces.get(&Square::from(File::E, rank));
-                let rook = self.pieces.get(&Square::from(File::A, rank));
+                let king = self.pieces.get(&square!(E rank));
+                let rook = self.pieces.get(&square!(A rank));
 
                 if king.is_none()
                     || rook.is_none()
@@ -134,8 +130,8 @@ impl Board {
             }
 
             if kingside {
-                let king = self.pieces.get(&Square::from(File::E, rank));
-                let rook = self.pieces.get(&Square::from(File::H, rank));
+                let king = self.pieces.get(&square!(E rank));
+                let rook = self.pieces.get(&square!(H rank));
 
                 if king.is_none()
                     || rook.is_none()

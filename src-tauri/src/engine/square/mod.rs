@@ -23,7 +23,7 @@ impl std::fmt::Debug for Square {
 
 impl Square {
     pub const ALL: [Square; 64] = [
-        Square::from(File::A, Rank::_8),
+        square!(A8),
         square!(B8),
         square!(C8),
         square!(D8),
@@ -89,17 +89,13 @@ impl Square {
         square!(H1),
     ];
 
-    pub const fn from(file: File, rank: Rank) -> Square {
-        Square { file, rank }
-    }
-
     pub fn offset(&self, file_offset: i8, rank_offset: i8) -> Option<Square> {
         let file = File::from_index(self.file.to_index() + file_offset);
         let rank = Rank::from_index(self.rank.to_index() + rank_offset);
 
         if let Some(file) = file {
             if let Some(rank) = rank {
-                return Some(Square::from(file, rank));
+                return Some(square!(file rank));
             }
         }
 

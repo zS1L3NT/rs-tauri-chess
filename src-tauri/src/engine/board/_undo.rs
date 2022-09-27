@@ -1,3 +1,5 @@
+use rs_tauri_chess::square;
+
 use crate::engine::{
     piece::PieceType,
     r#move::MoveType,
@@ -76,15 +78,9 @@ impl Board {
                 self.pieces.insert(r#move.from, king);
 
                 let (rook_square_from, rook_square_to) = if r#move.to.file == File::C {
-                    (
-                        Square::from(File::A, r#move.to.rank),
-                        Square::from(File::D, r#move.to.rank),
-                    )
+                    (square!(A r#move.to.rank), square!(D r#move.to.rank))
                 } else {
-                    (
-                        Square::from(File::H, r#move.to.rank),
-                        Square::from(File::F, r#move.to.rank),
-                    )
+                    (square!(H r#move.to.rank), square!(F r#move.to.rank))
                 };
                 let rook = self.pieces.remove(&rook_square_to).unwrap();
                 self.attack_lines.remove(&rook_square_to);

@@ -7,6 +7,8 @@ use std::sync::Mutex;
 
 use engine::{board::Board, client::ClientBoard, r#move::Move};
 
+use crate::engine::square::File;
+
 mod engine;
 
 #[tauri::command]

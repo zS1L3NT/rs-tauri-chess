@@ -1,3 +1,5 @@
+use rs_tauri_chess::square;
+
 use crate::engine::{
     color::Color,
     piece::{Directions, Piece, PieceType},
@@ -19,10 +21,10 @@ impl Board {
         };
         let mut in_check = false;
         let mut unchecked_squares = vec![
-            Square::from(File::C, initial_king_rank),
-            Square::from(File::D, initial_king_rank),
-            Square::from(File::F, initial_king_rank),
-            Square::from(File::G, initial_king_rank),
+            square!(C initial_king_rank),
+            square!(D initial_king_rank),
+            square!(F initial_king_rank),
+            square!(G initial_king_rank),
         ];
 
         for (square, piece) in &self.pieces {
@@ -315,34 +317,31 @@ impl Board {
         if !in_check {
             if queenside
                 && [
-                    Square::from(File::B, initial_king_rank),
-                    Square::from(File::C, initial_king_rank),
-                    Square::from(File::D, initial_king_rank),
+                    square!(B initial_king_rank),
+                    square!(C initial_king_rank),
+                    square!(D initial_king_rank),
                 ]
                 .iter()
                 .all(|s| self.pieces.get(s).is_none())
-                && unchecked_squares.contains(&Square::from(File::C, initial_king_rank))
-                && unchecked_squares.contains(&Square::from(File::D, initial_king_rank))
+                && unchecked_squares.contains(&square!(C initial_king_rank))
+                && unchecked_squares.contains(&square!(D initial_king_rank))
             {
                 moves.push(Move::from_castle(
-                    Square::from(File::E, initial_king_rank),
-                    Square::from(File::C, initial_king_rank),
+                    square!(E initial_king_rank),
+                    square!(C initial_king_rank),
                 ));
             }
 
             if kingside
-                && [
-                    Square::from(File::F, initial_king_rank),
-                    Square::from(File::G, initial_king_rank),
-                ]
-                .iter()
-                .all(|s| self.pieces.get(s).is_none())
-                && unchecked_squares.contains(&Square::from(File::F, initial_king_rank))
-                && unchecked_squares.contains(&Square::from(File::G, initial_king_rank))
+                && [square!(F initial_king_rank), square!(G initial_king_rank)]
+                    .iter()
+                    .all(|s| self.pieces.get(s).is_none())
+                && unchecked_squares.contains(&square!(F initial_king_rank))
+                && unchecked_squares.contains(&square!(G initial_king_rank))
             {
                 moves.push(Move::from_castle(
-                    Square::from(File::E, initial_king_rank),
-                    Square::from(File::G, initial_king_rank),
+                    square!(E initial_king_rank),
+                    square!(G initial_king_rank),
                 ));
             }
         }
