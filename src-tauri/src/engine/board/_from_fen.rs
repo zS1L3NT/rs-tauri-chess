@@ -1,12 +1,7 @@
 use {
     crate::{
         bishop,
-        engine::{
-            board::{Board, CastlingRights},
-            color::*,
-            piece::*,
-            square::{File, Rank, Square},
-        },
+        engine::{board::*, color::*, piece::*, square::*},
         king, knight, pawn, queen, rook,
     },
     indexmap::{indexmap, IndexMap},

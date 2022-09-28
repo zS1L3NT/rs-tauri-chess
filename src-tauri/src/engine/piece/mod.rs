@@ -6,7 +6,7 @@ mod tests;
 pub use {directions::Directions, piece_type::*};
 
 use {
-    crate::engine::{color::*, square::Square},
+    crate::engine::{color::*, square::*},
     serde::{Deserialize, Serialize},
 };
 

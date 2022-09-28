@@ -1,5 +1,5 @@
 use {
-    crate::engine::{board::Board, piece::*, r#move::*, square::File},
+    crate::engine::{board::*, piece::*, r#move::*, square::*},
     rs_tauri_chess::square,
 };
 

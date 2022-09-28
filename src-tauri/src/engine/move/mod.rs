@@ -5,7 +5,7 @@ mod tests;
 pub use move_type::*;
 
 use {
-    crate::engine::{piece::*, square::Square},
+    crate::engine::{piece::*, square::*},
     serde::{Deserialize, Serialize},
 };
 

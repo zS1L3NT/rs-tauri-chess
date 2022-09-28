@@ -1,11 +1,5 @@
 use {
-    crate::engine::{
-        board::{Board, CastlingRights},
-        color::*,
-        piece::*,
-        r#move::*,
-        square::{File, Rank},
-    },
+    crate::engine::{board::*, color::*, piece::*, r#move::*, square::*},
     rs_tauri_chess::square,
 };
 

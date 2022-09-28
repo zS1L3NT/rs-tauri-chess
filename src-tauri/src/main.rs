@@ -6,7 +6,7 @@
 mod engine;
 
 use {
-    engine::{board::Board, client::ClientBoard, r#move::*},
+    engine::{board::*, client::*, r#move::*},
     std::sync::Mutex,
 };
 
