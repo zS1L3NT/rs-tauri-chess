@@ -1,6 +1,9 @@
-use std::fmt::{Debug, Formatter, Result};
+pub use Color::*;
 
-use serde::{Deserialize, Serialize};
+use {
+    serde::{Deserialize, Serialize},
+    std::fmt::{Debug, Formatter, Result},
+};
 
 #[derive(Copy, Clone, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum Color {
@@ -14,8 +17,8 @@ impl Debug for Color {
             f,
             "{}",
             match self {
-                Color::White => "W",
-                Color::Black => "B",
+                White => "W",
+                Black => "B",
             }
         )
     }
@@ -24,8 +27,8 @@ impl Debug for Color {
 impl Color {
     pub fn opposite(self) -> Color {
         match self {
-            Color::White => Color::Black,
-            Color::Black => Color::White,
+            White => Black,
+            Black => White,
         }
     }
 }

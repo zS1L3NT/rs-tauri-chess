@@ -1,17 +1,8 @@
-use indexmap::{indexmap, IndexMap};
-use rs_tauri_chess::square;
-
-use crate::{
-    bishop,
-    engine::{
-        color::Color,
-        piece::{Piece, PieceType},
-        square::{File, Rank, Square},
-    },
-    king, knight, pawn, queen, rook,
+use {
+    crate::{bishop, engine::*, king, knight, pawn, queen, rook},
+    indexmap::{indexmap, IndexMap},
+    rs_tauri_chess::square,
 };
-
-use super::Board;
 
 #[derive(Debug)]
 pub enum FenError {
@@ -44,48 +35,61 @@ impl Board {
         let halfmove_clock = Board::parse_halfmove_clock(halfmove_clock)?;
         let fullmove_number = Board::parse_fullmove_number(fullmove_number)?;
 
-        for (color, sides) in &castling_rights {
+        for (color, castling_rights) in &castling_rights {
             let king = pieces.get(
-                &(if *color == Color::White {
+                &(if *color == White {
                     square!(E1)
                 } else {
                     square!(E8)
                 }),
             );
 
-            for (i, side) in sides.iter().enumerate() {
-                let rook = pieces.get(
-                    &(if i == 0 {
-                        if *color == Color::White {
-                            square!(H1)
-                        } else {
-                            square!(H8)
-                        }
-                    } else {
-                        if *color == Color::White {
-                            square!(A1)
-                        } else {
-                            square!(A8)
-                        }
-                    }),
-                );
+            let rook = pieces.get(
+                &(if *color == White {
+                    square!(H1)
+                } else {
+                    square!(H8)
+                }),
+            );
+            if castling_rights.kingside {
+                if king.is_some() && rook.is_some() {
+                    let king = king.unwrap();
+                    let rook = rook.unwrap();
 
-                if *side {
-                    if king.is_some() && rook.is_some() {
-                        let king = king.unwrap();
-                        let rook = rook.unwrap();
-
-                        if king.r#type == PieceType::King
-                            || rook.r#type == PieceType::Rook
-                            || king.color == *color
-                            || rook.color == *color
-                        {
-                            continue;
-                        }
+                    if king.r#type == King
+                        || rook.r#type == Rook
+                        || king.color == *color
+                        || rook.color == *color
+                    {
+                        continue;
                     }
-
-                    return Err(FenError::CastlingRights);
                 }
+
+                return Err(FenError::CastlingRights);
+            }
+
+            let rook = pieces.get(
+                &(if *color == White {
+                    square!(A1)
+                } else {
+                    square!(A8)
+                }),
+            );
+            if castling_rights.queenside {
+                if king.is_some() && rook.is_some() {
+                    let king = king.unwrap();
+                    let rook = rook.unwrap();
+
+                    if king.r#type == King
+                        || rook.r#type == Rook
+                        || king.color == *color
+                        || rook.color == *color
+                    {
+                        continue;
+                    }
+                }
+
+                return Err(FenError::CastlingRights);
             }
         }
 
@@ -96,14 +100,14 @@ impl Board {
         }
 
         if !(halfmove_clock
-            <= ((fullmove_number - 1) * 2) + (if active_color == Color::Black { 1 } else { 0 }))
+            <= ((fullmove_number - 1) * 2) + (if active_color == Black { 1 } else { 0 }))
         {
             return Err(FenError::HalfMoveClock);
         }
 
         let kings = indexmap! {
-            Color::White => pieces.iter().find_map(|(s, p)| if p.r#type == PieceType::King && p.color == Color::White { Some(*s) } else {None} ).unwrap(),
-            Color::Black => pieces.iter().find_map(|(s, p)| if p.r#type == PieceType::King && p.color == Color::Black { Some(*s) } else {None} ).unwrap(),
+            White => pieces.iter().find_map(|(s, p)| if p.r#type == King && p.color == White { Some(*s) } else {None} ).unwrap(),
+            Black => pieces.iter().find_map(|(s, p)| if p.r#type == King && p.color == Black { Some(*s) } else {None} ).unwrap(),
         };
 
         let mut board = Board {
@@ -176,7 +180,7 @@ impl Board {
 
         if pieces
             .values()
-            .filter(|p| p.r#type == PieceType::King && p.color == Color::White)
+            .filter(|p| p.r#type == King && p.color == White)
             .count()
             != 1
         {
@@ -185,7 +189,7 @@ impl Board {
 
         if pieces
             .values()
-            .filter(|p| p.r#type == PieceType::King && p.color == Color::Black)
+            .filter(|p| p.r#type == King && p.color == Black)
             .count()
             != 1
         {
@@ -197,13 +201,13 @@ impl Board {
 
     fn parse_active_color(text: &str) -> Result<Color, FenError> {
         match text {
-            "w" => Ok(Color::White),
-            "b" => Ok(Color::Black),
+            "w" => Ok(White),
+            "b" => Ok(Black),
             _ => return Err(FenError::ActiveColor),
         }
     }
 
-    fn parse_castling_rights(text: &str) -> Result<IndexMap<Color, [bool; 2]>, FenError> {
+    fn parse_castling_rights(text: &str) -> Result<IndexMap<Color, CastlingRights>, FenError> {
         let mut castling_rights = indexmap! {};
         let mut white_kingside = false;
         let mut white_queenside = false;
@@ -221,8 +225,8 @@ impl Board {
             }
         }
 
-        castling_rights.insert(Color::White, [white_kingside, white_queenside]);
-        castling_rights.insert(Color::Black, [black_kingside, black_queenside]);
+        castling_rights.insert(White, CastlingRights::new(white_kingside, white_queenside));
+        castling_rights.insert(Black, CastlingRights::new(black_kingside, black_queenside));
 
         Ok(castling_rights)
     }

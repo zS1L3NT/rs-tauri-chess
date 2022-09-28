@@ -1,11 +1,4 @@
-use rs_tauri_chess::square;
-
-use crate::engine::{
-    color::Color,
-    square::{File, Rank},
-};
-
-use super::Board;
+use {crate::engine::*, rs_tauri_chess::square};
 
 impl Board {
     pub fn to_fen(&self) -> String {
@@ -38,7 +31,7 @@ impl Board {
                     }
 
                     let mut piece_code = format!("{:?}", piece.r#type);
-                    if piece.color == Color::Black {
+                    if piece.color == Black {
                         piece_code = piece_code.to_ascii_lowercase();
                     }
 
@@ -61,27 +54,27 @@ impl Board {
 
     fn generate_active_color(&self) -> String {
         match self.turn {
-            Color::White => "w".into(),
-            Color::Black => "b".into(),
+            White => "w".into(),
+            Black => "b".into(),
         }
     }
 
     fn generate_castling_rights(&self) -> String {
         let mut castling_rights = String::new();
 
-        if self.castling_rights.get(&Color::White).unwrap()[0] {
+        if self.castling_rights.get(&White).unwrap().kingside {
             castling_rights.push('K');
         }
 
-        if self.castling_rights.get(&Color::White).unwrap()[1] {
+        if self.castling_rights.get(&White).unwrap().queenside {
             castling_rights.push('Q');
         }
 
-        if self.castling_rights.get(&Color::Black).unwrap()[0] {
+        if self.castling_rights.get(&Black).unwrap().kingside {
             castling_rights.push('k');
         }
 
-        if self.castling_rights.get(&Color::Black).unwrap()[1] {
+        if self.castling_rights.get(&Black).unwrap().queenside {
             castling_rights.push('q');
         }
 

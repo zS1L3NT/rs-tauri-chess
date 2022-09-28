@@ -1,20 +1,11 @@
-use rs_tauri_chess::square;
-
-use crate::engine::{
-    color::Color,
-    piece::{Directions, Piece, PieceType},
-    r#move::Move,
-    square::{Rank, Square},
-};
-
-use super::Board;
+use {crate::engine::*, rs_tauri_chess::square};
 
 impl Board {
     pub fn get_moves(&self) -> Vec<Move> {
         let mut moves = vec![];
         let opposite_color = self.turn.opposite();
 
-        let initial_king_rank = if self.turn == Color::White {
+        let initial_king_rank = if self.turn == White {
             Rank::_1
         } else {
             Rank::_8
@@ -34,10 +25,10 @@ impl Board {
 
             let square = *square;
             match piece.r#type {
-                PieceType::Pawn => {
-                    let team_multiplier = if self.turn == Color::White { 1 } else { -1 };
+                Pawn => {
+                    let team_multiplier = if self.turn == White { 1 } else { -1 };
                     let team_rank = |white_value: Rank, black_value: Rank| -> Rank {
-                        if self.turn == Color::White {
+                        if self.turn == White {
                             white_value
                         } else {
                             black_value
@@ -64,12 +55,7 @@ impl Board {
                         if let Some(target_square) = square.offset(-1, 1 * team_multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
-                                    for r#type in [
-                                        PieceType::Queen,
-                                        PieceType::Rook,
-                                        PieceType::Bishop,
-                                        PieceType::Knight,
-                                    ] {
+                                    for r#type in [Queen, Rook, Bishop, Knight] {
                                         moves.push(Move::from_promotion_capture(
                                             square,
                                             target_square,
@@ -82,24 +68,14 @@ impl Board {
                         }
                         let target_square = square.offset(0, 1 * team_multiplier).unwrap();
                         if let None = self.pieces.get(&target_square) {
-                            for r#type in [
-                                PieceType::Queen,
-                                PieceType::Rook,
-                                PieceType::Bishop,
-                                PieceType::Knight,
-                            ] {
+                            for r#type in [Queen, Rook, Bishop, Knight] {
                                 moves.push(Move::from_promotion(square, target_square, r#type));
                             }
                         }
                         if let Some(target_square) = square.offset(1, 1 * team_multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
-                                    for r#type in [
-                                        PieceType::Queen,
-                                        PieceType::Rook,
-                                        PieceType::Bishop,
-                                        PieceType::Knight,
-                                    ] {
+                                    for r#type in [Queen, Rook, Bishop, Knight] {
                                         moves.push(Move::from_promotion_capture(
                                             square,
                                             target_square,
@@ -181,7 +157,7 @@ impl Board {
                         }
                     }
                 }
-                PieceType::Knight => {
+                Knight => {
                     for (file, rank) in Directions::KNIGHT {
                         if let Some(target_square) = square.offset(file, rank) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
@@ -198,12 +174,10 @@ impl Board {
                         }
                     }
                 }
-                PieceType::Bishop => {
-                    self.get_straight_moves(&mut moves, &piece, &Directions::BISHOP)
-                }
-                PieceType::Rook => self.get_straight_moves(&mut moves, &piece, &Directions::ROOK),
-                PieceType::Queen => self.get_straight_moves(&mut moves, &piece, &Directions::QUEEN),
-                PieceType::King => {
+                Bishop => self.get_straight_moves(&mut moves, &piece, &Directions::BISHOP),
+                Rook => self.get_straight_moves(&mut moves, &piece, &Directions::ROOK),
+                Queen => self.get_straight_moves(&mut moves, &piece, &Directions::QUEEN),
+                King => {
                     for (file, rank) in Directions::KING {
                         if let Some(target_square) = square.offset(file, rank) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
@@ -313,7 +287,10 @@ impl Board {
             }
         }
 
-        let [kingside, queenside] = *self.castling_rights.get(&self.turn).unwrap();
+        let CastlingRights {
+            queenside,
+            kingside,
+        } = *self.castling_rights.get(&self.turn).unwrap();
         if !in_check {
             if kingside
                 && [square!(F initial_king_rank), square!(G initial_king_rank)]

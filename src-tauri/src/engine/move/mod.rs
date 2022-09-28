@@ -2,13 +2,11 @@ mod move_type;
 #[cfg(test)]
 mod tests;
 
-pub use move_type::MoveType;
+pub use move_type::*;
 
-use serde::{Deserialize, Serialize};
-
-use super::{
-    piece::{Piece, PieceType},
-    square::Square,
+use {
+    crate::engine::*,
+    serde::{Deserialize, Serialize},
 };
 
 #[derive(Clone, Deserialize, PartialEq, Serialize)]
@@ -46,7 +44,7 @@ impl Move {
         Move {
             from: from.clone(),
             to,
-            r#type: MoveType::Normal,
+            r#type: Normal,
             captured: None,
             promotion: None,
         }
@@ -59,7 +57,7 @@ impl Move {
         Move {
             from: from.clone(),
             to,
-            r#type: MoveType::PawnJump,
+            r#type: PawnJump,
             captured: None,
             promotion: None,
         }
@@ -70,7 +68,7 @@ impl Move {
         Move {
             from: from.clone(),
             to,
-            r#type: MoveType::Capture,
+            r#type: Capture,
             captured: Some(captured),
             promotion: None,
         }
@@ -79,12 +77,12 @@ impl Move {
     pub fn from_promotion(from: Square, to: Square, promotion: PieceType) -> Move {
         assert_ne!(from, to);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 1);
-        assert_ne!(promotion, PieceType::Pawn);
-        assert_ne!(promotion, PieceType::King);
+        assert_ne!(promotion, Pawn);
+        assert_ne!(promotion, King);
         Move {
             from: from.clone(),
             to,
-            r#type: MoveType::Promotion,
+            r#type: Promotion,
             captured: None,
             promotion: Some(promotion),
         }
@@ -98,12 +96,12 @@ impl Move {
     ) -> Move {
         assert_ne!(from, to);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 1);
-        assert_ne!(promotion, PieceType::Pawn);
-        assert_ne!(promotion, PieceType::King);
+        assert_ne!(promotion, Pawn);
+        assert_ne!(promotion, King);
         Move {
             from: from.clone(),
             to,
-            r#type: MoveType::PromotionCapture,
+            r#type: PromotionCapture,
             captured: Some(captured),
             promotion: Some(promotion),
         }
@@ -116,7 +114,7 @@ impl Move {
         Move {
             from: from.clone(),
             to,
-            r#type: MoveType::Enpassant,
+            r#type: Enpassant,
             captured: Some(captured),
             promotion: None,
         }
@@ -128,7 +126,7 @@ impl Move {
         Move {
             from: from.clone(),
             to,
-            r#type: MoveType::Castle,
+            r#type: Castle,
             captured: None,
             promotion: None,
         }

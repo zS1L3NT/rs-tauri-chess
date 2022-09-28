@@ -3,11 +3,12 @@ mod rank;
 #[cfg(test)]
 mod tests;
 
-pub use file::File;
-pub use rank::Rank;
+pub use {file::File, rank::Rank};
 
-use rs_tauri_chess::square;
-use serde::{Deserialize, Serialize};
+use {
+    rs_tauri_chess::square,
+    serde::{Deserialize, Serialize},
+};
 
 #[derive(Clone, Copy, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Square {

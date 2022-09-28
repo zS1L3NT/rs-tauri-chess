@@ -3,22 +3,19 @@ mod _from_fen;
 mod _get_moves;
 mod _to_fen;
 mod _undo;
+mod castling_rights;
 #[cfg(test)]
 mod tests;
 
-use crate::{bishop, king, knight, pawn, queen, rook};
-use indexmap::{indexmap, IndexMap};
-use rs_tauri_chess::square;
+pub use {_from_fen::FenError, castling_rights::CastlingRights};
 
-use super::{
-    client::{ClientBoard, ClientPiece},
-    color::Color,
-    piece::Piece,
-    r#move::Move,
-    square::Square,
+use {
+    crate::{bishop, engine::*, king, knight, pawn, queen, rook},
+    indexmap::{indexmap, IndexMap},
+    rs_tauri_chess::square,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Board {
     pub history: Vec<Move>,
     pub pieces: IndexMap<Square, Piece>,
@@ -26,7 +23,7 @@ pub struct Board {
     pub kings: IndexMap<Color, Square>,
 
     pub turn: Color,
-    pub castling_rights: IndexMap<Color, [bool; 2]>,
+    pub castling_rights: IndexMap<Color, CastlingRights>,
     pub enpassant_square: Option<Square>,
     pub halfmove_clock: u32,
     pub fullmove_number: u32,
@@ -72,14 +69,14 @@ impl Board {
             },
             attack_lines: indexmap! {},
             kings: indexmap! {
-                Color::White => square!(E1),
-                Color::Black => square!(E8)
+                White => square!(E1),
+                Black => square!(E8)
             },
 
-            turn: Color::White,
+            turn: White,
             castling_rights: indexmap! {
-                Color::White => [true, true],
-                Color::Black => [true, true],
+                White => CastlingRights::new(true, true),
+                Black => CastlingRights::new(true, true),
             },
             enpassant_square: None,
             halfmove_clock: 0,

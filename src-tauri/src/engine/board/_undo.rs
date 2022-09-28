@@ -1,8 +1,4 @@
-use rs_tauri_chess::square;
-
-use crate::engine::{piece::PieceType, r#move::MoveType, square::File};
-
-use super::Board;
+use {crate::engine::*, rs_tauri_chess::square};
 
 impl Board {
     pub fn undo(&mut self) -> Option<()> {
@@ -10,14 +6,14 @@ impl Board {
         self.turn = self.turn.opposite();
 
         match r#move.r#type {
-            MoveType::Normal | MoveType::PawnJump => {
+            Normal | PawnJump => {
                 let piece = self.pieces.remove(&r#move.to).unwrap();
                 self.attack_lines.remove(&r#move.to);
                 self.attack_lines
                     .insert(r#move.from, piece.get_attack_lines(r#move.from));
                 self.pieces.insert(r#move.from, piece);
             }
-            MoveType::Capture => {
+            Capture => {
                 let piece = self.pieces.remove(&r#move.to).unwrap();
                 self.attack_lines.remove(&r#move.to);
                 self.attack_lines
@@ -29,17 +25,17 @@ impl Board {
                     .insert(r#move.to, captured.get_attack_lines(r#move.to));
                 self.pieces.insert(r#move.to, captured);
             }
-            MoveType::Promotion => {
+            Promotion => {
                 let mut piece = self.pieces.remove(&r#move.to).unwrap();
-                piece.r#type = PieceType::Pawn;
+                piece.r#type = Pawn;
                 self.attack_lines.remove(&r#move.to);
                 self.attack_lines
                     .insert(r#move.from, piece.get_attack_lines(r#move.from));
                 self.pieces.insert(r#move.from, piece);
             }
-            MoveType::PromotionCapture => {
+            PromotionCapture => {
                 let mut piece = self.pieces.remove(&r#move.to).unwrap();
-                piece.r#type = PieceType::Pawn;
+                piece.r#type = Pawn;
                 self.attack_lines.remove(&r#move.to);
                 self.attack_lines
                     .insert(r#move.from, piece.get_attack_lines(r#move.from));
@@ -50,7 +46,7 @@ impl Board {
                     .insert(r#move.to, captured.get_attack_lines(r#move.to));
                 self.pieces.insert(r#move.to, captured);
             }
-            MoveType::Enpassant => {
+            Enpassant => {
                 let piece = self.pieces.remove(&r#move.to).unwrap();
                 self.attack_lines.remove(&r#move.to);
                 self.attack_lines
@@ -66,7 +62,7 @@ impl Board {
                     .insert(captured_square, captured.get_attack_lines(captured_square));
                 self.pieces.insert(captured_square, captured);
             }
-            MoveType::Castle => {
+            Castle => {
                 let king = self.pieces.remove(&r#move.to).unwrap();
                 self.attack_lines.remove(&r#move.to);
                 self.attack_lines
@@ -86,7 +82,7 @@ impl Board {
             }
         }
 
-        if let PieceType::King = self.pieces.get(&r#move.from).unwrap().r#type {
+        if let King = self.pieces.get(&r#move.from).unwrap().r#type {
             self.kings.insert(self.turn, r#move.from);
         }
 
