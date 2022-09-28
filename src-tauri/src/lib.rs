@@ -9,9 +9,9 @@ pub fn square(input: TokenStream) -> TokenStream {
         let rank = string.chars().nth(1).unwrap();
 
         format!(
-            r#"crate::engine::square::Square {{
-				file: crate::engine::square::File::{},
-				rank: crate::engine::square::Rank::_{}
+            r#"crate::engine::Square {{
+				file: crate::engine::File::{},
+				rank: crate::engine::Rank::_{}
 			}}"#,
             file, rank
         )
@@ -22,15 +22,15 @@ pub fn square(input: TokenStream) -> TokenStream {
         let mut rank: String = string.split_whitespace().nth(1).unwrap().into();
 
         if file.len() == 1 {
-            file = format!("crate::engine::square::File::{}", file);
+            file = format!("crate::engine::File::{}", file);
         }
 
         if rank.len() == 1 {
-            rank = format!("crate::engine::square::Rank::_{}", rank);
+            rank = format!("crate::engine::Rank::_{}", rank);
         }
 
         format!(
-            r#"crate::engine::square::Square {{
+            r#"crate::engine::Square {{
 				file: {},
 				rank: {},
 			}}"#,

@@ -5,14 +5,10 @@ mod _to_fen;
 mod _undo;
 mod castling_rights;
 
-pub use castling_rights::CastlingRights;
+pub use {_from_fen::FenError, castling_rights::CastlingRights};
 
 use {
-    crate::{
-        bishop,
-        engine::{client::*, color::*, piece::*, r#move::*, square::*},
-        king, knight, pawn, queen, rook,
-    },
+    crate::{bishop, engine::*, king, knight, pawn, queen, rook},
     indexmap::{indexmap, IndexMap},
     rs_tauri_chess::square,
 };

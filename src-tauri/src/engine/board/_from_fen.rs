@@ -1,9 +1,5 @@
 use {
-    crate::{
-        bishop,
-        engine::{board::*, color::*, piece::*, square::*},
-        king, knight, pawn, queen, rook,
-    },
+    crate::{bishop, engine::*, king, knight, pawn, queen, rook},
     indexmap::{indexmap, IndexMap},
     rs_tauri_chess::square,
 };

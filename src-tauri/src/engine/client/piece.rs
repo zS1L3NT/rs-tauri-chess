@@ -1,7 +1,4 @@
-use {
-    crate::engine::{color::*, piece::*, square::*},
-    serde::Serialize,
-};
+use {crate::engine::*, serde::Serialize};
 
 #[derive(Clone, Serialize)]
 pub struct ClientPiece {

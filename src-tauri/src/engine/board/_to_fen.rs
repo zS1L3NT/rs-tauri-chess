@@ -1,7 +1,4 @@
-use {
-    crate::engine::{board::*, color::*, square::*},
-    rs_tauri_chess::square,
-};
+use {crate::engine::*, rs_tauri_chess::square};
 
 impl Board {
     pub fn to_fen(&self) -> String {

@@ -1,5 +1,5 @@
 mod pawn {
-    use {crate::engine::board::*, rs_tauri_chess::square};
+    use {crate::engine::*, rs_tauri_chess::square};
 
     #[test]
     fn white_normal() {
@@ -87,7 +87,7 @@ mod pawn {
 }
 
 mod knight {
-    use {crate::engine::board::*, rs_tauri_chess::square};
+    use {crate::engine::*, rs_tauri_chess::square};
 
     #[test]
     fn normal() {
@@ -106,7 +106,7 @@ mod knight {
 
 mod bishop {
     use {
-        crate::{bishop, engine::board::*},
+        crate::{bishop, engine::*},
         rs_tauri_chess::square,
     };
 
@@ -154,7 +154,7 @@ mod bishop {
 
 mod rook {
     use {
-        crate::{engine::board::*, rook},
+        crate::{engine::*, rook},
         rs_tauri_chess::square,
     };
 
@@ -220,7 +220,7 @@ mod rook {
 
 mod queen {
     use {
-        crate::{engine::board::*, queen},
+        crate::{engine::*, queen},
         rs_tauri_chess::square,
     };
 
@@ -313,7 +313,7 @@ mod queen {
 }
 
 mod king {
-    use {crate::engine::board::*, rs_tauri_chess::square};
+    use {crate::engine::*, rs_tauri_chess::square};
 
     #[test]
     fn normal() {

@@ -5,10 +5,7 @@
 
 mod engine;
 
-use {
-    engine::{board::*, client::*, r#move::*},
-    std::sync::Mutex,
-};
+use {engine::*, std::sync::Mutex};
 
 #[tauri::command]
 fn state(state: tauri::State<Mutex<Board>>) -> ClientBoard {
