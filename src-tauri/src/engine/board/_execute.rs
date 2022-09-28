@@ -8,6 +8,7 @@ impl Board {
         match r#move.r#type {
             Normal | PawnJump => {
                 let piece = self.pieces.remove(&r#move.from).unwrap();
+                let enpassant_rank = piece.color.get_enpassant_rank();
                 let r#type = piece.r#type;
                 self.attack_lines.remove(&r#move.from);
                 self.attack_lines
@@ -19,11 +20,7 @@ impl Board {
                 }
 
                 if r#move.r#type == PawnJump {
-                    if r#move.from.rank == Rank::_2 {
-                        self.enpassant_square = Some(square!(r#move.from.file 3));
-                    } else {
-                        self.enpassant_square = Some(square!(r#move.from.file 6));
-                    }
+                    self.enpassant_square = Some(square!(r#move.from.file enpassant_rank));
                 }
             }
             Capture => {
@@ -62,7 +59,10 @@ impl Board {
 
                 let captured_square = &r#move
                     .from
-                    .offset(r#move.to.file.to_index() - r#move.from.file.to_index(), 0)
+                    .offset(
+                        Into::<i8>::into(r#move.to.file) - Into::<i8>::into(r#move.from.file),
+                        0,
+                    )
                     .unwrap();
                 self.pieces.remove(captured_square);
                 self.attack_lines.remove(captured_square);
@@ -104,11 +104,11 @@ impl Board {
                 kingside,
                 queenside,
             } = *self.castling_rights.get(color).unwrap();
-            let rank = if *color == White { Rank::_1 } else { Rank::_8 };
+            let piece_rank = color.get_piece_rank();
 
             if kingside {
-                let king = self.pieces.get(&square!(E rank));
-                let rook = self.pieces.get(&square!(H rank));
+                let king = self.pieces.get(&square!(E piece_rank));
+                let rook = self.pieces.get(&square!(A piece_rank));
 
                 if king.is_none()
                     || rook.is_none()
@@ -122,8 +122,8 @@ impl Board {
             }
 
             if queenside {
-                let king = self.pieces.get(&square!(E rank));
-                let rook = self.pieces.get(&square!(A rank));
+                let king = self.pieces.get(&square!(E piece_rank));
+                let rook = self.pieces.get(&square!(H piece_rank));
 
                 if king.is_none()
                     || rook.is_none()

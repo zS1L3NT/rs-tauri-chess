@@ -91,11 +91,11 @@ impl Square {
     ];
 
     pub fn offset(&self, file_offset: i8, rank_offset: i8) -> Option<Square> {
-        let file = File::from_index(self.file.to_index() + file_offset);
-        let rank = Rank::from_index(self.rank.to_index() + rank_offset);
+        let file = File::try_from((Into::<i8>::into(self.file) + file_offset) as i8);
+        let rank = Rank::try_from((Into::<i8>::into(self.rank) + rank_offset) as i8);
 
-        if let Some(file) = file {
-            if let Some(rank) = rank {
+        if let Ok(file) = file {
+            if let Ok(rank) = rank {
                 return Some(square!(file rank));
             }
         }

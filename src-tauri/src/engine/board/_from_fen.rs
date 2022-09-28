@@ -144,8 +144,8 @@ impl Board {
                 if char.is_numeric() {
                     file_index += char.to_digit(10).unwrap() as i8;
                 } else {
-                    let file = File::from_index(file_index).unwrap();
-                    let rank = Rank::from_index(rank_index).unwrap();
+                    let file = File::try_from(file_index).unwrap();
+                    let rank = Rank::try_from(rank_index).unwrap();
                     let square = square!(file rank);
 
                     match char {

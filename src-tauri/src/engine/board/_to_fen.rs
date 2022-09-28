@@ -17,11 +17,11 @@ impl Board {
         let mut piece_placements = String::new();
 
         for rank_index in (0..=7).rev() {
-            let rank = Rank::from_index(rank_index).unwrap();
+            let rank = Rank::try_from(rank_index).unwrap();
             let mut empty_squares = 0;
 
             for file_index in 0..=7 {
-                let file = File::from_index(file_index).unwrap();
+                let file = File::try_from(file_index).unwrap();
                 let square = square!(file rank);
 
                 if let Some(piece) = self.pieces.get(&square) {
