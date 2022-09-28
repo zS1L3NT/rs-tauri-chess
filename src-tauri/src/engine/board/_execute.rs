@@ -62,7 +62,10 @@ impl Board {
 
                 let captured_square = &r#move
                     .from
-                    .offset(r#move.to.file.to_index() - r#move.from.file.to_index(), 0)
+                    .offset(
+                        Into::<i8>::into(r#move.to.file) - Into::<i8>::into(r#move.from.file),
+                        0,
+                    )
                     .unwrap();
                 self.pieces.remove(captured_square);
                 self.attack_lines.remove(captured_square);

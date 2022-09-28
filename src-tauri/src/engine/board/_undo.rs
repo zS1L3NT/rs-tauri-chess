@@ -56,7 +56,10 @@ impl Board {
                 let captured = r#move.captured.unwrap();
                 let captured_square = r#move
                     .from
-                    .offset(r#move.to.file.to_index() - r#move.from.file.to_index(), 0)
+                    .offset(
+                        Into::<i8>::into(r#move.to.file) - Into::<i8>::into(r#move.from.file),
+                        0,
+                    )
                     .unwrap();
                 self.attack_lines
                     .insert(captured_square, captured.get_attack_lines(captured_square));

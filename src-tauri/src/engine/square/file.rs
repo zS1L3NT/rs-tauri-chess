@@ -17,7 +17,7 @@ impl std::fmt::Debug for File {
         write!(
             f,
             "{}",
-            ["A", "B", "C", "D", "E", "F", "G", "H"][self.to_index() as usize]
+            ["A", "B", "C", "D", "E", "F", "G", "H"][Into::<i8>::into(*self) as usize]
         )
     }
 }
@@ -27,7 +27,7 @@ impl Serialize for File {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_i8(self.to_index())
+        serializer.serialize_i8((*self).into())
     }
 }
 
@@ -37,29 +37,15 @@ impl<'de> Deserialize<'de> for File {
         D: serde::Deserializer<'de>,
     {
         let index = i8::deserialize(deserializer)?;
-        match File::from_index(index) {
-            Some(file) => Ok(file),
-            None => Err(serde::de::Error::custom("invalid file")),
+        match File::try_from(index) {
+            Ok(file) => Ok(file),
+            Err(_) => Err(serde::de::Error::custom("invalid file")),
         }
     }
 }
 
-impl File {
-    pub fn from_index(index: i8) -> Option<File> {
-        match index {
-            0 => Some(File::A),
-            1 => Some(File::B),
-            2 => Some(File::C),
-            3 => Some(File::D),
-            4 => Some(File::E),
-            5 => Some(File::F),
-            6 => Some(File::G),
-            7 => Some(File::H),
-            _ => None,
-        }
-    }
-
-    pub fn to_index(&self) -> i8 {
+impl Into<i8> for File {
+    fn into(self) -> i8 {
         match self {
             File::A => 0,
             File::B => 1,
@@ -69,6 +55,24 @@ impl File {
             File::F => 5,
             File::G => 6,
             File::H => 7,
+        }
+    }
+}
+
+impl TryFrom<i8> for File {
+    type Error = ();
+
+    fn try_from(value: i8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(File::A),
+            1 => Ok(File::B),
+            2 => Ok(File::C),
+            3 => Ok(File::D),
+            4 => Ok(File::E),
+            5 => Ok(File::F),
+            6 => Ok(File::G),
+            7 => Ok(File::H),
+            _ => Err(()),
         }
     }
 }

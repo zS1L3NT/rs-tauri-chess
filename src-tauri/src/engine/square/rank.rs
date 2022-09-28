@@ -14,7 +14,7 @@ pub enum Rank {
 
 impl std::fmt::Debug for Rank {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.to_index() + 1)
+        write!(f, "{:?}", Into::<i8>::into(*self) + 1)
     }
 }
 
@@ -23,7 +23,7 @@ impl Serialize for Rank {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_i8(self.to_index())
+        serializer.serialize_i8((*self).into())
     }
 }
 
@@ -33,29 +33,15 @@ impl<'de> Deserialize<'de> for Rank {
         D: serde::Deserializer<'de>,
     {
         let index = i8::deserialize(deserializer)?;
-        match Rank::from_index(index) {
-            Some(rank) => Ok(rank),
-            None => Err(serde::de::Error::custom("invalid rank")),
+        match Rank::try_from(index) {
+            Ok(rank) => Ok(rank),
+            Err(_) => Err(serde::de::Error::custom("invalid rank")),
         }
     }
 }
 
-impl Rank {
-    pub fn from_index(index: i8) -> Option<Rank> {
-        match index {
-            0 => Some(Rank::_1),
-            1 => Some(Rank::_2),
-            2 => Some(Rank::_3),
-            3 => Some(Rank::_4),
-            4 => Some(Rank::_5),
-            5 => Some(Rank::_6),
-            6 => Some(Rank::_7),
-            7 => Some(Rank::_8),
-            _ => None,
-        }
-    }
-
-    pub fn to_index(&self) -> i8 {
+impl Into<i8> for Rank {
+    fn into(self) -> i8 {
         match self {
             Rank::_1 => 0,
             Rank::_2 => 1,
@@ -65,6 +51,24 @@ impl Rank {
             Rank::_6 => 5,
             Rank::_7 => 6,
             Rank::_8 => 7,
+        }
+    }
+}
+
+impl TryFrom<i8> for Rank {
+    type Error = ();
+
+    fn try_from(value: i8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Rank::_1),
+            1 => Ok(Rank::_2),
+            2 => Ok(Rank::_3),
+            3 => Ok(Rank::_4),
+            4 => Ok(Rank::_5),
+            5 => Ok(Rank::_6),
+            6 => Ok(Rank::_7),
+            7 => Ok(Rank::_8),
+            _ => Err(()),
         }
     }
 }
