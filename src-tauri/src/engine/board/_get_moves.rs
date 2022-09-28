@@ -5,17 +5,13 @@ impl Board {
         let mut moves = vec![];
         let opposite_color = self.turn.opposite();
 
-        let initial_king_rank = if self.turn == White {
-            Rank::_1
-        } else {
-            Rank::_8
-        };
+        let piece_rank = self.turn.get_piece_rank();
         let mut in_check = false;
         let mut unchecked_squares = vec![
-            square!(C initial_king_rank),
-            square!(D initial_king_rank),
-            square!(F initial_king_rank),
-            square!(G initial_king_rank),
+            square!(C piece_rank),
+            square!(D piece_rank),
+            square!(F piece_rank),
+            square!(G piece_rank),
         ];
 
         for (square, piece) in &self.pieces {
@@ -26,33 +22,26 @@ impl Board {
             let square = *square;
             match piece.r#type {
                 Pawn => {
-                    let team_multiplier = if self.turn == White { 1 } else { -1 };
-                    let team_rank = |white_value: Rank, black_value: Rank| -> Rank {
-                        if self.turn == White {
-                            white_value
-                        } else {
-                            black_value
-                        }
-                    };
+                    let multiplier = self.turn.get_multiplier();
 
-                    if square.rank == team_rank(Rank::_2, Rank::_7)
+                    if square.rank == self.turn.get_pawn_rank()
                         && self
                             .pieces
-                            .get(&square.offset(0, 1 * team_multiplier).unwrap())
+                            .get(&square.offset(0, 1 * multiplier).unwrap())
                             .is_none()
                         && self
                             .pieces
-                            .get(&square.offset(0, 2 * team_multiplier).unwrap())
+                            .get(&square.offset(0, 2 * multiplier).unwrap())
                             .is_none()
                     {
                         moves.push(Move::from_pawn_jump(
                             square,
-                            square.offset(0, 2 * team_multiplier).unwrap(),
+                            square.offset(0, 2 * multiplier).unwrap(),
                         ));
                     }
 
-                    if square.rank == team_rank(Rank::_7, Rank::_2) {
-                        if let Some(target_square) = square.offset(-1, 1 * team_multiplier) {
+                    if square.rank == self.turn.opposite().get_pawn_rank() {
+                        if let Some(target_square) = square.offset(-1, 1 * multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
                                     for r#type in [Queen, Rook, Bishop, Knight] {
@@ -66,13 +55,13 @@ impl Board {
                                 }
                             }
                         }
-                        let target_square = square.offset(0, 1 * team_multiplier).unwrap();
+                        let target_square = square.offset(0, 1 * multiplier).unwrap();
                         if let None = self.pieces.get(&target_square) {
                             for r#type in [Queen, Rook, Bishop, Knight] {
                                 moves.push(Move::from_promotion(square, target_square, r#type));
                             }
                         }
-                        if let Some(target_square) = square.offset(1, 1 * team_multiplier) {
+                        if let Some(target_square) = square.offset(1, 1 * multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
                                     for r#type in [Queen, Rook, Bishop, Knight] {
@@ -88,11 +77,10 @@ impl Board {
                         }
                     } else {
                         if let Some(enpassant_square) = self.enpassant_square {
-                            if enpassant_square.rank == team_rank(Rank::_6, Rank::_3)
-                                && square.rank == team_rank(Rank::_5, Rank::_4)
+                            if enpassant_square.rank == self.turn.opposite().get_enpassant_rank()
+                                && square.rank == self.turn.opposite().get_center_rank()
                             {
-                                if let Some(left_target_square) =
-                                    square.offset(-1, 1 * team_multiplier)
+                                if let Some(left_target_square) = square.offset(-1, 1 * multiplier)
                                 {
                                     if left_target_square == enpassant_square {
                                         moves.push(Move::from_enpassant(
@@ -101,7 +89,7 @@ impl Board {
                                             self.pieces
                                                 .get(
                                                     &enpassant_square
-                                                        .offset(0, -1 * team_multiplier)
+                                                        .offset(0, -1 * multiplier)
                                                         .unwrap(),
                                                 )
                                                 .unwrap()
@@ -109,8 +97,7 @@ impl Board {
                                         ));
                                     }
                                 }
-                                if let Some(right_target_square) =
-                                    square.offset(1, 1 * team_multiplier)
+                                if let Some(right_target_square) = square.offset(1, 1 * multiplier)
                                 {
                                     if right_target_square == enpassant_square {
                                         moves.push(Move::from_enpassant(
@@ -119,7 +106,7 @@ impl Board {
                                             self.pieces
                                                 .get(
                                                     &enpassant_square
-                                                        .offset(0, -1 * team_multiplier)
+                                                        .offset(0, -1 * multiplier)
                                                         .unwrap(),
                                                 )
                                                 .unwrap()
@@ -129,7 +116,7 @@ impl Board {
                                 }
                             }
                         }
-                        if let Some(target_square) = square.offset(-1, 1 * team_multiplier) {
+                        if let Some(target_square) = square.offset(-1, 1 * multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
                                     moves.push(Move::from_capture(
@@ -140,11 +127,11 @@ impl Board {
                                 }
                             }
                         }
-                        let target_square = square.offset(0, 1 * team_multiplier).unwrap();
+                        let target_square = square.offset(0, 1 * multiplier).unwrap();
                         if let None = self.pieces.get(&target_square) {
                             moves.push(Move::from_normal(square, target_square));
                         }
-                        if let Some(target_square) = square.offset(1, 1 * team_multiplier) {
+                        if let Some(target_square) = square.offset(1, 1 * multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
                                     moves.push(Move::from_capture(
@@ -294,31 +281,31 @@ impl Board {
         if !in_check {
             if queenside
                 && [
-                    square!(B initial_king_rank),
-                    square!(C initial_king_rank),
-                    square!(D initial_king_rank),
+                    square!(B piece_rank),
+                    square!(C piece_rank),
+                    square!(D piece_rank),
                 ]
                 .iter()
                 .all(|s| self.pieces.get(s).is_none())
-                && unchecked_squares.contains(&square!(C initial_king_rank))
-                && unchecked_squares.contains(&square!(D initial_king_rank))
+                && unchecked_squares.contains(&square!(C piece_rank))
+                && unchecked_squares.contains(&square!(D piece_rank))
             {
                 moves.push(Move::from_castle(
-                    square!(E initial_king_rank),
-                    square!(C initial_king_rank),
+                    square!(E piece_rank),
+                    square!(C piece_rank),
                 ));
             }
 
             if kingside
-                && [square!(F initial_king_rank), square!(G initial_king_rank)]
+                && [square!(F piece_rank), square!(G piece_rank)]
                     .iter()
                     .all(|s| self.pieces.get(s).is_none())
-                && unchecked_squares.contains(&square!(F initial_king_rank))
-                && unchecked_squares.contains(&square!(G initial_king_rank))
+                && unchecked_squares.contains(&square!(F piece_rank))
+                && unchecked_squares.contains(&square!(G piece_rank))
             {
                 moves.push(Move::from_castle(
-                    square!(E initial_king_rank),
-                    square!(G initial_king_rank),
+                    square!(E piece_rank),
+                    square!(G piece_rank),
                 ));
             }
         }
