@@ -1,10 +1,6 @@
 use rs_tauri_chess::square;
 
-use crate::engine::{
-    piece::PieceType,
-    r#move::MoveType,
-    square::{File, Square},
-};
+use crate::engine::{piece::PieceType, r#move::MoveType, square::File};
 
 use super::Board;
 

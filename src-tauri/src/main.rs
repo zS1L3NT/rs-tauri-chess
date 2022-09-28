@@ -7,8 +7,6 @@ use std::sync::Mutex;
 
 use engine::{board::Board, client::ClientBoard, r#move::Move};
 
-use crate::engine::square::File;
-
 mod engine;
 
 #[tauri::command]
@@ -26,9 +24,9 @@ fn execute(state: tauri::State<Mutex<Board>>, r#move: Move) -> ClientBoard {
 
 #[tauri::command]
 fn reset(state: tauri::State<Mutex<Board>>) -> ClientBoard {
-	let mut board = state.lock().unwrap();
-	*board = Board::new();
-	board.to_client_board()
+    let mut board = state.lock().unwrap();
+    *board = Board::new();
+    board.to_client_board()
 }
 
 #[allow(unused_macros)]

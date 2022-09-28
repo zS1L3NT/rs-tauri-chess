@@ -4,7 +4,7 @@ use crate::engine::{
     color::Color,
     piece::{Directions, Piece, PieceType},
     r#move::Move,
-    square::{File, Rank, Square},
+    square::{Rank, Square},
 };
 
 use super::Board;
