@@ -1,59 +1,31 @@
+use rs_tauri_chess::square;
+
 use crate::engine::{
     color::Color,
     piece::{Directions, Piece, PieceType},
-    r#move::{Move, MoveType},
-    square::{File, Rank, Square},
+    r#move::Move,
+    square::{Rank, Square},
 };
 
 use super::Board;
 
 impl Board {
     pub fn get_moves(&self) -> Vec<Move> {
-        let color = if self.history.len() % 2 == 0 {
-            Color::White
-        } else {
-            Color::Black
-        };
-
         let mut moves = vec![];
-        let opposite_color = color.opposite();
+        let opposite_color = self.turn.opposite();
 
-        let initial_king_rank = if color == Color::White {
+        let initial_king_rank = if self.turn == Color::White {
             Rank::_1
         } else {
             Rank::_8
         };
         let mut in_check = false;
         let mut unchecked_squares = vec![
-            Square::from(File::C, initial_king_rank),
-            Square::from(File::D, initial_king_rank),
-            Square::from(File::F, initial_king_rank),
-            Square::from(File::G, initial_king_rank),
+            square!(C initial_king_rank),
+            square!(D initial_king_rank),
+            square!(F initial_king_rank),
+            square!(G initial_king_rank),
         ];
-
-        let get_straight_moves = |moves: &mut Vec<Move>, piece: &Piece, directions: &[(i8, i8)]| {
-            let square = self.get_square(piece).unwrap();
-            for (file, rank) in directions {
-                let mut file_offset = *file;
-                let mut rank_offset = *rank;
-                while let Some(target_square) = square.offset(file_offset, rank_offset) {
-                    if let Some(target_piece) = self.pieces.get(&target_square) {
-                        if target_piece.color != color {
-                            moves.push(Move::from_capture(
-                                square,
-                                target_square,
-                                target_piece.clone(),
-                            ));
-                        }
-                        break;
-                    } else {
-                        moves.push(Move::from_normal(square, target_square));
-                    }
-                    file_offset += file;
-                    rank_offset += rank;
-                }
-            }
-        };
 
         for (square, piece) in &self.pieces {
             if piece.color == opposite_color {
@@ -63,9 +35,9 @@ impl Board {
             let square = *square;
             match piece.r#type {
                 PieceType::Pawn => {
-                    let team_multiplier = if color == Color::White { 1 } else { -1 };
+                    let team_multiplier = if self.turn == Color::White { 1 } else { -1 };
                     let team_rank = |white_value: Rank, black_value: Rank| -> Rank {
-                        if color == Color::White {
+                        if self.turn == Color::White {
                             white_value
                         } else {
                             black_value
@@ -91,7 +63,7 @@ impl Board {
                     if square.rank == team_rank(Rank::_7, Rank::_2) {
                         if let Some(target_square) = square.offset(-1, 1 * team_multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
-                                if target_piece.color != color {
+                                if target_piece.color != self.turn {
                                     for r#type in [
                                         PieceType::Queen,
                                         PieceType::Rook,
@@ -121,7 +93,7 @@ impl Board {
                         }
                         if let Some(target_square) = square.offset(1, 1 * team_multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
-                                if target_piece.color != color {
+                                if target_piece.color != self.turn {
                                     for r#type in [
                                         PieceType::Queen,
                                         PieceType::Rook,
@@ -139,40 +111,51 @@ impl Board {
                             }
                         }
                     } else {
-                        if let Some(last_move) = self.history.last() {
-                            if last_move.r#type == MoveType::PawnJump {
-                                let enpassant_square = last_move.to;
-                                if enpassant_square.rank == team_rank(Rank::_5, Rank::_4)
-                                    && square.rank == team_rank(Rank::_5, Rank::_4)
+                        if let Some(enpassant_square) = self.enpassant_square {
+                            if enpassant_square.rank == team_rank(Rank::_6, Rank::_3)
+                                && square.rank == team_rank(Rank::_5, Rank::_4)
+                            {
+                                if let Some(left_target_square) =
+                                    square.offset(-1, 1 * team_multiplier)
                                 {
-                                    if let Some(left_target_square) = square.offset(-1, 0) {
-                                        if left_target_square == enpassant_square {
-                                            moves.push(Move::from_enpassant(
-                                                square,
-                                                left_target_square
-                                                    .offset(0, 1 * team_multiplier)
-                                                    .unwrap(),
-                                                self.pieces.get(&enpassant_square).unwrap().clone(),
-                                            ));
-                                        }
+                                    if left_target_square == enpassant_square {
+                                        moves.push(Move::from_enpassant(
+                                            square,
+                                            left_target_square,
+                                            self.pieces
+                                                .get(
+                                                    &enpassant_square
+                                                        .offset(0, -1 * team_multiplier)
+                                                        .unwrap(),
+                                                )
+                                                .unwrap()
+                                                .clone(),
+                                        ));
                                     }
-                                    if let Some(right_target_square) = square.offset(1, 0) {
-                                        if right_target_square == enpassant_square {
-                                            moves.push(Move::from_enpassant(
-                                                square,
-                                                right_target_square
-                                                    .offset(0, 1 * team_multiplier)
-                                                    .unwrap(),
-                                                self.pieces.get(&enpassant_square).unwrap().clone(),
-                                            ));
-                                        }
+                                }
+                                if let Some(right_target_square) =
+                                    square.offset(1, 1 * team_multiplier)
+                                {
+                                    if right_target_square == enpassant_square {
+                                        moves.push(Move::from_enpassant(
+                                            square,
+                                            right_target_square,
+                                            self.pieces
+                                                .get(
+                                                    &enpassant_square
+                                                        .offset(0, -1 * team_multiplier)
+                                                        .unwrap(),
+                                                )
+                                                .unwrap()
+                                                .clone(),
+                                        ));
                                     }
                                 }
                             }
                         }
                         if let Some(target_square) = square.offset(-1, 1 * team_multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
-                                if target_piece.color != color {
+                                if target_piece.color != self.turn {
                                     moves.push(Move::from_capture(
                                         square,
                                         target_square,
@@ -187,7 +170,7 @@ impl Board {
                         }
                         if let Some(target_square) = square.offset(1, 1 * team_multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
-                                if target_piece.color != color {
+                                if target_piece.color != self.turn {
                                     moves.push(Move::from_capture(
                                         square,
                                         target_square,
@@ -202,7 +185,7 @@ impl Board {
                     for (file, rank) in Directions::KNIGHT {
                         if let Some(target_square) = square.offset(file, rank) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
-                                if target_piece.color != color {
+                                if target_piece.color != self.turn {
                                     moves.push(Move::from_capture(
                                         square,
                                         target_square,
@@ -215,14 +198,16 @@ impl Board {
                         }
                     }
                 }
-                PieceType::Bishop => get_straight_moves(&mut moves, &piece, &Directions::BISHOP),
-                PieceType::Rook => get_straight_moves(&mut moves, &piece, &Directions::ROOK),
-                PieceType::Queen => get_straight_moves(&mut moves, &piece, &Directions::QUEEN),
+                PieceType::Bishop => {
+                    self.get_straight_moves(&mut moves, &piece, &Directions::BISHOP)
+                }
+                PieceType::Rook => self.get_straight_moves(&mut moves, &piece, &Directions::ROOK),
+                PieceType::Queen => self.get_straight_moves(&mut moves, &piece, &Directions::QUEEN),
                 PieceType::King => {
                     for (file, rank) in Directions::KING {
                         if let Some(target_square) = square.offset(file, rank) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
-                                if target_piece.color != color {
+                                if target_piece.color != self.turn {
                                     moves.push(Move::from_capture(
                                         square,
                                         target_square,
@@ -238,10 +223,10 @@ impl Board {
             }
         }
 
-        let king_square = *self.kings.get(&color).unwrap();
+        let king_square = *self.kings.get(&self.turn).unwrap();
         for square in Square::ALL {
             if let Some(piece) = self.pieces.get(&square) {
-                if piece.color != color {
+                if piece.color != self.turn {
                     // This block of code runs where {piece} is every piece
                     // on the enemy team
 
@@ -328,47 +313,63 @@ impl Board {
             }
         }
 
-        let is_untouched = |square: Square| {
-            self.history
+        let [queenside, kingside] = *self.castling_rights.get(&self.turn).unwrap();
+        if !in_check {
+            if queenside
+                && [
+                    square!(B initial_king_rank),
+                    square!(C initial_king_rank),
+                    square!(D initial_king_rank),
+                ]
                 .iter()
-                .find(|m| m.from == square || m.to == square)
-                .is_none()
-        };
-        if !in_check && is_untouched(Square::from(File::E, initial_king_rank)) {
-            if [
-                Square::from(File::B, initial_king_rank),
-                Square::from(File::C, initial_king_rank),
-                Square::from(File::D, initial_king_rank),
-            ]
-            .iter()
-            .all(|s| self.pieces.get(s).is_none())
-                && is_untouched(Square::from(File::A, initial_king_rank))
-                && unchecked_squares.contains(&Square::from(File::C, initial_king_rank))
-                && unchecked_squares.contains(&Square::from(File::D, initial_king_rank))
+                .all(|s| self.pieces.get(s).is_none())
+                && unchecked_squares.contains(&square!(C initial_king_rank))
+                && unchecked_squares.contains(&square!(D initial_king_rank))
             {
                 moves.push(Move::from_castle(
-                    Square::from(File::E, initial_king_rank),
-                    Square::from(File::C, initial_king_rank),
+                    square!(E initial_king_rank),
+                    square!(C initial_king_rank),
                 ));
             }
 
-            if [
-                Square::from(File::F, initial_king_rank),
-                Square::from(File::G, initial_king_rank),
-            ]
-            .iter()
-            .all(|s| self.pieces.get(s).is_none())
-                && is_untouched(Square::from(File::H, initial_king_rank))
-                && unchecked_squares.contains(&Square::from(File::F, initial_king_rank))
-                && unchecked_squares.contains(&Square::from(File::G, initial_king_rank))
+            if kingside
+                && [square!(F initial_king_rank), square!(G initial_king_rank)]
+                    .iter()
+                    .all(|s| self.pieces.get(s).is_none())
+                && unchecked_squares.contains(&square!(F initial_king_rank))
+                && unchecked_squares.contains(&square!(G initial_king_rank))
             {
                 moves.push(Move::from_castle(
-                    Square::from(File::E, initial_king_rank),
-                    Square::from(File::G, initial_king_rank),
+                    square!(E initial_king_rank),
+                    square!(G initial_king_rank),
                 ));
             }
         }
 
         moves
+    }
+
+    fn get_straight_moves(&self, moves: &mut Vec<Move>, piece: &Piece, directions: &[(i8, i8)]) {
+        let square = self.get_square(piece).unwrap();
+        for (file, rank) in directions {
+            let mut file_offset = *file;
+            let mut rank_offset = *rank;
+            while let Some(target_square) = square.offset(file_offset, rank_offset) {
+                if let Some(target_piece) = self.pieces.get(&target_square) {
+                    if target_piece.color != self.turn {
+                        moves.push(Move::from_capture(
+                            square,
+                            target_square,
+                            target_piece.clone(),
+                        ));
+                    }
+                    break;
+                } else {
+                    moves.push(Move::from_normal(square, target_square));
+                }
+                file_offset += file;
+                rank_offset += rank;
+            }
+        }
     }
 }

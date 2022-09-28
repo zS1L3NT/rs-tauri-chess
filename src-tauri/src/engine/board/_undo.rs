@@ -1,15 +1,13 @@
-use crate::engine::{
-    color::Color,
-    piece::PieceType,
-    r#move::MoveType,
-    square::{File, Square},
-};
+use rs_tauri_chess::square;
+
+use crate::engine::{piece::PieceType, r#move::MoveType, square::File};
 
 use super::Board;
 
 impl Board {
-    pub fn undo(&mut self) {
-        let r#move = self.history.last().expect("No moves to undo").clone();
+    pub fn undo(&mut self) -> Option<()> {
+        let r#move = self.history.pop()?;
+        self.turn = self.turn.opposite();
 
         match r#move.r#type {
             MoveType::Normal | MoveType::PawnJump => {
@@ -76,15 +74,9 @@ impl Board {
                 self.pieces.insert(r#move.from, king);
 
                 let (rook_square_from, rook_square_to) = if r#move.to.file == File::C {
-                    (
-                        Square::from(File::A, r#move.to.rank),
-                        Square::from(File::D, r#move.to.rank),
-                    )
+                    (square!(A r#move.to.rank), square!(D r#move.to.rank))
                 } else {
-                    (
-                        Square::from(File::H, r#move.to.rank),
-                        Square::from(File::F, r#move.to.rank),
-                    )
+                    (square!(H r#move.to.rank), square!(F r#move.to.rank))
                 };
                 let rook = self.pieces.remove(&rook_square_to).unwrap();
                 self.attack_lines.remove(&rook_square_to);
@@ -95,16 +87,9 @@ impl Board {
         }
 
         if let PieceType::King = self.pieces.get(&r#move.from).unwrap().r#type {
-            self.kings.insert(
-                if self.history.len() % 2 == 0 {
-                    Color::White
-                } else {
-                    Color::Black
-                },
-                r#move.from,
-            );
+            self.kings.insert(self.turn, r#move.from);
         }
 
-        self.history.pop();
+        Some(())
     }
 }

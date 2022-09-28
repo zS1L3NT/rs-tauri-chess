@@ -1,4 +1,5 @@
 mod _execute;
+mod _from_fen;
 mod _get_moves;
 mod _undo;
 
@@ -20,6 +21,12 @@ pub struct Board {
     pub pieces: IndexMap<Square, Piece>,
     pub attack_lines: IndexMap<Square, Vec<Vec<Square>>>,
     pub kings: IndexMap<Color, Square>,
+
+    pub turn: Color,
+    pub castling_rights: IndexMap<Color, [bool; 2]>,
+    pub enpassant_square: Option<Square>,
+    pub halfmove_clock: u32,
+    pub fullmove_number: u32,
 }
 
 impl Board {
@@ -65,6 +72,15 @@ impl Board {
                 Color::White => square!(E1),
                 Color::Black => square!(E8)
             },
+
+            turn: Color::White,
+            castling_rights: indexmap! {
+                Color::White => [true, true],
+                Color::Black => [true, true],
+            },
+            enpassant_square: None,
+            halfmove_clock: 0,
+            fullmove_number: 0,
         };
 
         board.attack_lines = board
