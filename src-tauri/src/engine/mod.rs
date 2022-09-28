@@ -10,8 +10,8 @@ macro_rules! pawn {
     ($id:tt, $color:tt) => {
         crate::engine::piece::Piece::new(
             $id,
-            crate::engine::piece::PieceType::Pawn,
-            crate::engine::color::Color::$color,
+            crate::engine::piece::Pawn,
+            crate::engine::color::$color,
         )
     };
 }
@@ -21,8 +21,8 @@ macro_rules! knight {
     ($id:tt, $color:tt) => {
         crate::engine::piece::Piece::new(
             $id,
-            crate::engine::piece::PieceType::Knight,
-            crate::engine::color::Color::$color,
+            crate::engine::piece::Knight,
+            crate::engine::color::$color,
         )
     };
 }
@@ -32,8 +32,8 @@ macro_rules! bishop {
     ($id:tt, $color:tt) => {
         crate::engine::piece::Piece::new(
             $id,
-            crate::engine::piece::PieceType::Bishop,
-            crate::engine::color::Color::$color,
+            crate::engine::piece::Bishop,
+            crate::engine::color::$color,
         )
     };
 }
@@ -43,8 +43,8 @@ macro_rules! rook {
     ($id:tt, $color:tt) => {
         crate::engine::piece::Piece::new(
             $id,
-            crate::engine::piece::PieceType::Rook,
-            crate::engine::color::Color::$color,
+            crate::engine::piece::Rook,
+            crate::engine::color::$color,
         )
     };
 }
@@ -54,8 +54,8 @@ macro_rules! queen {
     ($id:tt, $color:tt) => {
         crate::engine::piece::Piece::new(
             $id,
-            crate::engine::piece::PieceType::Queen,
-            crate::engine::color::Color::$color,
+            crate::engine::piece::Queen,
+            crate::engine::color::$color,
         )
     };
 }
@@ -65,8 +65,8 @@ macro_rules! king {
     ($id:tt, $color:tt) => {
         crate::engine::piece::Piece::new(
             $id,
-            crate::engine::piece::PieceType::King,
-            crate::engine::color::Color::$color,
+            crate::engine::piece::King,
+            crate::engine::color::$color,
         )
     };
 }

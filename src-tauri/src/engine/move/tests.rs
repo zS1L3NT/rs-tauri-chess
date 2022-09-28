@@ -1,5 +1,5 @@
 use {
-    crate::{engine::r#move::Move, pawn},
+    crate::{engine::r#move::*, pawn},
     rs_tauri_chess::square,
 };
 

@@ -3,10 +3,10 @@ mod piece_type;
 #[cfg(test)]
 mod tests;
 
-pub use {directions::Directions, piece_type::PieceType};
+pub use {directions::Directions, piece_type::*};
 
 use {
-    crate::engine::{color::Color, square::Square},
+    crate::engine::{color::*, square::Square},
     serde::{Deserialize, Serialize},
 };
 
@@ -31,22 +31,22 @@ impl Piece {
     pub fn get_attack_lines(&self, square: Square) -> Vec<Vec<Square>> {
         let mut attack_lines = vec![];
         match self.r#type {
-            PieceType::Pawn => {
-                let team_multiplier = if self.color == Color::White { 1 } else { -1 };
+            Pawn => {
+                let team_multiplier = if self.color == White { 1 } else { -1 };
                 for (file, rank) in [(-1, team_multiplier), (1, team_multiplier)] {
                     if let Some(target_square) = square.offset(file, rank) {
                         attack_lines.push(vec![target_square]);
                     }
                 }
             }
-            PieceType::Knight => {
+            Knight => {
                 for (file, rank) in Directions::KNIGHT {
                     if let Some(target_square) = square.offset(file, rank) {
                         attack_lines.push(vec![target_square]);
                     }
                 }
             }
-            PieceType::Bishop => {
+            Bishop => {
                 for (file, rank) in Directions::BISHOP {
                     let mut current_square = square;
                     let mut line = vec![];
@@ -60,7 +60,7 @@ impl Piece {
                     }
                 }
             }
-            PieceType::Rook => {
+            Rook => {
                 for (file, rank) in Directions::ROOK {
                     let mut current_square = square;
                     let mut line = vec![];
@@ -74,7 +74,7 @@ impl Piece {
                     }
                 }
             }
-            PieceType::Queen => {
+            Queen => {
                 for (file, rank) in Directions::QUEEN {
                     let mut current_square = square;
                     let mut line = vec![];
@@ -88,7 +88,7 @@ impl Piece {
                     }
                 }
             }
-            PieceType::King => {
+            King => {
                 for (file, rank) in Directions::KING {
                     if let Some(target_square) = square.offset(file, rank) {
                         attack_lines.push(vec![target_square]);

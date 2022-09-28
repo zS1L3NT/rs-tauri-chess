@@ -10,9 +10,9 @@ use {
         bishop,
         engine::{
             client::{ClientBoard, ClientPiece},
-            color::Color,
-            piece::Piece,
-            r#move::Move,
+            color::*,
+            piece::*,
+            r#move::*,
             square::Square,
         },
         king, knight, pawn, queen, rook,
@@ -76,14 +76,14 @@ impl Board {
             },
             attack_lines: indexmap! {},
             kings: indexmap! {
-                Color::White => square!(E1),
-                Color::Black => square!(E8)
+                White => square!(E1),
+                Black => square!(E8)
             },
 
-            turn: Color::White,
+            turn: White,
             castling_rights: indexmap! {
-                Color::White => CastlingRights::new(true, true),
-                Color::Black => CastlingRights::new(true, true),
+                White => CastlingRights::new(true, true),
+                Black => CastlingRights::new(true, true),
             },
             enpassant_square: None,
             halfmove_clock: 0,

@@ -1,7 +1,7 @@
 use {
     crate::engine::{
         board::Board,
-        color::Color,
+        color::*,
         square::{File, Rank},
     },
     rs_tauri_chess::square,
@@ -38,7 +38,7 @@ impl Board {
                     }
 
                     let mut piece_code = format!("{:?}", piece.r#type);
-                    if piece.color == Color::Black {
+                    if piece.color == Black {
                         piece_code = piece_code.to_ascii_lowercase();
                     }
 
@@ -61,27 +61,27 @@ impl Board {
 
     fn generate_active_color(&self) -> String {
         match self.turn {
-            Color::White => "w".into(),
-            Color::Black => "b".into(),
+            White => "w".into(),
+            Black => "b".into(),
         }
     }
 
     fn generate_castling_rights(&self) -> String {
         let mut castling_rights = String::new();
 
-        if self.castling_rights.get(&Color::White).unwrap().kingside {
+        if self.castling_rights.get(&White).unwrap().kingside {
             castling_rights.push('K');
         }
 
-        if self.castling_rights.get(&Color::White).unwrap().queenside {
+        if self.castling_rights.get(&White).unwrap().queenside {
             castling_rights.push('Q');
         }
 
-        if self.castling_rights.get(&Color::Black).unwrap().kingside {
+        if self.castling_rights.get(&Black).unwrap().kingside {
             castling_rights.push('k');
         }
 
-        if self.castling_rights.get(&Color::Black).unwrap().queenside {
+        if self.castling_rights.get(&Black).unwrap().queenside {
             castling_rights.push('q');
         }
 

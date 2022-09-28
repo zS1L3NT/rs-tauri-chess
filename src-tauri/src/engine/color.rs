@@ -1,3 +1,5 @@
+pub use Color::*;
+
 use {
     serde::{Deserialize, Serialize},
     std::fmt::{Debug, Formatter, Result},
@@ -15,8 +17,8 @@ impl Debug for Color {
             f,
             "{}",
             match self {
-                Color::White => "W",
-                Color::Black => "B",
+                White => "W",
+                Black => "B",
             }
         )
     }
@@ -25,8 +27,8 @@ impl Debug for Color {
 impl Color {
     pub fn opposite(self) -> Color {
         match self {
-            Color::White => Color::Black,
-            Color::Black => Color::White,
+            White => Black,
+            Black => White,
         }
     }
 }

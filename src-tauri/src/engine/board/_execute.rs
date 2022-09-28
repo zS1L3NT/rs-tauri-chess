@@ -1,9 +1,9 @@
 use {
     crate::engine::{
         board::{Board, CastlingRights},
-        color::Color,
-        piece::PieceType,
-        r#move::{Move, MoveType},
+        color::*,
+        piece::*,
+        r#move::*,
         square::{File, Rank},
     },
     rs_tauri_chess::square,
@@ -15,7 +15,7 @@ impl Board {
         self.fullmove_number += 1;
 
         match r#move.r#type {
-            MoveType::Normal | MoveType::PawnJump => {
+            Normal | PawnJump => {
                 let piece = self.pieces.remove(&r#move.from).unwrap();
                 let r#type = piece.r#type;
                 self.attack_lines.remove(&r#move.from);
@@ -23,11 +23,11 @@ impl Board {
                     .insert(r#move.to, piece.get_attack_lines(r#move.to));
                 self.pieces.insert(r#move.to, piece);
 
-                if r#type == PieceType::Pawn {
+                if r#type == Pawn {
                     self.halfmove_clock = 0;
                 }
 
-                if r#move.r#type == MoveType::PawnJump {
+                if r#move.r#type == PawnJump {
                     if r#move.from.rank == Rank::_2 {
                         self.enpassant_square = Some(square!(r#move.from.file 3));
                     } else {
@@ -35,7 +35,7 @@ impl Board {
                     }
                 }
             }
-            MoveType::Capture => {
+            Capture => {
                 let piece = self.pieces.remove(&r#move.from).unwrap();
                 self.attack_lines.remove(&r#move.from);
                 self.attack_lines
@@ -44,7 +44,7 @@ impl Board {
 
                 self.halfmove_clock = 0;
             }
-            MoveType::Promotion => {
+            Promotion => {
                 let mut piece = self.pieces.remove(&r#move.from).unwrap();
                 piece.r#type = r#move.promotion.unwrap();
                 self.attack_lines.remove(&r#move.from);
@@ -52,7 +52,7 @@ impl Board {
                     .insert(r#move.to, piece.get_attack_lines(r#move.to));
                 self.pieces.insert(r#move.to, piece);
             }
-            MoveType::PromotionCapture => {
+            PromotionCapture => {
                 let mut piece = self.pieces.remove(&r#move.from).unwrap();
                 piece.r#type = r#move.promotion.unwrap();
                 self.attack_lines.remove(&r#move.from);
@@ -62,7 +62,7 @@ impl Board {
 
                 self.halfmove_clock = 0;
             }
-            MoveType::Enpassant => {
+            Enpassant => {
                 let piece = self.pieces.remove(&r#move.from).unwrap();
                 self.attack_lines.remove(&r#move.from);
                 self.attack_lines
@@ -78,7 +78,7 @@ impl Board {
 
                 self.halfmove_clock = 0;
             }
-            MoveType::Castle => {
+            Castle => {
                 let king = self.pieces.remove(&r#move.from).unwrap();
                 self.attack_lines.remove(&r#move.from);
                 self.attack_lines
@@ -101,23 +101,19 @@ impl Board {
             }
         }
 
-        if let PieceType::King = self.pieces.get(&r#move.to).unwrap().r#type {
+        if let King = self.pieces.get(&r#move.to).unwrap().r#type {
             self.kings.insert(self.turn, r#move.to);
         }
 
         self.history.push(r#move);
         self.turn = self.turn.opposite();
 
-        for color in [Color::White, Color::Black].iter() {
+        for color in [White, Black].iter() {
             let CastlingRights {
                 kingside,
                 queenside,
             } = *self.castling_rights.get(color).unwrap();
-            let rank = if *color == Color::White {
-                Rank::_1
-            } else {
-                Rank::_8
-            };
+            let rank = if *color == White { Rank::_1 } else { Rank::_8 };
 
             if queenside {
                 let king = self.pieces.get(&square!(E rank));
@@ -125,8 +121,8 @@ impl Board {
 
                 if king.is_none()
                     || rook.is_none()
-                    || king.unwrap().r#type != PieceType::King
-                    || rook.unwrap().r#type != PieceType::Rook
+                    || king.unwrap().r#type != King
+                    || rook.unwrap().r#type != Rook
                     || king.unwrap().color != rook.unwrap().color
                 {
                     self.castling_rights
@@ -140,8 +136,8 @@ impl Board {
 
                 if king.is_none()
                     || rook.is_none()
-                    || king.unwrap().r#type != PieceType::King
-                    || rook.unwrap().r#type != PieceType::Rook
+                    || king.unwrap().r#type != King
+                    || rook.unwrap().r#type != Rook
                     || king.unwrap().color != rook.unwrap().color
                 {
                     self.castling_rights

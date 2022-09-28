@@ -3,8 +3,8 @@ use {
         bishop,
         engine::{
             board::{Board, CastlingRights},
-            color::Color,
-            piece::{Piece, PieceType},
+            color::*,
+            piece::*,
             square::{File, Rank, Square},
         },
         king, knight, pawn, queen, rook,
@@ -46,7 +46,7 @@ impl Board {
 
         for (color, castling_rights) in &castling_rights {
             let king = pieces.get(
-                &(if *color == Color::White {
+                &(if *color == White {
                     square!(E1)
                 } else {
                     square!(E8)
@@ -54,7 +54,7 @@ impl Board {
             );
 
             let rook = pieces.get(
-                &(if *color == Color::White {
+                &(if *color == White {
                     square!(H1)
                 } else {
                     square!(H8)
@@ -65,8 +65,8 @@ impl Board {
                     let king = king.unwrap();
                     let rook = rook.unwrap();
 
-                    if king.r#type == PieceType::King
-                        || rook.r#type == PieceType::Rook
+                    if king.r#type == King
+                        || rook.r#type == Rook
                         || king.color == *color
                         || rook.color == *color
                     {
@@ -78,7 +78,7 @@ impl Board {
             }
 
             let rook = pieces.get(
-                &(if *color == Color::White {
+                &(if *color == White {
                     square!(A1)
                 } else {
                     square!(A8)
@@ -89,8 +89,8 @@ impl Board {
                     let king = king.unwrap();
                     let rook = rook.unwrap();
 
-                    if king.r#type == PieceType::King
-                        || rook.r#type == PieceType::Rook
+                    if king.r#type == King
+                        || rook.r#type == Rook
                         || king.color == *color
                         || rook.color == *color
                     {
@@ -109,14 +109,14 @@ impl Board {
         }
 
         if !(halfmove_clock
-            <= ((fullmove_number - 1) * 2) + (if active_color == Color::Black { 1 } else { 0 }))
+            <= ((fullmove_number - 1) * 2) + (if active_color == Black { 1 } else { 0 }))
         {
             return Err(FenError::HalfMoveClock);
         }
 
         let kings = indexmap! {
-            Color::White => pieces.iter().find_map(|(s, p)| if p.r#type == PieceType::King && p.color == Color::White { Some(*s) } else {None} ).unwrap(),
-            Color::Black => pieces.iter().find_map(|(s, p)| if p.r#type == PieceType::King && p.color == Color::Black { Some(*s) } else {None} ).unwrap(),
+            White => pieces.iter().find_map(|(s, p)| if p.r#type == King && p.color == White { Some(*s) } else {None} ).unwrap(),
+            Black => pieces.iter().find_map(|(s, p)| if p.r#type == King && p.color == Black { Some(*s) } else {None} ).unwrap(),
         };
 
         let mut board = Board {
@@ -189,7 +189,7 @@ impl Board {
 
         if pieces
             .values()
-            .filter(|p| p.r#type == PieceType::King && p.color == Color::White)
+            .filter(|p| p.r#type == King && p.color == White)
             .count()
             != 1
         {
@@ -198,7 +198,7 @@ impl Board {
 
         if pieces
             .values()
-            .filter(|p| p.r#type == PieceType::King && p.color == Color::Black)
+            .filter(|p| p.r#type == King && p.color == Black)
             .count()
             != 1
         {
@@ -210,8 +210,8 @@ impl Board {
 
     fn parse_active_color(text: &str) -> Result<Color, FenError> {
         match text {
-            "w" => Ok(Color::White),
-            "b" => Ok(Color::Black),
+            "w" => Ok(White),
+            "b" => Ok(Black),
             _ => return Err(FenError::ActiveColor),
         }
     }
@@ -234,14 +234,8 @@ impl Board {
             }
         }
 
-        castling_rights.insert(
-            Color::White,
-            CastlingRights::new(white_kingside, white_queenside),
-        );
-        castling_rights.insert(
-            Color::Black,
-            CastlingRights::new(black_kingside, black_queenside),
-        );
+        castling_rights.insert(White, CastlingRights::new(white_kingside, white_queenside));
+        castling_rights.insert(Black, CastlingRights::new(black_kingside, black_queenside));
 
         Ok(castling_rights)
     }
