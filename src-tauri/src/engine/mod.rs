@@ -70,3 +70,22 @@ macro_rules! king {
         )
     };
 }
+
+#[macro_export]
+#[allow(unused_macros)]
+macro_rules! execute {
+    ($board:tt $square_1:tt $square_2:tt) => {
+        $board.execute(
+            $board
+                .get_moves()
+                .iter()
+                .filter(|m| {
+                    m.from == rs_tauri_chess::square!($square_1)
+                        && m.to == rs_tauri_chess::square!($square_2)
+                })
+                .next()
+                .unwrap()
+                .clone(),
+        );
+    };
+}
