@@ -1,8 +1,7 @@
-use rs_tauri_chess::square;
-
-use crate::engine::{piece::PieceType, r#move::MoveType, square::File};
-
-use super::Board;
+use {
+    crate::engine::{board::Board, piece::PieceType, r#move::MoveType, square::File},
+    rs_tauri_chess::square,
+};
 
 impl Board {
     pub fn undo(&mut self) -> Option<()> {

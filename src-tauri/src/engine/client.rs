@@ -1,10 +1,11 @@
-use serde::Serialize;
-
-use super::{
-    color::Color,
-    piece::{Piece, PieceType},
-    r#move::Move,
-    square::Square,
+use {
+    crate::engine::{
+        color::Color,
+        piece::{Piece, PieceType},
+        r#move::Move,
+        square::Square,
+    },
+    serde::Serialize,
 };
 
 #[derive(Clone, Serialize)]

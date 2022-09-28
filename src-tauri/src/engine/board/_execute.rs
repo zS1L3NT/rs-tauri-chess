@@ -1,13 +1,13 @@
-use rs_tauri_chess::square;
-
-use crate::engine::{
-    color::Color,
-    piece::PieceType,
-    r#move::{Move, MoveType},
-    square::{File, Rank},
+use {
+    crate::engine::{
+        board::{Board, CastlingRights},
+        color::Color,
+        piece::PieceType,
+        r#move::{Move, MoveType},
+        square::{File, Rank},
+    },
+    rs_tauri_chess::square,
 };
-
-use super::{castling_rights::CastlingRights, Board};
 
 impl Board {
     pub fn execute(&mut self, r#move: Move) {

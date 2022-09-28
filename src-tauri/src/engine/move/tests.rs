@@ -1,5 +1,7 @@
-use crate::{engine::r#move::Move, pawn};
-use rs_tauri_chess::square;
+use {
+    crate::{engine::r#move::Move, pawn},
+    rs_tauri_chess::square,
+};
 
 #[test]
 fn equality() {

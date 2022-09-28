@@ -1,13 +1,13 @@
-use rs_tauri_chess::square;
-
-use crate::engine::{
-    color::Color,
-    piece::{Directions, Piece, PieceType},
-    r#move::Move,
-    square::{Rank, Square},
+use {
+    crate::engine::{
+        board::{Board, CastlingRights},
+        color::Color,
+        piece::{Directions, Piece, PieceType},
+        r#move::Move,
+        square::{Rank, Square},
+    },
+    rs_tauri_chess::square,
 };
-
-use super::{castling_rights::CastlingRights, Board};
 
 impl Board {
     pub fn get_moves(&self) -> Vec<Move> {

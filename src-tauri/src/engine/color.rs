@@ -1,6 +1,7 @@
-use std::fmt::{Debug, Formatter, Result};
-
-use serde::{Deserialize, Serialize};
+use {
+    serde::{Deserialize, Serialize},
+    std::fmt::{Debug, Formatter, Result},
+};
 
 #[derive(Copy, Clone, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub enum Color {

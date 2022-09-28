@@ -3,11 +3,12 @@
     windows_subsystem = "windows"
 )]
 
-use std::sync::Mutex;
-
-use engine::{board::Board, client::ClientBoard, r#move::Move};
-
 mod engine;
+
+use {
+    engine::{board::Board, client::ClientBoard, r#move::Move},
+    std::sync::Mutex,
+};
 
 #[tauri::command]
 fn state(state: tauri::State<Mutex<Board>>) -> ClientBoard {

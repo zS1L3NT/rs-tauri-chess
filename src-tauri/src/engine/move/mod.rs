@@ -4,11 +4,12 @@ mod tests;
 
 pub use move_type::MoveType;
 
-use serde::{Deserialize, Serialize};
-
-use super::{
-    piece::{Piece, PieceType},
-    square::Square,
+use {
+    crate::engine::{
+        piece::{Piece, PieceType},
+        square::Square,
+    },
+    serde::{Deserialize, Serialize},
 };
 
 #[derive(Clone, Deserialize, PartialEq, Serialize)]

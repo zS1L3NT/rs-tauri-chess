@@ -1,17 +1,17 @@
-use indexmap::{indexmap, IndexMap};
-use rs_tauri_chess::square;
-
-use crate::{
-    bishop,
-    engine::{
-        color::Color,
-        piece::{Piece, PieceType},
-        square::{File, Rank, Square},
+use {
+    crate::{
+        bishop,
+        engine::{
+            board::{Board, CastlingRights},
+            color::Color,
+            piece::{Piece, PieceType},
+            square::{File, Rank, Square},
+        },
+        king, knight, pawn, queen, rook,
     },
-    king, knight, pawn, queen, rook,
+    indexmap::{indexmap, IndexMap},
+    rs_tauri_chess::square,
 };
-
-use super::{castling_rights::CastlingRights, Board};
 
 #[derive(Debug)]
 pub enum FenError {
@@ -77,7 +77,7 @@ impl Board {
                 return Err(FenError::CastlingRights);
             }
 
-			let rook = pieces.get(
+            let rook = pieces.get(
                 &(if *color == Color::White {
                     square!(A1)
                 } else {
@@ -100,7 +100,7 @@ impl Board {
 
                 return Err(FenError::CastlingRights);
             }
-		}
+        }
 
         if let Some(enpassant_square) = enpassant_square {
             if enpassant_square.rank != Rank::_3 && enpassant_square.rank != Rank::_6 {

@@ -5,18 +5,21 @@ mod _to_fen;
 mod _undo;
 mod castling_rights;
 
-use crate::{bishop, king, knight, pawn, queen, rook};
-use indexmap::{indexmap, IndexMap};
-use rs_tauri_chess::square;
-
-use self::castling_rights::CastlingRights;
-
-use super::{
-    client::{ClientBoard, ClientPiece},
-    color::Color,
-    piece::Piece,
-    r#move::Move,
-    square::Square,
+use {
+    crate::{
+        bishop,
+        engine::{
+            client::{ClientBoard, ClientPiece},
+            color::Color,
+            piece::Piece,
+            r#move::Move,
+            square::Square,
+        },
+        king, knight, pawn, queen, rook,
+    },
+    castling_rights::CastlingRights,
+    indexmap::{indexmap, IndexMap},
+    rs_tauri_chess::square,
 };
 
 #[derive(Debug, PartialEq)]

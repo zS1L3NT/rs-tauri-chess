@@ -1,11 +1,11 @@
-use rs_tauri_chess::square;
-
-use crate::engine::{
-    color::Color,
-    square::{File, Rank},
+use {
+    crate::engine::{
+        board::Board,
+        color::Color,
+        square::{File, Rank},
+    },
+    rs_tauri_chess::square,
 };
-
-use super::Board;
 
 impl Board {
     pub fn to_fen(&self) -> String {

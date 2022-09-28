@@ -3,12 +3,12 @@ mod piece_type;
 #[cfg(test)]
 mod tests;
 
-pub use directions::Directions;
-pub use piece_type::PieceType;
+pub use {directions::Directions, piece_type::PieceType};
 
-use serde::{Deserialize, Serialize};
-
-use super::{color::Color, square::Square};
+use {
+    crate::engine::{color::Color, square::Square},
+    serde::{Deserialize, Serialize},
+};
 
 #[derive(Clone, Deserialize, PartialEq, Serialize)]
 pub struct Piece {
