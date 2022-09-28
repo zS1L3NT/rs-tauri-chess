@@ -1,6 +1,7 @@
 mod _execute;
 mod _from_fen;
 mod _get_moves;
+mod _to_fen;
 mod _undo;
 
 use crate::{bishop, king, knight, pawn, queen, rook};
