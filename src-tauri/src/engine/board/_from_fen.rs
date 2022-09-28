@@ -280,11 +280,3 @@ impl Board {
         }
     }
 }
-
-#[test]
-fn test() {
-    Board::from_fen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1".into()).unwrap();
-    Board::from_fen("8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50".into()).unwrap();
-    Board::from_fen("rnb2bnr/ppp1pppp/4k3/3q4/8/8/PPPP1PPP/RNBQKBNR w KQ - 0 1".into()).unwrap();
-    Board::from_fen("rnb2bnr/ppp1pppp/4k3/3q4/8/7K/PPPP1PPP/RNBQ1BNR b - - 0 1".into()).unwrap();
-}
