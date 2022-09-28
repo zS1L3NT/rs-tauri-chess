@@ -7,7 +7,7 @@ use crate::engine::{
     square::{File, Rank},
 };
 
-use super::Board;
+use super::{castling_rights::CastlingRights, Board};
 
 impl Board {
     pub fn execute(&mut self, r#move: Move) {
@@ -96,7 +96,8 @@ impl Board {
                     .insert(rook_square_to, rook.get_attack_lines(rook_square_to));
                 self.pieces.insert(rook_square_to, rook);
 
-                self.castling_rights.insert(self.turn, [false, false]);
+                self.castling_rights
+                    .insert(self.turn, CastlingRights::new(false, false));
             }
         }
 
@@ -108,7 +109,10 @@ impl Board {
         self.turn = self.turn.opposite();
 
         for color in [Color::White, Color::Black].iter() {
-            let [queenside, kingside] = *self.castling_rights.get(color).unwrap();
+            let CastlingRights {
+                kingside,
+                queenside,
+            } = *self.castling_rights.get(color).unwrap();
             let rank = if *color == Color::White {
                 Rank::_1
             } else {
@@ -125,7 +129,8 @@ impl Board {
                     || rook.unwrap().r#type != PieceType::Rook
                     || king.unwrap().color != rook.unwrap().color
                 {
-                    self.castling_rights.insert(*color, [false, kingside]);
+                    self.castling_rights
+                        .insert(*color, CastlingRights::new(kingside, false));
                 }
             }
 
@@ -139,7 +144,8 @@ impl Board {
                     || rook.unwrap().r#type != PieceType::Rook
                     || king.unwrap().color != rook.unwrap().color
                 {
-                    self.castling_rights.insert(*color, [queenside, false]);
+                    self.castling_rights
+                        .insert(*color, CastlingRights::new(false, queenside));
                 }
             }
         }

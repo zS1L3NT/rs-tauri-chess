@@ -3,10 +3,13 @@ mod _from_fen;
 mod _get_moves;
 mod _to_fen;
 mod _undo;
+mod castling_rights;
 
 use crate::{bishop, king, knight, pawn, queen, rook};
 use indexmap::{indexmap, IndexMap};
 use rs_tauri_chess::square;
+
+use self::castling_rights::CastlingRights;
 
 use super::{
     client::{ClientBoard, ClientPiece},
@@ -16,7 +19,7 @@ use super::{
     square::Square,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Board {
     pub history: Vec<Move>,
     pub pieces: IndexMap<Square, Piece>,
@@ -24,7 +27,7 @@ pub struct Board {
     pub kings: IndexMap<Color, Square>,
 
     pub turn: Color,
-    pub castling_rights: IndexMap<Color, [bool; 2]>,
+    pub castling_rights: IndexMap<Color, CastlingRights>,
     pub enpassant_square: Option<Square>,
     pub halfmove_clock: u32,
     pub fullmove_number: u32,
@@ -76,8 +79,8 @@ impl Board {
 
             turn: Color::White,
             castling_rights: indexmap! {
-                Color::White => [true, true],
-                Color::Black => [true, true],
+                Color::White => CastlingRights::new(true, true),
+                Color::Black => CastlingRights::new(true, true),
             },
             enpassant_square: None,
             halfmove_clock: 0,

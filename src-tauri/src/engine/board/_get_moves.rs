@@ -7,7 +7,7 @@ use crate::engine::{
     square::{Rank, Square},
 };
 
-use super::Board;
+use super::{castling_rights::CastlingRights, Board};
 
 impl Board {
     pub fn get_moves(&self) -> Vec<Move> {
@@ -313,7 +313,10 @@ impl Board {
             }
         }
 
-        let [queenside, kingside] = *self.castling_rights.get(&self.turn).unwrap();
+        let CastlingRights {
+            queenside,
+            kingside,
+        } = *self.castling_rights.get(&self.turn).unwrap();
         if !in_check {
             if queenside
                 && [

@@ -69,19 +69,19 @@ impl Board {
     fn generate_castling_rights(&self) -> String {
         let mut castling_rights = String::new();
 
-        if self.castling_rights.get(&Color::White).unwrap()[0] {
+        if self.castling_rights.get(&Color::White).unwrap().kingside {
             castling_rights.push('K');
         }
 
-        if self.castling_rights.get(&Color::White).unwrap()[1] {
+        if self.castling_rights.get(&Color::White).unwrap().queenside {
             castling_rights.push('Q');
         }
 
-        if self.castling_rights.get(&Color::Black).unwrap()[0] {
+        if self.castling_rights.get(&Color::Black).unwrap().kingside {
             castling_rights.push('k');
         }
 
-        if self.castling_rights.get(&Color::Black).unwrap()[1] {
+        if self.castling_rights.get(&Color::Black).unwrap().queenside {
             castling_rights.push('q');
         }
 
