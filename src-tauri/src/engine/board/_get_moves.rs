@@ -313,8 +313,21 @@ impl Board {
             }
         }
 
-        let [queenside, kingside] = *self.castling_rights.get(&self.turn).unwrap();
+        let [kingside, queenside] = *self.castling_rights.get(&self.turn).unwrap();
         if !in_check {
+            if kingside
+                && [square!(F initial_king_rank), square!(G initial_king_rank)]
+                    .iter()
+                    .all(|s| self.pieces.get(s).is_none())
+                && unchecked_squares.contains(&square!(F initial_king_rank))
+                && unchecked_squares.contains(&square!(G initial_king_rank))
+            {
+                moves.push(Move::from_castle(
+                    square!(E initial_king_rank),
+                    square!(G initial_king_rank),
+                ));
+            }
+
             if queenside
                 && [
                     square!(B initial_king_rank),
@@ -329,19 +342,6 @@ impl Board {
                 moves.push(Move::from_castle(
                     square!(E initial_king_rank),
                     square!(C initial_king_rank),
-                ));
-            }
-
-            if kingside
-                && [square!(F initial_king_rank), square!(G initial_king_rank)]
-                    .iter()
-                    .all(|s| self.pieces.get(s).is_none())
-                && unchecked_squares.contains(&square!(F initial_king_rank))
-                && unchecked_squares.contains(&square!(G initial_king_rank))
-            {
-                moves.push(Move::from_castle(
-                    square!(E initial_king_rank),
-                    square!(G initial_king_rank),
                 ));
             }
         }

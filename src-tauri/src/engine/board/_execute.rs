@@ -108,26 +108,12 @@ impl Board {
         self.turn = self.turn.opposite();
 
         for color in [Color::White, Color::Black].iter() {
-            let [queenside, kingside] = *self.castling_rights.get(color).unwrap();
+            let [kingside, queenside] = *self.castling_rights.get(color).unwrap();
             let rank = if *color == Color::White {
                 Rank::_1
             } else {
                 Rank::_8
             };
-
-            if queenside {
-                let king = self.pieces.get(&square!(E rank));
-                let rook = self.pieces.get(&square!(A rank));
-
-                if king.is_none()
-                    || rook.is_none()
-                    || king.unwrap().r#type != PieceType::King
-                    || rook.unwrap().r#type != PieceType::Rook
-                    || king.unwrap().color != rook.unwrap().color
-                {
-                    self.castling_rights.insert(*color, [false, kingside]);
-                }
-            }
 
             if kingside {
                 let king = self.pieces.get(&square!(E rank));
@@ -139,7 +125,21 @@ impl Board {
                     || rook.unwrap().r#type != PieceType::Rook
                     || king.unwrap().color != rook.unwrap().color
                 {
-                    self.castling_rights.insert(*color, [queenside, false]);
+                    self.castling_rights.insert(*color, [false, queenside]);
+                }
+            }
+
+            if queenside {
+                let king = self.pieces.get(&square!(E rank));
+                let rook = self.pieces.get(&square!(A rank));
+
+                if king.is_none()
+                    || rook.is_none()
+                    || king.unwrap().r#type != PieceType::King
+                    || rook.unwrap().r#type != PieceType::Rook
+                    || king.unwrap().color != rook.unwrap().color
+                {
+                    self.castling_rights.insert(*color, [kingside, false]);
                 }
             }
         }
