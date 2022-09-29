@@ -118,9 +118,23 @@ mod position_3 {
         perft!("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1", 3, 2812);
     }
 
+	#[test]
+	fn test() {
+		let mut board = crate::engine::Board::from_fen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1".into()).unwrap();
+		crate::execute!(board G2 G4);
+		crate::execute!(board C7 C5);
+		crate::execute!(board E2 E4);
+		println!("{}", board.to_fen());
+	}
+
+	#[test]
+	fn test2() {
+		perft!("8/8/3p4/KPp4r/1R2PpPk/8/8/8 b - e3 0 4", 1!!, 16);
+	}
+
     #[test]
     fn depth_4() {
-        perft!("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1", 4, 43238);
+        perft!("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1", 4!!, 43238);
     }
 
     #[test]

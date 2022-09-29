@@ -345,7 +345,11 @@ impl Board {
                                         return true;
                                     }
                                 }
-                            }
+                            } else {
+                                if let Some(piece) = self.pieces.get(&square!(file  king.rank)) {
+									return true;
+								}
+							}
                         }
                     }
 
@@ -375,7 +379,11 @@ impl Board {
                                         return true;
                                     }
                                 }
-                            }
+                            } else {
+                                if let Some(piece) = self.pieces.get(&square!(file  king.rank)) {
+									return true;
+								}
+							}
                         }
                     }
                 }
