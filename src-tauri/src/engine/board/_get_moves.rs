@@ -323,7 +323,7 @@ impl Board {
                     // Once this boolean is true, look out for a rook or a queen
                     let mut scanned_pawns = false;
 
-                    for file_index in (0..=king_file_index).rev() {
+                    for file_index in (0..king_file_index).rev() {
                         // Scan to the left
                         if let Ok(file) = File::try_from(file_index) {
                             if file == m.from.file || file == m.to.file {
@@ -346,10 +346,10 @@ impl Board {
                                     }
                                 }
                             } else {
-                                if let Some(piece) = self.pieces.get(&square!(file  king.rank)) {
-									return true;
-								}
-							}
+                                if self.pieces.get(&square!(file  king.rank)).is_some() {
+                                    return true;
+                                }
+                            }
                         }
                     }
 
@@ -380,10 +380,10 @@ impl Board {
                                     }
                                 }
                             } else {
-                                if let Some(piece) = self.pieces.get(&square!(file  king.rank)) {
-									return true;
-								}
-							}
+                                if self.pieces.get(&square!(file  king.rank)).is_some() {
+                                    return true;
+                                }
+                            }
                         }
                     }
                 }
