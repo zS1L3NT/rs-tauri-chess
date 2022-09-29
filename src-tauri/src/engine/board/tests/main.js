@@ -1,49 +1,53 @@
-const stockfish = [
-	"f4f3: 1",
-	"c5c4: 1",
-	"d6d5: 1",
-	"c5b4: 1",
-	"f4e3: 1",
-	"h5d5: 1",
-	"h5e5: 1",
-	"h5f5: 1",
-	"h5g5: 1",
-	"h5h6: 1",
-	"h5h7: 1",
-	"h5h8: 1",
-	"h4g3: 1",
-	"h4h3: 1",
-	"h4g4: 1",
-	"h4g5: 1"
-]
+const clean = str => {
+	const perft = {}
+	const lines = str
+		.split("\n")
+		.map(l => l.trim())
+		.filter(l => !!l)
 
-const engine = [
-	"d6d5: 1",
-	"c5b4: 1",
-	"c5c4: 1",
-	"h5h6: 1",
-	"h5h7: 1",
-	"h5h8: 1",
-	"h5g5: 1",
-	"h5f5: 1",
-	"h5e5: 1",
-	"h5d5: 1",
-	"f4f3: 1",
-	"h4h3: 1",
-	"h4g3: 1",
-	"h4g4: 1",
-	"h4g5: 1"
-]
-
-let i = 0
-while (true) {
-	if (!stockfish[i] && !engine[i]) {
-		break
+	for (const line of lines.sort()) {
+		const [_, move, count] = line.match(/(\w{4}): (\d+)/)
+		perft[move] = parseInt(count)
 	}
 
-	if (stockfish[i] !== engine[i]) {
-		console.log({ stockfish: stockfish[i], engine: engine[i] })
-	}
+	return perft
+}
 
-	i++
+const stockfish = clean(`
+
+`)
+
+const engine = clean(`
+
+`)
+
+for (const move in stockfish) {
+	if (move in engine) {
+		if (stockfish[move] !== engine[move]) {
+			console.log({
+				move,
+				stockfish: stockfish[move],
+				engine: engine[move],
+				offset: engine[move] - stockfish[move]
+			})
+		}
+	} else {
+		console.log({
+			move,
+			stockfish: stockfish[move],
+			engine: null,
+			offset: engine[move] - stockfish[move]
+		})
+	}
+}
+
+for (const move in engine) {
+	if (!(move in stockfish)) {
+		console.log({
+			move,
+			stockfish: null,
+			engine: engine[move],
+			offset: engine[move] - stockfish[move]
+		})
+	}
 }
