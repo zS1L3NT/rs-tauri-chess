@@ -16,6 +16,7 @@ pub enum FenError {
 }
 
 impl Board {
+	#[allow(dead_code)]
     pub fn from_fen(fen: String) -> Result<Board, FenError> {
         let mut fen = fen.split_whitespace();
         let piece_placements = fen.next().ok_or(FenError::InvalidFen)?;

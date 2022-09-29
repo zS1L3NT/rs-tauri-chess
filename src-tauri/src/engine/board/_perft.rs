@@ -1,6 +1,7 @@
 use crate::engine::*;
 
 impl Board {
+	#[allow(dead_code)]
     pub fn perft(&mut self, depth: usize, log_depth: usize) -> usize {
         if depth == 0 {
             return 1;
