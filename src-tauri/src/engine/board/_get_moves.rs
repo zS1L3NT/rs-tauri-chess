@@ -212,17 +212,21 @@ impl Board {
                                             in_check = true;
 
                                             // Move that checks the King
+                                            // IGNORE ALL ENPASSANTS, THOSE ARE HANDLED LATER
                                             moves.retain(|m| {
                                                 (m.from == king_square
                                                     && !attack_line.contains(&m.to))
                                                     || resolving_squares.contains(&m.to)
+                                                    || m.r#type == Enpassant
                                             });
                                         }
                                         1 => {
                                             // Move that pins another piece
+                                            // IGNORE ALL ENPASSANTS, THOSE ARE HANDLED LATER
                                             moves.retain(|m| {
                                                 !resolving_squares.contains(&m.from)
                                                     || resolving_squares.contains(&m.to)
+                                                    || m.r#type == Enpassant
                                             });
                                         }
                                         _ => {}
@@ -310,10 +314,20 @@ impl Board {
             }
         }
 
-        // Special Enpassant case that leaves the King in check
+        // Determining whether an Enpassant move leaves a King in check is determined here
         moves.retain(|m| {
             if m.r#type == Enpassant {
                 let king = *self.kings.get(&self.turn).unwrap();
+                let captured = m.captured.as_ref().unwrap();
+
+                if in_check {
+                    // If the King is in check
+                    // Only allow the Enpassant move if the captured piece attacks the King
+                    return captured
+                        .get_attack_lines(square!(m.to.file m.from.rank))
+                        .contains(&vec![king]);
+                }
+
                 if king.rank == m.from.rank {
                     // King is on the same rank as the Enpassant pawn
 
@@ -321,68 +335,82 @@ impl Board {
 
                     // Whether the scan to the left or right has reached either of the pawn
                     // Once this boolean is true, look out for a rook or a queen
-                    let mut scanned_pawns = false;
+                    let mut scanned_pawns: i8 = 0;
 
                     for file_index in (0..king_file_index).rev() {
                         // Scan to the left
+
                         if let Ok(file) = File::try_from(file_index) {
                             if file == m.from.file || file == m.to.file {
-                                scanned_pawns = true;
+                                scanned_pawns += 1;
                                 continue;
                             }
 
-                            if scanned_pawns {
-                                // Since the pawns have been detected at this file
-                                // Check if the first piece we see is an enemy Queen or Rook
-                                // If so, the enpassant is illegal since the Queen or Rook XRays our King
-                                // If not, there is no XRay and we can chill
-                                if let Some(piece) = self.pieces.get(&square!(file  king.rank)) {
-                                    if piece.color == opposite_color
-                                        && (piece.r#type == Queen || piece.r#type == Rook)
+                            match scanned_pawns {
+                                2 => {
+                                    // Since both pawns have been detected at this file in a row
+                                    // Check if the first piece we see is an enemy Queen or Rook
+                                    // If so, the enpassant is illegal since the Queen or Rook XRays our King
+                                    // If not, there is no XRay and we can chill
+                                    if let Some(piece) = self.pieces.get(&square!(file  king.rank))
                                     {
-                                        return false;
-                                    } else {
+                                        if piece.color == opposite_color
+                                            && (piece.r#type == Queen || piece.r#type == Rook)
+                                        {
+                                            return false;
+                                        } else {
+                                            return true;
+                                        }
+                                    }
+                                }
+                                0 => {
+                                    // No pawn found yet, continue scanning
+
+                                    if self.pieces.get(&square!(file  king.rank)).is_some() {
+                                        // If the code reached here, it found a piece unrelated to the Enpassant move
+                                        // This means there is no possible XRay from a Queen or Rook that can happen
                                         return true;
                                     }
                                 }
-                            } else {
-                                if self.pieces.get(&square!(file  king.rank)).is_some() {
-                                    return true;
-                                }
+                                _ => panic!("???"),
                             }
                         }
                     }
 
-                    if scanned_pawns {
+                    if scanned_pawns == 2 {
+                        // If the code reached here, it scanned to the left of the board and found no pieces
+                        // and no XRay was found
                         return true;
                     }
 
                     for file_index in (king_file_index + 1)..=7 {
                         // Scan to the right
+
                         if let Ok(file) = File::try_from(file_index) {
                             if file == m.from.file || file == m.to.file {
-                                scanned_pawns = true;
+                                scanned_pawns += 1;
                                 continue;
                             }
 
-                            if scanned_pawns {
-                                // Since the pawns have been detected at this file
-                                // Check if the first piece we see is an enemy Queen or Rook
-                                // If so, the enpassant is illegal since the Queen or Rook XRays our King
-                                // If not, there is no XRay and we can chill
-                                if let Some(piece) = self.pieces.get(&square!(file  king.rank)) {
-                                    if piece.color == opposite_color
-                                        && (piece.r#type == Queen || piece.r#type == Rook)
+                            match scanned_pawns {
+                                2 => {
+                                    if let Some(piece) = self.pieces.get(&square!(file  king.rank))
                                     {
-                                        return false;
-                                    } else {
+                                        if piece.color == opposite_color
+                                            && (piece.r#type == Queen || piece.r#type == Rook)
+                                        {
+                                            return false;
+                                        } else {
+                                            return true;
+                                        }
+                                    }
+                                }
+                                0 => {
+                                    if self.pieces.get(&square!(file  king.rank)).is_some() {
                                         return true;
                                     }
                                 }
-                            } else {
-                                if self.pieces.get(&square!(file  king.rank)).is_some() {
-                                    return true;
-                                }
+                                _ => panic!("???"),
                             }
                         }
                     }
