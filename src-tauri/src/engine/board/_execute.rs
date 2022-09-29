@@ -112,7 +112,7 @@ impl Board {
 
             if kingside {
                 let king = self.pieces.get(&square!(E piece_rank));
-                let rook = self.pieces.get(&square!(A piece_rank));
+                let rook = self.pieces.get(&square!(H piece_rank));
 
                 if king.is_none()
                     || rook.is_none()
@@ -127,7 +127,7 @@ impl Board {
 
             if queenside {
                 let king = self.pieces.get(&square!(E piece_rank));
-                let rook = self.pieces.get(&square!(H piece_rank));
+                let rook = self.pieces.get(&square!(A piece_rank));
 
                 if king.is_none()
                     || rook.is_none()
