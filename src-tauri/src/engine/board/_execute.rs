@@ -96,6 +96,10 @@ impl Board {
             self.kings.insert(self.turn, r#move.to);
         }
 
+        if r#move.r#type != PawnJump {
+            self.enpassant_square = None;
+        }
+
         self.history.push(r#move);
         self.turn = self.turn.opposite();
 
@@ -117,7 +121,7 @@ impl Board {
                     || king.unwrap().color != rook.unwrap().color
                 {
                     self.castling_rights
-                        .insert(*color, CastlingRights::new(kingside, false));
+                        .insert(*color, CastlingRights::new(false, queenside));
                 }
             }
 
@@ -132,7 +136,7 @@ impl Board {
                     || king.unwrap().color != rook.unwrap().color
                 {
                     self.castling_rights
-                        .insert(*color, CastlingRights::new(false, queenside));
+                        .insert(*color, CastlingRights::new(kingside, false));
                 }
             }
         }

@@ -116,9 +116,13 @@ impl Board {
         let mut count = 0;
 
         for r#move in self.get_moves() {
+            let castling_rights = self.castling_rights.clone();
+            let enpassant_square = self.enpassant_square;
+            let halfmove_clock = self.halfmove_clock;
+
             self.execute(r#move);
             count += self.count_moves(depth - 1);
-            self.undo();
+            self.undo(castling_rights, enpassant_square, halfmove_clock);
         }
 
         count
