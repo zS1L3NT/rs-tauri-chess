@@ -320,12 +320,13 @@ impl Board {
                 let king = *self.kings.get(&self.turn).unwrap();
                 let captured = m.captured.as_ref().unwrap();
 
-                if in_check {
-                    // If the King is in check
-                    // Only allow the Enpassant move if the captured piece attacks the King
-                    return captured
+                // If the King is in check, only allow the Enpassant move if the captured piece attacks the King
+                if in_check
+                    && !captured
                         .get_attack_lines(square!(m.to.file m.from.rank))
-                        .contains(&vec![king]);
+                        .contains(&vec![king])
+                {
+                    return false;
                 }
 
                 if king.rank == m.from.rank {
@@ -345,8 +346,8 @@ impl Board {
                     }
 
                     if scanned_pawns == 2 {
-                        // If the code reached here, it scanned to the left of the board and found no pieces
-                        // and no XRay was found
+                        // If the code reached here, it scanned to the left of the board and found
+                        // the enpassant pawns but no other pieces meaning no XRay was found
                         return true;
                     }
 
@@ -354,6 +355,36 @@ impl Board {
                         self.enpassant_scan_rank(m, (king_file_index + 1)..=7, &mut scanned_pawns)
                     {
                         // If when scanning to the right we encounter a need to return
+                        return bool;
+                    }
+                }
+
+                if king.file == m.from.file {
+                    // King is on the same file as the Enpassant pawn
+
+                    let king_rank_index: i8 = king.rank.into();
+
+                    // Whether the scan to the left or right has reached the enpassant pawn
+                    // Once this boolean is true, look out for a rook or a queen
+                    let mut scanned_pawn = false;
+
+                    if let Some(bool) =
+                        self.enpassant_scan_file(m, (king_rank_index + 1)..=7, &mut scanned_pawn)
+                    {
+                        // If when scanning up we encounter a need to return
+                        return bool;
+                    }
+
+                    if scanned_pawn {
+                        // If the code reached here, it scanned up the board and found
+                        // the enpassant pawn but no other pieces meaning no XRay was found
+                        return true;
+                    }
+
+                    if let Some(bool) =
+                        self.enpassant_scan_file(m, (0..king_rank_index).rev(), &mut scanned_pawn)
+                    {
+                        // If when scanning up we encounter a need to return
                         return bool;
                     }
                 }
@@ -401,6 +432,45 @@ impl Board {
                         }
                     }
                     _ => panic!("???"),
+                }
+            }
+        }
+
+        None
+    }
+
+    fn enpassant_scan_file<T>(
+        &self,
+        r#move: &Move,
+        rank_indexes: T,
+        scanned_pawn: &mut bool,
+    ) -> Option<bool>
+    where
+        T: IntoIterator<Item = i8>,
+    {
+        let king = *self.kings.get(&self.turn).unwrap();
+
+        for rank_index in rank_indexes {
+            if let Ok(rank) = Rank::try_from(rank_index) {
+                if rank == r#move.from.rank {
+                    *scanned_pawn = true;
+                    continue;
+                }
+
+                if *scanned_pawn {
+                    if let Some(piece) = self.pieces.get(&square!(king.file rank)) {
+                        if piece.color == self.turn.opposite()
+                            && (piece.r#type == Queen || piece.r#type == Rook)
+                        {
+                            return Some(false);
+                        } else {
+                            return Some(true);
+                        }
+                    }
+                } else {
+                    if self.pieces.get(&square!(king.file rank)).is_some() {
+                        return Some(true);
+                    }
                 }
             }
         }
