@@ -334,47 +334,14 @@ impl Board {
                     let king_file_index: i8 = king.file.into();
 
                     // Whether the scan to the left or right has reached either of the pawn
-                    // Once this boolean is true, look out for a rook or a queen
+                    // Once this value is 2, look out for a rook or a queen
                     let mut scanned_pawns: i8 = 0;
 
-                    for file_index in (0..king_file_index).rev() {
-                        // Scan to the left
-
-                        if let Ok(file) = File::try_from(file_index) {
-                            if file == m.from.file || file == m.to.file {
-                                scanned_pawns += 1;
-                                continue;
-                            }
-
-                            match scanned_pawns {
-                                2 => {
-                                    // Since both pawns have been detected at this file in a row
-                                    // Check if the first piece we see is an enemy Queen or Rook
-                                    // If so, the enpassant is illegal since the Queen or Rook XRays our King
-                                    // If not, there is no XRay and we can chill
-                                    if let Some(piece) = self.pieces.get(&square!(file  king.rank))
-                                    {
-                                        if piece.color == opposite_color
-                                            && (piece.r#type == Queen || piece.r#type == Rook)
-                                        {
-                                            return false;
-                                        } else {
-                                            return true;
-                                        }
-                                    }
-                                }
-                                0 => {
-                                    // No pawn found yet, continue scanning
-
-                                    if self.pieces.get(&square!(file  king.rank)).is_some() {
-                                        // If the code reached here, it found a piece unrelated to the Enpassant move
-                                        // This means there is no possible XRay from a Queen or Rook that can happen
-                                        return true;
-                                    }
-                                }
-                                _ => panic!("???"),
-                            }
-                        }
+                    if let Some(bool) =
+                        self.enpassant_scan_rank(m, (0..king_file_index).rev(), &mut scanned_pawns)
+                    {
+                        // If when scanning to the left we encounter a need to return
+                        return bool;
                     }
 
                     if scanned_pawns == 2 {
@@ -383,36 +350,11 @@ impl Board {
                         return true;
                     }
 
-                    for file_index in (king_file_index + 1)..=7 {
-                        // Scan to the right
-
-                        if let Ok(file) = File::try_from(file_index) {
-                            if file == m.from.file || file == m.to.file {
-                                scanned_pawns += 1;
-                                continue;
-                            }
-
-                            match scanned_pawns {
-                                2 => {
-                                    if let Some(piece) = self.pieces.get(&square!(file  king.rank))
-                                    {
-                                        if piece.color == opposite_color
-                                            && (piece.r#type == Queen || piece.r#type == Rook)
-                                        {
-                                            return false;
-                                        } else {
-                                            return true;
-                                        }
-                                    }
-                                }
-                                0 => {
-                                    if self.pieces.get(&square!(file  king.rank)).is_some() {
-                                        return true;
-                                    }
-                                }
-                                _ => panic!("???"),
-                            }
-                        }
+                    if let Some(bool) =
+                        self.enpassant_scan_rank(m, (king_file_index + 1)..=7, &mut scanned_pawns)
+                    {
+                        // If when scanning to the right we encounter a need to return
+                        return bool;
                     }
                 }
             }
@@ -421,6 +363,49 @@ impl Board {
         });
 
         moves
+    }
+
+    fn enpassant_scan_rank<T>(
+        &self,
+        r#move: &Move,
+        file_indexes: T,
+        scanned_pawns: &mut i8,
+    ) -> Option<bool>
+    where
+        T: IntoIterator<Item = i8>,
+    {
+        let king = *self.kings.get(&self.turn).unwrap();
+
+        for file_index in file_indexes {
+            if let Ok(file) = File::try_from(file_index) {
+                if file == r#move.from.file || file == r#move.to.file {
+                    *scanned_pawns += 1;
+                    continue;
+                }
+
+                match scanned_pawns {
+                    2 => {
+                        if let Some(piece) = self.pieces.get(&square!(file  king.rank)) {
+                            if piece.color == self.turn.opposite()
+                                && (piece.r#type == Queen || piece.r#type == Rook)
+                            {
+                                return Some(false);
+                            } else {
+                                return Some(true);
+                            }
+                        }
+                    }
+                    0 => {
+                        if self.pieces.get(&square!(file  king.rank)).is_some() {
+                            return Some(true);
+                        }
+                    }
+                    _ => panic!("???"),
+                }
+            }
+        }
+
+        None
     }
 
     fn get_straight_moves(&self, moves: &mut Vec<Move>, piece: &Piece, directions: &[(i8, i8)]) {
