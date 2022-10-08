@@ -1,7 +1,7 @@
 use crate::engine::*;
 
 impl Board {
-	#[allow(dead_code)]
+    #[allow(dead_code)]
     pub fn perft(&mut self, depth: usize, log_depth: usize) -> usize {
         if depth == 0 {
             return 1;
@@ -14,7 +14,16 @@ impl Board {
             let enpassant_square = self.enpassant_square;
             let halfmove_clock = self.halfmove_clock;
 
-            let move_name = format!("{:?}{:?}", r#move.from, r#move.to).to_lowercase();
+            let move_name = format!(
+                "{:?}{:?}{}",
+                r#move.from,
+                r#move.to,
+                match r#move.promotion {
+                    Some(p) => format!("{:?}", p),
+                    None => "".into(),
+                }
+            )
+            .to_lowercase();
             self.execute(r#move);
 
             let perft = self.perft(depth - 1, log_depth);
