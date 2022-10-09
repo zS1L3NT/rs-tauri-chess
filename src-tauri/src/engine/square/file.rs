@@ -44,19 +44,19 @@ impl<'de> Deserialize<'de> for File {
     }
 }
 
-impl Into<i8> for File {
-    fn into(self) -> i8 {
-        match self {
-            File::A => 0,
-            File::B => 1,
-            File::C => 2,
-            File::D => 3,
-            File::E => 4,
-            File::F => 5,
-            File::G => 6,
-            File::H => 7,
-        }
-    }
+impl From<File> for i8 {
+	fn from(file: File) -> i8 {
+		match file {
+			File::A => 0,
+			File::B => 1,
+			File::C => 2,
+			File::D => 3,
+			File::E => 4,
+			File::F => 5,
+			File::G => 6,
+			File::H => 7,
+		}
+	}
 }
 
 impl TryFrom<i8> for File {

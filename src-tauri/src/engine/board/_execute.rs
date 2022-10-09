@@ -96,6 +96,10 @@ impl Board {
             self.kings.insert(self.turn, r#move.to);
         }
 
+        if r#move.r#type != PawnJump {
+            self.enpassant_square = None;
+        }
+
         self.history.push(r#move);
         self.turn = self.turn.opposite();
 
@@ -105,21 +109,6 @@ impl Board {
                 queenside,
             } = *self.castling_rights.get(color).unwrap();
             let piece_rank = color.get_piece_rank();
-
-            if queenside {
-                let king = self.pieces.get(&square!(E piece_rank));
-                let rook = self.pieces.get(&square!(A piece_rank));
-
-                if king.is_none()
-                    || rook.is_none()
-                    || king.unwrap().r#type != King
-                    || rook.unwrap().r#type != Rook
-                    || king.unwrap().color != rook.unwrap().color
-                {
-                    self.castling_rights
-                        .insert(*color, CastlingRights::new(kingside, false));
-                }
-            }
 
             if kingside {
                 let king = self.pieces.get(&square!(E piece_rank));
@@ -133,6 +122,21 @@ impl Board {
                 {
                     self.castling_rights
                         .insert(*color, CastlingRights::new(false, queenside));
+                }
+            }
+
+            if queenside {
+                let king = self.pieces.get(&square!(E piece_rank));
+                let rook = self.pieces.get(&square!(A piece_rank));
+
+                if king.is_none()
+                    || rook.is_none()
+                    || king.unwrap().r#type != King
+                    || rook.unwrap().r#type != Rook
+                    || king.unwrap().color != rook.unwrap().color
+                {
+                    self.castling_rights
+                        .insert(*color, CastlingRights::new(kingside, false));
                 }
             }
         }

@@ -1,6 +1,7 @@
 use {crate::engine::*, rs_tauri_chess::square};
 
 impl Board {
+	#[allow(dead_code)]
     pub fn to_fen(&self) -> String {
         format!(
             "{} {} {} {} {} {}",

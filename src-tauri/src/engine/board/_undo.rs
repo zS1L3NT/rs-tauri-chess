@@ -1,9 +1,18 @@
-use {crate::engine::*, rs_tauri_chess::square};
+use {crate::engine::*, indexmap::IndexMap, rs_tauri_chess::square};
 
 impl Board {
-    pub fn undo(&mut self) -> Option<()> {
+    pub fn undo(
+        &mut self,
+        castling_rights: IndexMap<Color, CastlingRights>,
+        enpassant_square: Option<Square>,
+        halfmove_clock: u32,
+    ) -> Option<()> {
         let r#move = self.history.pop()?;
         self.turn = self.turn.opposite();
+		self.castling_rights = castling_rights;
+		self.enpassant_square = enpassant_square;
+		self.halfmove_clock = halfmove_clock;
+		self.fullmove_number -= 1;
 
         match r#move.r#type {
             Normal | PawnJump => {

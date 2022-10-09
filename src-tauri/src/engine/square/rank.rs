@@ -40,9 +40,9 @@ impl<'de> Deserialize<'de> for Rank {
     }
 }
 
-impl Into<i8> for Rank {
-    fn into(self) -> i8 {
-        match self {
+impl From<Rank> for i8 {
+    fn from(rank: Rank) -> i8 {
+        match rank {
             Rank::_1 => 0,
             Rank::_2 => 1,
             Rank::_3 => 2,

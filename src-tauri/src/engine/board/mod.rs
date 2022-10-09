@@ -1,9 +1,12 @@
 mod _execute;
 mod _from_fen;
 mod _get_moves;
+mod _perft;
 mod _to_fen;
 mod _undo;
 mod castling_rights;
+#[cfg(test)]
+mod tests;
 
 pub use {_from_fen::FenError, castling_rights::CastlingRights};
 
@@ -13,7 +16,7 @@ use {
     rs_tauri_chess::square,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct Board {
     pub history: Vec<Move>,
     pub pieces: IndexMap<Square, Piece>,

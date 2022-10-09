@@ -27,7 +27,7 @@ impl Board {
                     if square.rank == self.turn.get_pawn_rank()
                         && self
                             .pieces
-                            .get(&square.offset(0, 1 * multiplier).unwrap())
+                            .get(&square.offset(0, multiplier).unwrap())
                             .is_none()
                         && self
                             .pieces
@@ -41,7 +41,7 @@ impl Board {
                     }
 
                     if square.rank == self.turn.opposite().get_pawn_rank() {
-                        if let Some(target_square) = square.offset(-1, 1 * multiplier) {
+                        if let Some(target_square) = square.offset(-1, multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
                                     for r#type in [Queen, Rook, Bishop, Knight] {
@@ -55,13 +55,13 @@ impl Board {
                                 }
                             }
                         }
-                        let target_square = square.offset(0, 1 * multiplier).unwrap();
-                        if let None = self.pieces.get(&target_square) {
+                        let target_square = square.offset(0, multiplier).unwrap();
+                        if self.pieces.get(&target_square).is_none() {
                             for r#type in [Queen, Rook, Bishop, Knight] {
                                 moves.push(Move::from_promotion(square, target_square, r#type));
                             }
                         }
-                        if let Some(target_square) = square.offset(1, 1 * multiplier) {
+                        if let Some(target_square) = square.offset(1, multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
                                     for r#type in [Queen, Rook, Bishop, Knight] {
@@ -80,8 +80,7 @@ impl Board {
                             if enpassant_square.rank == self.turn.opposite().get_enpassant_rank()
                                 && square.rank == self.turn.opposite().get_center_rank()
                             {
-                                if let Some(left_target_square) = square.offset(-1, 1 * multiplier)
-                                {
+                                if let Some(left_target_square) = square.offset(-1, multiplier) {
                                     if left_target_square == enpassant_square {
                                         moves.push(Move::from_enpassant(
                                             square,
@@ -89,7 +88,7 @@ impl Board {
                                             self.pieces
                                                 .get(
                                                     &enpassant_square
-                                                        .offset(0, -1 * multiplier)
+                                                        .offset(0, -multiplier)
                                                         .unwrap(),
                                                 )
                                                 .unwrap()
@@ -97,8 +96,7 @@ impl Board {
                                         ));
                                     }
                                 }
-                                if let Some(right_target_square) = square.offset(1, 1 * multiplier)
-                                {
+                                if let Some(right_target_square) = square.offset(1, multiplier) {
                                     if right_target_square == enpassant_square {
                                         moves.push(Move::from_enpassant(
                                             square,
@@ -106,7 +104,7 @@ impl Board {
                                             self.pieces
                                                 .get(
                                                     &enpassant_square
-                                                        .offset(0, -1 * multiplier)
+                                                        .offset(0, -multiplier)
                                                         .unwrap(),
                                                 )
                                                 .unwrap()
@@ -116,7 +114,7 @@ impl Board {
                                 }
                             }
                         }
-                        if let Some(target_square) = square.offset(-1, 1 * multiplier) {
+                        if let Some(target_square) = square.offset(-1, multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
                                     moves.push(Move::from_capture(
@@ -127,11 +125,11 @@ impl Board {
                                 }
                             }
                         }
-                        let target_square = square.offset(0, 1 * multiplier).unwrap();
-                        if let None = self.pieces.get(&target_square) {
+                        let target_square = square.offset(0, multiplier).unwrap();
+                        if self.pieces.get(&target_square).is_none() {
                             moves.push(Move::from_normal(square, target_square));
                         }
-                        if let Some(target_square) = square.offset(1, 1 * multiplier) {
+                        if let Some(target_square) = square.offset(1, multiplier) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
                                     moves.push(Move::from_capture(
@@ -161,9 +159,9 @@ impl Board {
                         }
                     }
                 }
-                Bishop => self.get_straight_moves(&mut moves, &piece, &Directions::BISHOP),
-                Rook => self.get_straight_moves(&mut moves, &piece, &Directions::ROOK),
-                Queen => self.get_straight_moves(&mut moves, &piece, &Directions::QUEEN),
+                Bishop => self.get_straight_moves(&mut moves, piece, &Directions::BISHOP),
+                Rook => self.get_straight_moves(&mut moves, piece, &Directions::ROOK),
+                Queen => self.get_straight_moves(&mut moves, piece, &Directions::QUEEN),
                 King => {
                     for (file, rank) in Directions::KING {
                         if let Some(target_square) = square.offset(file, rank) {
@@ -205,7 +203,7 @@ impl Board {
                         for square in attack_line {
                             let square = *square;
 
-                            if let Some(_) = self.pieces.get(&square) {
+                            if self.pieces.get(&square).is_some() {
                                 if square == king_square {
                                     match blocking_pieces {
                                         0 => {
@@ -216,6 +214,10 @@ impl Board {
                                                 (m.from == king_square
                                                     && !attack_line.contains(&m.to))
                                                     || resolving_squares.contains(&m.to)
+													// Allow Enpassant where captured piece is checking the King
+                                                    || (m.r#type == Enpassant
+                                                        && resolving_squares.get(0).unwrap()
+                                                            == &square!(m.to.file m.from.rank))
                                             });
                                         }
                                         1 => {
@@ -224,6 +226,14 @@ impl Board {
                                                 !resolving_squares.contains(&m.from)
                                                     || resolving_squares.contains(&m.to)
                                             });
+                                        }
+                                        2 => {
+                                            // Enpassant that leaves the king in check
+                                            // This takes two pieces off the board
+                                            moves.retain(|m| {
+                                                m.r#type != Enpassant
+                                                    || m.from.rank != king_square.rank
+                                            })
                                         }
                                         _ => {}
                                     }
@@ -244,7 +254,7 @@ impl Board {
                         moves.retain(|m| {
                             if m.from == king_square {
                                 for square in attack_line {
-                                    if let Some(_) = self.pieces.get(square) {
+                                    if self.pieces.get(square).is_some() {
                                         return *square != m.to;
                                     } else if *square == m.to {
                                         return false;
@@ -279,6 +289,19 @@ impl Board {
             kingside,
         } = *self.castling_rights.get(&self.turn).unwrap();
         if !in_check {
+            if kingside
+                && [square!(F piece_rank), square!(G piece_rank)]
+                    .iter()
+                    .all(|s| self.pieces.get(s).is_none())
+                && unchecked_squares.contains(&square!(F piece_rank))
+                && unchecked_squares.contains(&square!(G piece_rank))
+            {
+                moves.push(Move::from_castle(
+                    square!(E piece_rank),
+                    square!(G piece_rank),
+                ));
+            }
+
             if queenside
                 && [
                     square!(B piece_rank),
@@ -293,19 +316,6 @@ impl Board {
                 moves.push(Move::from_castle(
                     square!(E piece_rank),
                     square!(C piece_rank),
-                ));
-            }
-
-            if kingside
-                && [square!(F piece_rank), square!(G piece_rank)]
-                    .iter()
-                    .all(|s| self.pieces.get(s).is_none())
-                && unchecked_squares.contains(&square!(F piece_rank))
-                && unchecked_squares.contains(&square!(G piece_rank))
-            {
-                moves.push(Move::from_castle(
-                    square!(E piece_rank),
-                    square!(G piece_rank),
                 ));
             }
         }
