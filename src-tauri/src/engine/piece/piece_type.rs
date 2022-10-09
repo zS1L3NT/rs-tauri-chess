@@ -2,7 +2,7 @@ pub use PieceType::*;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Deserialize, Eq, PartialEq, Serialize)]
 pub enum PieceType {
     Pawn,
     Knight,

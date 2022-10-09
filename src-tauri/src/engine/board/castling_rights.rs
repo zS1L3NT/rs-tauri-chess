@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct CastlingRights {
     pub kingside: bool,
     pub queenside: bool,

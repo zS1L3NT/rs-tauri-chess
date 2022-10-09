@@ -16,7 +16,7 @@ pub enum FenError {
 }
 
 impl Board {
-	#[allow(dead_code)]
+    #[allow(dead_code)]
     pub fn from_fen(fen: String) -> Result<Board, FenError> {
         let mut fen = fen.split_whitespace();
         let piece_placements = fen.next().ok_or(FenError::InvalidFen)?;
@@ -53,16 +53,15 @@ impl Board {
                 }),
             );
             if castling_rights.kingside {
-                if king.is_some() && rook.is_some() {
-                    let king = king.unwrap();
-                    let rook = rook.unwrap();
-
-                    if king.r#type == King
-                        || rook.r#type == Rook
-                        || king.color == *color
-                        || rook.color == *color
-                    {
-                        continue;
+                if let Some(king) = king {
+                    if let Some(rook) = rook {
+                        if king.r#type == King
+                            || rook.r#type == Rook
+                            || king.color == *color
+                            || rook.color == *color
+                        {
+                            continue;
+                        }
                     }
                 }
 
@@ -77,16 +76,15 @@ impl Board {
                 }),
             );
             if castling_rights.queenside {
-                if king.is_some() && rook.is_some() {
-                    let king = king.unwrap();
-                    let rook = rook.unwrap();
-
-                    if king.r#type == King
-                        || rook.r#type == Rook
-                        || king.color == *color
-                        || rook.color == *color
-                    {
-                        continue;
+                if let Some(king) = king {
+                    if let Some(rook) = rook {
+                        if king.r#type == King
+                            || rook.r#type == Rook
+                            || king.color == *color
+                            || rook.color == *color
+                        {
+                            continue;
+                        }
                     }
                 }
 
@@ -100,8 +98,8 @@ impl Board {
             }
         }
 
-        if !(halfmove_clock
-            <= ((fullmove_number - 1) * 2) + (if active_color == Black { 1 } else { 0 }))
+        if halfmove_clock
+            > ((fullmove_number - 1) * 2) + (if active_color == Black { 1 } else { 0 })
         {
             return Err(FenError::HalfMoveClock);
         }
@@ -139,9 +137,9 @@ impl Board {
         let mut rank_index: i8 = 7;
         let mut piece_id = 0;
 
-        for part in text.split("/") {
+        for part in text.split('/') {
             let mut file_index = 0;
-            for char in part.chars().into_iter() {
+            for char in part.chars() {
                 if char.is_numeric() {
                     file_index += char.to_digit(10).unwrap() as i8;
                 } else {
@@ -204,7 +202,7 @@ impl Board {
         match text {
             "w" => Ok(White),
             "b" => Ok(Black),
-            _ => return Err(FenError::ActiveColor),
+            _ => Err(FenError::ActiveColor),
         }
     }
 
@@ -215,7 +213,7 @@ impl Board {
         let mut black_kingside = false;
         let mut black_queenside = false;
 
-        for char in text.chars().into_iter() {
+        for char in text.chars() {
             match char {
                 'K' => white_kingside = true,
                 'Q' => white_queenside = true,

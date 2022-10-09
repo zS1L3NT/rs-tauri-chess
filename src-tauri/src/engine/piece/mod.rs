@@ -10,7 +10,7 @@ use {
     serde::{Deserialize, Serialize},
 };
 
-#[derive(Clone, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Piece {
     pub id: u8,
     pub r#type: PieceType,
@@ -55,7 +55,7 @@ impl Piece {
                         current_square = target_square;
                     }
 
-                    if line.len() >= 1 {
+                    if !line.is_empty() {
                         attack_lines.push(line);
                     }
                 }
@@ -69,7 +69,7 @@ impl Piece {
                         current_square = target_square;
                     }
 
-                    if line.len() >= 1 {
+                    if !line.is_empty() {
                         attack_lines.push(line);
                     }
                 }
@@ -83,7 +83,7 @@ impl Piece {
                         current_square = target_square;
                     }
 
-                    if line.len() >= 1 {
+                    if !line.is_empty() {
                         attack_lines.push(line);
                     }
                 }

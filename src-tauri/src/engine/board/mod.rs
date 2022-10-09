@@ -16,7 +16,7 @@ use {
     rs_tauri_chess::square,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct Board {
     pub history: Vec<Move>,
     pub pieces: IndexMap<Square, Piece>,

@@ -9,7 +9,7 @@ use {
     serde::{Deserialize, Serialize},
 };
 
-#[derive(Clone, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Move {
     pub from: Square,
     pub to: Square,
@@ -42,7 +42,7 @@ impl Move {
     pub fn from_normal(from: Square, to: Square) -> Move {
         assert_ne!(from, to);
         Move {
-            from: from.clone(),
+            from,
             to,
             r#type: Normal,
             captured: None,
@@ -55,7 +55,7 @@ impl Move {
         assert_eq!(from.file, to.file);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 2);
         Move {
-            from: from.clone(),
+            from,
             to,
             r#type: PawnJump,
             captured: None,
@@ -66,7 +66,7 @@ impl Move {
     pub fn from_capture(from: Square, to: Square, captured: Piece) -> Move {
         assert_ne!(from, to);
         Move {
-            from: from.clone(),
+            from,
             to,
             r#type: Capture,
             captured: Some(captured),
@@ -80,7 +80,7 @@ impl Move {
         assert_ne!(promotion, Pawn);
         assert_ne!(promotion, King);
         Move {
-            from: from.clone(),
+            from,
             to,
             r#type: Promotion,
             captured: None,
@@ -99,7 +99,7 @@ impl Move {
         assert_ne!(promotion, Pawn);
         assert_ne!(promotion, King);
         Move {
-            from: from.clone(),
+            from,
             to,
             r#type: PromotionCapture,
             captured: Some(captured),
@@ -112,7 +112,7 @@ impl Move {
         assert_eq!((from.file as i8 - to.file as i8).abs(), 1);
         assert_eq!((from.rank as i8 - to.rank as i8).abs(), 1);
         Move {
-            from: from.clone(),
+            from,
             to,
             r#type: Enpassant,
             captured: Some(captured),
@@ -124,7 +124,7 @@ impl Move {
         assert_ne!(from, to);
         assert_eq!((from.file as i8 - to.file as i8).abs(), 2);
         Move {
-            from: from.clone(),
+            from,
             to,
             r#type: Castle,
             captured: None,
