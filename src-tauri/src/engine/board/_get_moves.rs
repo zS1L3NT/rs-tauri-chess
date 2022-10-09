@@ -212,22 +212,30 @@ impl Board {
                                             in_check = true;
 
                                             // Move that checks the King
-                                            // IGNORE ALL ENPASSANTS, THOSE ARE HANDLED LATER
                                             moves.retain(|m| {
                                                 (m.from == king_square
                                                     && !attack_line.contains(&m.to))
                                                     || resolving_squares.contains(&m.to)
-                                                    || m.r#type == Enpassant
+													// Allow Enpassant where captured piece is checking the King
+                                                    || (m.r#type == Enpassant
+                                                        && resolving_squares.get(0).unwrap()
+                                                            == &square!(m.to.file m.from.rank))
                                             });
                                         }
                                         1 => {
                                             // Move that pins another piece
-                                            // IGNORE ALL ENPASSANTS, THOSE ARE HANDLED LATER
                                             moves.retain(|m| {
                                                 !resolving_squares.contains(&m.from)
                                                     || resolving_squares.contains(&m.to)
-                                                    || m.r#type == Enpassant
                                             });
+                                        }
+                                        2 => {
+                                            // Enpassant that leaves the king in check
+                                            // This takes two pieces off the board
+                                            moves.retain(|m| {
+                                                m.r#type != Enpassant
+                                                    || m.from.rank != king_square.rank
+                                            })
                                         }
                                         _ => {}
                                     }
@@ -314,168 +322,7 @@ impl Board {
             }
         }
 
-        // Determining whether an Enpassant move leaves a King in check is determined here
-        moves.retain(|m| {
-            if m.r#type == Enpassant {
-                let king = *self.kings.get(&self.turn).unwrap();
-                let captured = m.captured.as_ref().unwrap();
-
-                // If the King is in check, only allow the Enpassant move if the captured piece attacks the King
-                if in_check
-                    && !captured
-                        .get_attack_lines(square!(m.to.file m.from.rank))
-                        .contains(&vec![king])
-                {
-                    return false;
-                }
-
-                if king.rank == m.from.rank {
-                    // King is on the same rank as the Enpassant pawn
-
-                    let king_file_index: i8 = king.file.into();
-
-                    // Whether the scan to the left or right has reached either of the pawn
-                    // Once this value is 2, look out for a rook or a queen
-                    let mut scanned_pawns: i8 = 0;
-
-                    if let Some(bool) =
-                        self.enpassant_scan_rank(m, (0..king_file_index).rev(), &mut scanned_pawns)
-                    {
-                        // If when scanning to the left we encounter a need to return
-                        return bool;
-                    }
-
-                    if scanned_pawns == 2 {
-                        // If the code reached here, it scanned to the left of the board and found
-                        // the enpassant pawns but no other pieces meaning no XRay was found
-                        return true;
-                    }
-
-                    if let Some(bool) =
-                        self.enpassant_scan_rank(m, (king_file_index + 1)..=7, &mut scanned_pawns)
-                    {
-                        // If when scanning to the right we encounter a need to return
-                        return bool;
-                    }
-                }
-
-                if king.file == m.from.file {
-                    // King is on the same file as the Enpassant pawn
-
-                    let king_rank_index: i8 = king.rank.into();
-
-                    // Whether the scan to the left or right has reached the enpassant pawn
-                    // Once this boolean is true, look out for a rook or a queen
-                    let mut scanned_pawn = false;
-
-                    if let Some(bool) =
-                        self.enpassant_scan_file(m, (king_rank_index + 1)..=7, &mut scanned_pawn)
-                    {
-                        // If when scanning up we encounter a need to return
-                        return bool;
-                    }
-
-                    if scanned_pawn {
-                        // If the code reached here, it scanned up the board and found
-                        // the enpassant pawn but no other pieces meaning no XRay was found
-                        return true;
-                    }
-
-                    if let Some(bool) =
-                        self.enpassant_scan_file(m, (0..king_rank_index).rev(), &mut scanned_pawn)
-                    {
-                        // If when scanning up we encounter a need to return
-                        return bool;
-                    }
-                }
-            }
-
-            true
-        });
-
         moves
-    }
-
-    fn enpassant_scan_rank<T>(
-        &self,
-        r#move: &Move,
-        file_indexes: T,
-        scanned_pawns: &mut i8,
-    ) -> Option<bool>
-    where
-        T: IntoIterator<Item = i8>,
-    {
-        let king = *self.kings.get(&self.turn).unwrap();
-
-        for file_index in file_indexes {
-            if let Ok(file) = File::try_from(file_index) {
-                if file == r#move.from.file || file == r#move.to.file {
-                    *scanned_pawns += 1;
-                    continue;
-                }
-
-                match scanned_pawns {
-                    2 => {
-                        if let Some(piece) = self.pieces.get(&square!(file  king.rank)) {
-                            if piece.color == self.turn.opposite()
-                                && (piece.r#type == Queen || piece.r#type == Rook)
-                            {
-                                return Some(false);
-                            } else {
-                                return Some(true);
-                            }
-                        }
-                    }
-                    0 => {
-                        if self.pieces.get(&square!(file  king.rank)).is_some() {
-                            return Some(true);
-                        }
-                    }
-                    _ => panic!("???"),
-                }
-            }
-        }
-
-        None
-    }
-
-    fn enpassant_scan_file<T>(
-        &self,
-        r#move: &Move,
-        rank_indexes: T,
-        scanned_pawn: &mut bool,
-    ) -> Option<bool>
-    where
-        T: IntoIterator<Item = i8>,
-    {
-        let king = *self.kings.get(&self.turn).unwrap();
-
-        for rank_index in rank_indexes {
-            if let Ok(rank) = Rank::try_from(rank_index) {
-                if rank == r#move.from.rank {
-                    *scanned_pawn = true;
-                    continue;
-                }
-
-                if *scanned_pawn {
-                    if let Some(piece) = self.pieces.get(&square!(king.file rank)) {
-                        if piece.color == self.turn.opposite()
-                            && (piece.r#type == Queen || piece.r#type == Rook)
-                        {
-                            return Some(false);
-                        } else {
-                            return Some(true);
-                        }
-                    }
-                } else {
-                    if self.pieces.get(&square!(king.file rank)).is_some() {
-                        return Some(true);
-                    }
-                }
-            }
-        }
-
-        None
     }
 
     fn get_straight_moves(&self, moves: &mut Vec<Move>, piece: &Piece, directions: &[(i8, i8)]) {
