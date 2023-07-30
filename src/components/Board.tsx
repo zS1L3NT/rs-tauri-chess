@@ -16,7 +16,7 @@ const Board = () => {
 				backgroundImage: "url(./assets/Board.png)",
 				backgroundSize: "contain",
 				width: "800px",
-				height: "800px"
+				height: "800px",
 			}}
 			onClick={handleClick}
 		/>

@@ -6,7 +6,7 @@ export enum File {
 	E,
 	F,
 	G,
-	H
+	H,
 }
 
 export enum Rank {
@@ -17,7 +17,7 @@ export enum Rank {
 	_5,
 	_6,
 	_7,
-	_8
+	_8,
 }
 
 export interface Square {
@@ -27,7 +27,7 @@ export interface Square {
 
 export enum Color {
 	White = "White",
-	Black = "Black"
+	Black = "Black",
 }
 
 export enum PieceType {
@@ -36,7 +36,7 @@ export enum PieceType {
 	Rook = "Rook",
 	Bishop = "Bishop",
 	Knight = "Knight",
-	Pawn = "Pawn"
+	Pawn = "Pawn",
 }
 
 export interface Piece {
@@ -53,7 +53,7 @@ export enum MoveType {
 	PromotionCapture = "PromotionCapture",
 	PawnJump = "PawnJump",
 	Enpassant = "Enpassant",
-	Castle = "Castle"
+	Castle = "Castle",
 }
 
 export interface Move {

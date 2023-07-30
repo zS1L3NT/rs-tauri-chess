@@ -7,7 +7,7 @@ export default (css: CSSStyleDeclaration): Square => {
 	let top: string
 
 	const transformMatch = css.transform.match(
-		/translateX\((-?[\.\d]+)px\) translateY\((-?[\.\d]+)px\)/
+		/translateX\((-?[\\.\d]+)px\) translateY\((-?[\\.\d]+)px\)/,
 	)
 	if (transformMatch) {
 		transformX = transformMatch[1]
@@ -17,14 +17,14 @@ export default (css: CSSStyleDeclaration): Square => {
 		transformY = "0"
 	}
 
-	const leftMatch = css.left.match(/([\.\d]+)px/)
+	const leftMatch = css.left.match(/([\\.\d]+)px/)
 	if (leftMatch) {
 		left = leftMatch[1]
 	} else {
 		throw new Error("Invalid CSS left")
 	}
 
-	const topMatch = css.top.match(/([\.\d]+)px/)
+	const topMatch = css.top.match(/([\\.\d]+)px/)
 	if (topMatch) {
 		top = topMatch[1]
 	} else {
@@ -36,6 +36,6 @@ export default (css: CSSStyleDeclaration): Square => {
 
 	return {
 		file: Math.round(draggedX / 100) as File,
-		rank: (7 - Math.round(draggedY / 100)) as Rank
+		rank: (7 - Math.round(draggedY / 100)) as Rank,
 	}
 }

@@ -31,7 +31,7 @@ const Promotion = () => {
 				zIndex: 11,
 				backgroundColor: "white",
 				borderRadius: 3,
-				boxShadow: "3px 3px 10px rgb(0 0 0 / 45%)"
+				boxShadow: "3px 3px 10px rgb(0 0 0 / 45%)",
 			}}>
 			<div
 				style={{
@@ -40,7 +40,7 @@ const Promotion = () => {
 					width: 100,
 					height: 100,
 					cursor: "pointer",
-					zIndex: 5
+					zIndex: 5,
 				}}
 				onClick={() => handleClick(PieceType.Queen)}
 			/>
@@ -51,7 +51,7 @@ const Promotion = () => {
 					width: 100,
 					height: 100,
 					cursor: "pointer",
-					zIndex: 5
+					zIndex: 5,
 				}}
 				onClick={() => handleClick(PieceType.Knight)}
 			/>
@@ -62,7 +62,7 @@ const Promotion = () => {
 					width: 100,
 					height: 100,
 					cursor: "pointer",
-					zIndex: 5
+					zIndex: 5,
 				}}
 				onClick={() => handleClick(PieceType.Rook)}
 			/>
@@ -73,7 +73,7 @@ const Promotion = () => {
 					width: 100,
 					height: 100,
 					cursor: "pointer",
-					zIndex: 5
+					zIndex: 5,
 				}}
 				onClick={() => handleClick(PieceType.Bishop)}
 			/>
@@ -88,7 +88,7 @@ const Promotion = () => {
 					alignItems: "center",
 					cursor: "pointer",
 					fontWeight: "900",
-					fontSize: 24
+					fontSize: 24,
 				}}
 				onClick={() => {
 					dispatch(setPromotion(null))

@@ -10,13 +10,13 @@ const slice = createSlice({
 			if (action.payload) {
 				return {
 					file: action.payload.file,
-					color: action.payload.rank === Rank._8 ? Color.White : Color.Black
+					color: action.payload.rank === Rank._8 ? Color.White : Color.Black,
 				}
 			} else {
 				return null
 			}
-		}
-	}
+		},
+	},
 })
 
 export default slice.reducer

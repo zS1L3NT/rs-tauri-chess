@@ -8,8 +8,8 @@ const store = configureStore({
 	reducer: {
 		cursor: CursorSlice,
 		board: BoardSlice,
-		promotion: PromotionSlice
-	}
+		promotion: PromotionSlice,
+	},
 })
 
 export default store
