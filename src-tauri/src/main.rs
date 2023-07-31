@@ -28,9 +28,19 @@ fn reset(state: tauri::State<Mutex<Board>>) -> ClientBoard {
 }
 
 fn main() {
-    tauri::Builder::default()
-        .manage(Mutex::new(Board::new()))
-        .invoke_handler(tauri::generate_handler![state, execute, reset])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+	let board = Board::new();
+
+	let time = std::time::Instant::now();
+
+	board.get_moves();
+
+	println!("main ({:.2?})", time.elapsed());
+	
+	if 1 != 1 {
+		tauri::Builder::default()
+			.manage(Mutex::new(Board::new()))
+			.invoke_handler(tauri::generate_handler![state, execute, reset])
+			.run(tauri::generate_context!())
+			.expect("error while running tauri application");
+	}
 }

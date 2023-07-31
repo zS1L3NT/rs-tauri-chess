@@ -19,7 +19,7 @@ pub struct Piece {
 
 impl std::fmt::Debug for Piece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}{:?}{:0<2}", self.color, self.r#type, self.id)
+        write!(f, "{:?}{:?}{:0>2}", self.color, self.r#type, self.id)
     }
 }
 
