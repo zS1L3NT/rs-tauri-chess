@@ -15,8 +15,6 @@ impl Board {
         ];
 
         for (square, piece) in &self.pieces {
-            let time = std::time::Instant::now();
-
             if piece.color == opposite_color {
                 continue;
             }
@@ -24,8 +22,6 @@ impl Board {
             let square = *square;
             match piece.r#type {
                 Pawn => {
-					let time = std::time::Instant::now();
-
                     let multiplier = self.turn.get_multiplier();
 
                     if square.rank == self.turn.get_pawn_rank()
@@ -145,13 +141,9 @@ impl Board {
                             }
                         }
                     }
-
-					println!("    _get_moves.rs::iter_1::pawn ({:.2?})", time.elapsed());
                 }
                 Knight => {
                     for (file, rank) in Directions::KNIGHT {
-						let time = std::time::Instant::now();
-
                         if let Some(target_square) = square.offset(file, rank) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
@@ -165,8 +157,6 @@ impl Board {
                                 moves.push(Move::from_normal(square, target_square));
                             }
                         }
-
-						println!("      _get_moves.rs::iter_1::knight::iter ({:.2?}) [{:?}, {:?}]", time.elapsed(), square, piece);
                     }
                 }
                 Bishop => self.get_straight_moves(&mut moves, piece, &Directions::BISHOP),
@@ -174,8 +164,6 @@ impl Board {
                 Queen => self.get_straight_moves(&mut moves, piece, &Directions::QUEEN),
                 King => {
                     for (file, rank) in Directions::KING {
-						let time = std::time::Instant::now();
-
                         if let Some(target_square) = square.offset(file, rank) {
                             if let Some(target_piece) = self.pieces.get(&target_square) {
                                 if target_piece.color != self.turn {
@@ -189,24 +177,15 @@ impl Board {
                                 moves.push(Move::from_normal(square, target_square));
                             }
                         }
-
-						println!("    _get_moves.rs::iter_1::king::iter ({:.2?}) [{:?}, {:?}]", time.elapsed(), file, rank);
                     }
                 }
             }
-
-            println!("  _get_moves.rs::iter_1 ({:.2?}) [{:?}, {:?}]", time.elapsed(), square, piece);
         }
 
         let king_square = *self.kings.get(&self.turn).unwrap();
-
         for square in Square::ALL {
-            let time = std::time::Instant::now();
-
             if let Some(piece) = self.pieces.get(&square) {
                 if piece.color != self.turn {
-					let time = std::time::Instant::now();
-					
                     // This block of code runs where {piece} is every piece
                     // on the enemy team
 
@@ -300,14 +279,9 @@ impl Board {
                                 }
                             }
                         }
-
                     }
-
-					println!("    _get_moves.rs::iter_2::has_opponent ({:.2?})", time.elapsed());
                 }
             }
-
-            println!("  _get_moves.rs::iter_2 ({:.2?}) [{:?}]", time.elapsed(), square);
         }
 
         let CastlingRights {
@@ -352,8 +326,6 @@ impl Board {
     fn get_straight_moves(&self, moves: &mut Vec<Move>, piece: &Piece, directions: &[(i8, i8)]) {
         let square = self.get_square(piece).unwrap();
         for (file, rank) in directions {
-			let time = std::time::Instant::now();
-
             let mut file_offset = *file;
             let mut rank_offset = *rank;
             while let Some(target_square) = square.offset(file_offset, rank_offset) {
@@ -372,8 +344,6 @@ impl Board {
                 file_offset += file;
                 rank_offset += rank;
             }
-
-			println!("    _get_moves.rs::get_straight_moves ({:.2?}) [{:?}, {:?}]", time.elapsed(), file, rank);
         }
     }
 }
