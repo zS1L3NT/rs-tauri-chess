@@ -5,24 +5,36 @@
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview",
-		"tauri": "tauri"
+		"tauri": "tauri",
+		"lint": "eslint src",
+		"lint:fix": "eslint src --fix",
+		"prettier": "prettier src --check",
+		"prettier:fix": "prettier src --write",
+		"clean": "tsc --noEmit && eslint src --fix && prettier src --write"
 	},
 	"dependencies": {
-		"@reduxjs/toolkit": "^1.8.5",
-		"@tauri-apps/api": "^1.0.2",
-		"framer-motion": "^7.3.2",
+		"@reduxjs/toolkit": "^1.9.5",
+		"@tauri-apps/api": "^1.4.0",
+		"framer-motion": "^7.10.3",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
-		"react-redux": "^8.0.4",
+		"react-redux": "^8.1.2",
 		"use-async-effect": "^2.2.7"
 	},
 	"devDependencies": {
-		"@tauri-apps/cli": "^1.1.1",
-		"@types/node": "^18.7.10",
-		"@types/react": "^18.0.15",
-		"@types/react-dom": "^18.0.6",
-		"@vitejs/plugin-react": "^2.0.0",
-		"typescript": "^4.6.4",
-		"vite": "^3.0.2"
+		"@tauri-apps/cli": "^1.4.0",
+		"@types/node": "^18.17.1",
+		"@types/react": "^18.2.17",
+		"@types/react-dom": "^18.2.7",
+		"@typescript-eslint/eslint-plugin": "latest",
+		"@typescript-eslint/parser": "latest",
+		"@vitejs/plugin-react": "^2.2.0",
+		"eslint": "latest",
+		"eslint-config-prettier": "latest",
+		"eslint-plugin-simple-import-sort": "latest",
+		"prettier": "latest",
+		"ts-node": "latest",
+		"typescript": "^5.1.6",
+		"vite": "^3.2.7"
 	}
 }

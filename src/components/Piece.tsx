@@ -49,8 +49,8 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 			setCursor({
 				isDragging: true,
 				selected: { id, color, type, square },
-				hovered: calculateSquareFromCss(e.currentTarget.style)
-			})
+				hovered: calculateSquareFromCss(e.currentTarget.style),
+			}),
 		)
 	}
 
@@ -65,8 +65,8 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 
 		dispatch(
 			setCursor({
-				hovered: calculateSquareFromCss(e.currentTarget.style)
-			})
+				hovered: calculateSquareFromCss(e.currentTarget.style),
+			}),
 		)
 	}
 
@@ -78,22 +78,22 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 		dispatch(
 			setCursor({
 				isDragging: false,
-				hovered: null
-			})
+				hovered: null,
+			}),
 		)
 
 		// If it didn't move, de-select it
 		if (moved === false) {
 			return dispatch(
 				setCursor({
-					selected: null
-				})
+					selected: null,
+				}),
 			)
 		}
 
 		const targetSquare = calculateSquareFromCss(e.currentTarget.style)
 		const move = moves.find(
-			m => equalSquares(m.from, square) && equalSquares(m.to, targetSquare)
+			m => equalSquares(m.from, square) && equalSquares(m.to, targetSquare),
 		)
 		if (move) {
 			if (move.type === MoveType.Promotion) {
@@ -118,14 +118,14 @@ const Piece = ({ piece: { id, color, type, square } }: { piece: iPiece }) => {
 				top: 700 - square.rank * 100,
 				left: square.file * 100,
 				x,
-				y
+				y,
 			}}
 			drag
 			dragConstraints={{
 				top: (square.rank - 7) * 100,
 				right: (7 - square.file) * 100,
 				bottom: square.rank * 100,
-				left: -square.file * 100
+				left: -square.file * 100,
 			}}
 			dragMomentum={false}
 			dragElastic={0.1}

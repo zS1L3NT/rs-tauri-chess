@@ -6,13 +6,13 @@ const slice = createSlice({
 	name: "board",
 	initialState: {
 		pieces: [],
-		moves: []
+		moves: [],
 	} as Board,
 	reducers: {
 		setBoard: (state, action: PayloadAction<Board>) => {
 			return action.payload
-		}
-	}
+		},
+	},
 })
 
 export default slice.reducer

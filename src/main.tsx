@@ -7,5 +7,5 @@ import store from "./store"
 ReactDOM.createRoot(document.getElementById("root")!).render(
 	<ReduxProvider store={store}>
 		<App />
-	</ReduxProvider>
+	</ReduxProvider>,
 )

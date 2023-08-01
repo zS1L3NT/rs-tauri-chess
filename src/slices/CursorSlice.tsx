@@ -7,13 +7,13 @@ const slice = createSlice({
 	initialState: {
 		isDragging: false,
 		hovered: null as Square | null,
-		selected: null as Piece | null
+		selected: null as Piece | null,
 	},
 	reducers: {
 		setCursor: (state, action: PayloadAction<Partial<typeof state>>) => {
 			return { ...state, ...action.payload }
-		}
-	}
+		},
+	},
 })
 
 export default slice.reducer

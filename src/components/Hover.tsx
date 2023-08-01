@@ -12,7 +12,7 @@ const Hover = () => {
 				position: "absolute",
 				zIndex: 1,
 				top: 700 - hovered.rank * 100,
-				left: hovered.file * 100
+				left: hovered.file * 100,
 			}}
 		/>
 	) : (

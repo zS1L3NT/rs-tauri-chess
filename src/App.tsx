@@ -34,7 +34,7 @@ const App = () => {
 		<div
 			style={{
 				position: "relative",
-				overflow: "hidden"
+				overflow: "hidden",
 			}}>
 			<Board />
 			<Hover />
@@ -55,7 +55,7 @@ const App = () => {
 									}
 									isPromotion={!!m.promotion}
 								/>
-							) : null
+							) : null,
 						)
 				: null}
 			{pieces.map(piece => (

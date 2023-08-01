@@ -10,7 +10,7 @@ import { Board, Square } from "../types"
 const Target = ({
 	square,
 	isCapture,
-	isPromotion
+	isPromotion,
 }: {
 	square: Square
 	isCapture: boolean
@@ -25,7 +25,7 @@ const Target = ({
 			dispatch(setPromotion(square))
 		} else {
 			const move = moves.find(
-				m => equalSquares(m.from, selected!.square) && equalSquares(m.to, square)
+				m => equalSquares(m.from, selected!.square) && equalSquares(m.to, square),
 			)!
 			dispatch(setBoard(await invoke<Board>("execute", { move })))
 		}
@@ -40,7 +40,7 @@ const Target = ({
 				position: "absolute",
 				zIndex: 3,
 				top: 700 - square.rank * 100,
-				left: square.file * 100
+				left: square.file * 100,
 			}}
 			onClick={handleClick}>
 			{isCapture ? (
@@ -49,7 +49,7 @@ const Target = ({
 						width: 100,
 						height: 100,
 						border: "10px solid rgba(0, 0, 0, 0.1)",
-						borderRadius: "50%"
+						borderRadius: "50%",
 					}}
 				/>
 			) : (
@@ -59,7 +59,7 @@ const Target = ({
 						height: "36px",
 						margin: "32px",
 						background: "rgba(0, 0, 0, 0.1)",
-						borderRadius: "50%"
+						borderRadius: "50%",
 					}}
 				/>
 			)}
