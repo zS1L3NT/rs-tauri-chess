@@ -6,11 +6,7 @@
 		"build": "tsc && vite build",
 		"preview": "vite preview",
 		"tauri": "tauri",
-		"lint": "eslint src",
-		"lint:fix": "eslint src --fix",
-		"prettier": "prettier src --check",
-		"prettier:fix": "prettier src --write",
-		"clean": "tsc --noEmit && eslint src --fix && prettier src --write"
+		"lint": "tsc --noEmit && eslint src --fix && prettier src --write && rm tsconfig.tsbuildinfo"
 	},
 	"dependencies": {
 		"@reduxjs/toolkit": "^1.9.5",
