@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": "rs-tauri-chess"
+        },
+        {
+            "path": "web-tauri-chess"
+        },
+        {
+            "path": "."
+        }
+    ]
+}

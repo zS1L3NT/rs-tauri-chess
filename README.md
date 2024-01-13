@@ -1,6 +1,6 @@
 # Tauri Chess Engine
 
-![License](https://img.shields.io/github/license/zS1L3NT/rs-tauri-chess?style=for-the-badge) ![Languages](https://img.shields.io/github/languages/count/zS1L3NT/rs-tauri-chess?style=for-the-badge) ![Top Language](https://img.shields.io/github/languages/top/zS1L3NT/rs-tauri-chess?style=for-the-badge) ![Commit Activity](https://img.shields.io/github/commit-activity/y/zS1L3NT/rs-tauri-chess?style=for-the-badge) ![Last commit](https://img.shields.io/github/last-commit/zS1L3NT/rs-tauri-chess?style=for-the-badge)
+![License](https://img.shields.io/github/license/zS1L3NT/tauri-chess?style=for-the-badge) ![Languages](https://img.shields.io/github/languages/count/zS1L3NT/tauri-chess?style=for-the-badge) ![Top Language](https://img.shields.io/github/languages/top/zS1L3NT/tauri-chess?style=for-the-badge) ![Commit Activity](https://img.shields.io/github/commit-activity/y/zS1L3NT/tauri-chess?style=for-the-badge) ![Last commit](https://img.shields.io/github/last-commit/zS1L3NT/tauri-chess?style=for-the-badge)
 
 This is a chess engine written in Tauri, where the frontend (the board and pieces) is in React and the backend (move generation) is written in Rust. This is NOT a chess AI, meaning that all this repository contains is code to determine the next possible legal moves for a specific chess position.
 
@@ -39,22 +39,22 @@ $ cargo test
         -   [![serde_json](https://img.shields.io/badge/serde_json-1.0-blue?style=flat-square)](https://crates.io/crates/serde_json/1.0)
 -   Typescript
     -   Typescript
-        -   [![@types/node](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/dev/@types/node?style=flat-square)](https://npmjs.com/package/@types/node)
-        -   [![@types/react](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/dev/@types/react?style=flat-square)](https://npmjs.com/package/@types/react)
-        -   [![@types/react-dom](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/dev/@types/react-dom?style=flat-square)](https://npmjs.com/package/@types/react-dom)
-        -   [![typescript](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/dev/typescript?style=flat-square)](https://npmjs.com/package/typescript)
+        -   [![@types/node](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/dev/@types/node?style=flat-square)](https://npmjs.com/package/@types/node)
+        -   [![@types/react](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/dev/@types/react?style=flat-square)](https://npmjs.com/package/@types/react)
+        -   [![@types/react-dom](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/dev/@types/react-dom?style=flat-square)](https://npmjs.com/package/@types/react-dom)
+        -   [![typescript](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/dev/typescript?style=flat-square)](https://npmjs.com/package/typescript)
     -   React
-        -   [![react](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/react?style=flat-square)](https://npmjs.com/package/react)
-        -   [![react-dom](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/react-dom?style=flat-square)](https://npmjs.com/package/react-dom)
+        -   [![react](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/react?style=flat-square)](https://npmjs.com/package/react)
+        -   [![react-dom](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/react-dom?style=flat-square)](https://npmjs.com/package/react-dom)
     -   Redux
-        -   [![@reduxjs/toolkit](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/@reduxjs/toolkit?style=flat-square)](https://npmjs.com/package/@reduxjs/toolkit)
-        -   [![react-redux](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/react-redux?style=flat-square)](https://npmjs.com/package/react-redux)
+        -   [![@reduxjs/toolkit](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/@reduxjs/toolkit?style=flat-square)](https://npmjs.com/package/@reduxjs/toolkit)
+        -   [![react-redux](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/react-redux?style=flat-square)](https://npmjs.com/package/react-redux)
     -   Tauri
-        -   [![@tauri-apps/api](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/@tauri-apps/api?style=flat-square)](https://npmjs.com/package/@tauri-apps/api)
-        -   [![@tauri-apps/cli](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/dev/@tauri-apps/cli?style=flat-square)](https://npmjs.com/package/@tauri-apps/cli)
+        -   [![@tauri-apps/api](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/@tauri-apps/api?style=flat-square)](https://npmjs.com/package/@tauri-apps/api)
+        -   [![@tauri-apps/cli](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/dev/@tauri-apps/cli?style=flat-square)](https://npmjs.com/package/@tauri-apps/cli)
     -   Vite
-        -   [![@vitejs/plugin-react](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/dev/@vitejs/plugin-react?style=flat-square)](https://npmjs.com/package/@vitejs/plugin-react)
-        -   [![vite](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/dev/vite?style=flat-square)](https://npmjs.com/package/vite)
+        -   [![@vitejs/plugin-react](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/dev/@vitejs/plugin-react?style=flat-square)](https://npmjs.com/package/@vitejs/plugin-react)
+        -   [![vite](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/dev/vite?style=flat-square)](https://npmjs.com/package/vite)
     -   Miscellaneous
-        -   [![framer-motion](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/framer-motion?style=flat-square)](https://npmjs.com/package/framer-motion)
-        -   [![use-async-effect](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/rs-tauri-chess/use-async-effect?style=flat-square)](https://npmjs.com/package/use-async-effect)
+        -   [![framer-motion](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/framer-motion?style=flat-square)](https://npmjs.com/package/framer-motion)
+        -   [![use-async-effect](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/tauri-chess/use-async-effect?style=flat-square)](https://npmjs.com/package/use-async-effect)
