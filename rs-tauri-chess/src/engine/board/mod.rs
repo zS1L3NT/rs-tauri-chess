@@ -8,7 +8,7 @@ mod castling_rights;
 #[cfg(test)]
 mod tests;
 
-pub use {_from_fen::FenError, castling_rights::CastlingRights};
+pub use castling_rights::CastlingRights;
 
 use {
     crate::{bishop, engine::*, king, knight, pawn, queen, rook},
